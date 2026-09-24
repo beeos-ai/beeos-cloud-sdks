@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feat/publish-cloud-sdk
+      - feat/beeos-cloud/integration
 
 permissions:
   contents: read
@@ -45,7 +45,9 @@ jobs:
             echo "::error::Refusing to publish ${package_name}"
             exit 1
           fi
-          if npm view "${package_name}@${local_version}" version >/dev/null 2>&1; then
+          version_url="https://registry.npmjs.org/@beeos-ai/cloud-sdk/${local_version}"
+          status=$(curl -s -o /dev/null -w '%{http_code}' "$version_url")
+          if [ "$status" = "200" ]; then
             echo "${package_name}@${local_version} is already published"
             exit 0
           fi
