@@ -1,10 +1,9 @@
 name: Publish @beeos-ai/cloud-sdk
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - feat/beeos-cloud/integration
+    tags:
+      - "v*"
 
 permissions:
   contents: read
@@ -24,6 +23,14 @@ jobs:
         with:
           node-version: "20"
           registry-url: https://registry.npmjs.org
+
+      - name: Verify tag matches package version
+        run: |
+          package_version=$(node -p "require('./package.json').version")
+          if [ "v${package_version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match package version v${package_version}"
+            exit 1
+          fi
 
       - name: Install
         run: npm ci
