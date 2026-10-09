@@ -1,0 +1,74 @@
+name: Publish beeos-cloud-sdk to PyPI
+
+on:
+  push:
+    tags:
+      - "python/v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Validate, test, and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify tag matches Python package version
+        run: |
+          python - <<'PY'
+          import os
+          import pathlib
+          import tomllib
+
+          project = tomllib.loads(pathlib.Path("python/pyproject.toml").read_text())["project"]
+          expected = f"python/v{project['version']}"
+          actual = os.environ["GITHUB_REF_NAME"]
+          if actual != expected:
+              raise SystemExit(f"Tag {actual} does not match Python package tag {expected}")
+          PY
+
+      - name: Install test and build tools
+        run: python -m pip install "./python[dev]" build
+
+      - name: Test
+        run: python -m unittest discover -s python/tests -v
+
+      - name: Check types
+        run: python -m mypy --strict --python-version 3.11 python/beeos_cloud_sdk python/examples/typed_smoke.py
+
+      - name: Build source distribution and wheel
+        run: python -m build python --outdir dist
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-distributions
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish with PyPI trusted publishing
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: python-distributions
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/
