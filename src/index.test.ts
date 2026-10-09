@@ -25,7 +25,7 @@ describe("BeeOSClient", () => {
     const client = new BeeOSClient({
       baseURL: "https://api.cloud.beeos.ai/v1/",
       apiKey: "bsk_test",
-      fetch: async () => new Response(JSON.stringify({ code: "instance_execution_unavailable", message: "no runtime" }), { status: 503 }),
+      fetch: async () => new Response(JSON.stringify({ code: "instance_execution_unavailable", message: "no runtime" }), { status: 503, headers: { "Content-Type": "application/json" } }),
     });
     await expect(client.instances.create({ name: "n" }, "key")).rejects.toMatchObject({
       status: 503,
@@ -179,4 +179,82 @@ describe("BeeOSClient", () => {
     const client = new BeeOSClient({ baseURL: "https://api.cloud.beeos.ai/v1/", apiKey: "bsk_test", fetch: async () => new Response("{}", { status: 200 }) });
     expect(client.taskWebhooks.verifySignature(body, { "X-BeeOS-Event-Id": "evt_1", "X-BeeOS-Signature": `t=${timestamp},v1=${signature}` }, secret)).toBe(true);
   });
+});
+
+describe('generated typed resources', () => {
+  it('preserves variant and BYOK configuration, auth and scoped actor', async () => {
+    const llm = { providers: [{ id: 'provider-example', protocol: 'openai' as const, base_url: 'https://example.invalid/v1', api_key: 'example-provider-key' }], models: [{ provider_id: 'provider-example', model: 'model-example', role: 'default', order: 0 }] };
+    const input = { name: 'typed', variant_id: 'variant-example', llm };
+    let request: Request | undefined;
+    const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: () => 'example-api-key', fetch: async (url, init) => {
+      request = new Request(url, init);
+      return Response.json({ data: { id: 'instance-example' }, operation: { id: 'operation-example' } }, { status: 202 });
+    } }).withExternalUser('example-user');
+    const result = await client.instances.create(input, 'example-idempotency-key');
+    expect(result.data.id).toBe('instance-example');
+    expect(await request!.json()).toEqual(input);
+    expect(request!.headers.get('Authorization')).toBe('Bearer example-api-key');
+    expect(request!.headers.get('X-BeeOS-External-User-ID')).toBe('example-user');
+  });
+
+  it('uses the producer UHP surface and preserves typed nested errors', async () => {
+    const calls: string[] = [];
+    const body = { error: { type: 'invalid_request_error', code: 'harness_not_found', message: 'missing harness' } };
+    const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key', fetch: async (url) => {
+      calls.push(String(url));
+      return Response.json(body, { status: 404, headers: { 'X-Request-ID': 'request-example' } });
+    } });
+    await expect(client.responses.create({ input: 'hello', metadata: { harness_id: 'harness-example' } })).rejects.toMatchObject({ status: 404, code: 'harness_not_found', requestId: 'request-example', body });
+    expect(calls).toEqual(['https://example.invalid/uhp/v1/responses']);
+  });
+
+  it('decodes typed SSE events across CRLF chunk boundaries', async () => {
+    const chunks = ['data: {"type":"response.created","response":{"id":"response-example"}}\r', '\n\r\n', 'data: [DONE]\r\n\r\n'];
+    const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key', fetch: async (_url, init) => {
+      expect(new Headers(init?.headers).get('Accept')).toBe('text/event-stream');
+      expect(JSON.parse(String(init?.body)).stream).toBe(true);
+      return new Response(new ReadableStream<Uint8Array>({ start(controller) { for (const chunk of chunks) controller.enqueue(new TextEncoder().encode(chunk)); controller.close(); } }), { headers: { 'Content-Type': 'text/event-stream' } });
+    } });
+    const events = await client.responses.createStream({ input: 'hello' });
+    const received = [];
+    for await (const event of events) received.push(event);
+    expect(received).toEqual([{ type: 'response.created', response: { id: 'response-example' } }]);
+  });
+
+  it('keeps malformed error responses visible', async () => {
+    const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key', fetch: async () => new Response('invalid JSON', { status: 500, headers: { 'Content-Type': 'application/json' } }) });
+    await expect(client.instances.get('instance-example')).rejects.toBeInstanceOf(SyntaxError);
+  });
+});
+
+it('sends audio as multipart rather than JSON', async () => {
+  const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key', fetch: async (_url, init) => {
+    expect(init?.body).toBeInstanceOf(FormData);
+    expect(new Headers(init?.headers).has('Content-Type')).toBe(false);
+    const file = (init!.body as FormData).get('file') as Blob;
+    expect(await file.text()).toBe('example-audio-bytes');
+    return Response.json({ success: true, data: { text: 'hello', duration_seconds: 1 } });
+  } });
+  const result = await client.audio.transcribe({ file: new Blob(['example-audio-bytes'], { type: 'audio/wav' }) });
+  expect(result.data.text).toBe('hello');
+});
+
+it('preserves typed HTTP errors for known unregistered plaintext routes', async () => {
+  const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key', fetch: async () => new Response('404 page not found', { status: 404, statusText: 'Not Found', headers: { 'Content-Type': 'text/plain; charset=utf-8' } }) });
+  await expect(client.images.get('image-example')).rejects.toMatchObject({ status: 404, code: 'invalid_response', body: { contentType: 'text/plain; charset=utf-8', text: '404 page not found' } } satisfies Partial<BeeOSAPIError>);
+});
+
+it('resumes typed Responses events with the producer cursor header', async () => {
+  const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key', fetch: async (url, init) => {
+    expect(String(url)).toBe('https://example.invalid/uhp/v1/responses/response-example/events');
+    expect(new Headers(init?.headers).get('Last-Event-ID')).toBe('7');
+    return new Response('data: {"type":"response.completed","sequence_number":8}\n\n', { headers: { 'Content-Type': 'text/event-stream' } });
+  } });
+  const events = await client.responses.getEvents('response-example', '7');
+  for await (const event of events) expect(event.sequence_number).toBe(8);
+});
+
+it('decodes the device binding producer error field', async () => {
+  const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key', fetch: async () => Response.json({ error: 'not_found', message: 'missing binding' }, { status: 404 }) });
+  await expect(client.deviceBindings.getDetails('binding-example')).rejects.toMatchObject({ status: 404, code: 'not_found', message: 'missing binding', body: { error: 'not_found', message: 'missing binding' } });
 });

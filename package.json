@@ -1,6 +1,6 @@
 {
   "name": "@beeos-ai/cloud-sdk",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "BeeOS Cloud server SDK for ISV backends. Credential is bsk_ only.",
   "type": "module",
   "main": "./dist/index.js",
@@ -18,7 +18,10 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "generate": "node generator/generate.mjs",
+    "generate:check": "node generator/generate.mjs --check",
+    "typecheck:smoke": "tsc -p tsconfig.smoke.json"
   },
   "engines": {
     "node": ">=20"
@@ -33,6 +36,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.19.0",
+    "openapi-typescript": "^7.10.1",
     "typescript": "^5.7.0",
     "vitest": "^3.2.7"
   }
