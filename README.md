@@ -1,10 +1,10 @@
 # BeeOS Cloud Server SDKs
 
 The TypeScript package `@beeos-ai/cloud-sdk`, Python distribution
-`beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go` share
+`beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v2` share
 one contract: [`spec/server.openapi.json`](spec/server.openapi.json). Version
-1.1.0 adds generated request, response, query, and error models, with the existing
-TypeScript constructor and resource helpers preserved.
+2.0.0 generates typed request, response, query, and error models for the 133
+registered Server operations. Inactive API methods and their models are removed.
 
 ```ts
 import { BeeOSClient } from '@beeos-ai/cloud-sdk';
@@ -32,14 +32,15 @@ harnesses, and discovery use the producer's `/uhp/v1` surface on the same host;
 other server operations use the configured `/v1` base. Non-streaming Responses
 use `responses.create` / `Responses.Create`; streaming uses `createStream`,
 `create_stream`, or `CreateStream`, with typed SSE events. Audio transcription
-uses multipart upload. HTTP errors expose typed wire bodies; JSON and transport
-failures propagate without retries or fallback values.
+uses multipart upload. HTTP errors expose typed wire bodies; every failed HTTP response raises a typed API error with its original status.
+Malformed or unrecognized error bodies use `invalid_response` and retain raw
+diagnostics; transport failures without an HTTP response remain transport errors.
+Python uses a 30-second default timeout, configurable with `timeout=...` and
+preserved by `with_external_user`.
 
-`JSONValue` is reserved for genuinely open protocol extension fields and the
-previously shipped image APIs whose producer schemas are absent. The spec marks
-`legacy-undocumented` and `not-routed` operations explicitly; their
-continued presence preserves public SDK methods and does not imply a live server
-route.
+`JSONValue` represents genuinely open protocol extension fields. The SDK exposes
+only operations registered by the pinned producer; the 14 unregistered operations
+and 10 image operations without producer routes are absent from all three clients.
 
 ## Regeneration and verification
 
@@ -50,7 +51,8 @@ npm run generate:check
 npm test
 npm run build
 npm run typecheck:smoke
-PYTHONPATH=python mypy --strict python/beeos_cloud_sdk python/examples/typed_smoke.py
+python3 -m pip install -e "./python[dev]"
+PYTHONPATH=python mypy --strict --python-version 3.11 python/beeos_cloud_sdk python/examples/typed_smoke.py
 cd go
 go test ./...
 go vet ./...
@@ -69,16 +71,17 @@ python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend \
 sources and contract refresh. Generated artifacts are committed and checked by
 the generator snapshot test. The TypeScript schema generator is pinned in
 `package-lock.json`; the Python and Go emitters preserve their native typed
-resource interfaces. Generation requires Node and Go (`gofmt`).
+resource interfaces. Generation requires Node and Go (`gofmt`). The Python development extra pins
+`mypy==2.4.0`.
 
 ## Release
 
 No package is published by regeneration. The existing **Publish
 @beeos-ai/cloud-sdk** workflow (`.github/workflows/publish.yml`) publishes the root
-npm package only when a matching `v1.1.0` tag is pushed; it uses GitHub secret
+npm package only when a matching `v2.0.0` tag is pushed; it uses GitHub secret
 `NPM_TOKEN`. The Python package has no publishing workflow in this repository.
 Its wheel must be built and published separately after coordinator approval. The
-Go module resides in `go/`, so its module release tag is `go/v1.1.0`. Go discovery
+Go module resides in `go/`, so its module release tag is `go/v2.0.0`. The import path is `github.com/beeos-ai/beeos-cloud-sdks/go/v2`. Go discovery
 needs no package-registry secret. These tags and registry writes require the
 separate release authorization.
 

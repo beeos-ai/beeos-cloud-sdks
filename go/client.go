@@ -125,27 +125,6 @@ type InstancePage struct {
 	Total int64             `json:"total"`
 }
 
-type InstanceResult struct {
-	Data InstanceSummary `json:"data"`
-}
-
-type InstanceConfigPatch struct {
-	ModelPrimary *string                `json:"model_primary,omitempty"`
-	Models       []string               `json:"models,omitempty"`
-	SystemPrompt *string                `json:"system_prompt,omitempty"`
-	McpServers   []map[string]JSONValue `json:"mcp_servers,omitempty"`
-}
-
-type InstanceLogEntry struct {
-	Timestamp string  `json:"timestamp"`
-	Stream    *string `json:"stream,omitempty"`
-	Message   string  `json:"message"`
-}
-
-type InstanceLogPage struct {
-	Data []InstanceLogEntry `json:"data"`
-}
-
 type ProviderCapabilities struct {
 	LongRunning    bool   `json:"long_running"`
 	BrowserUse     bool   `json:"browser_use"`
@@ -214,12 +193,6 @@ type AgentPatch struct {
 	A2aEnabled *bool                 `json:"a2a_enabled,omitempty"`
 }
 
-type AgentAPIError struct {
-	Code      string `json:"code"`
-	Message   string `json:"message"`
-	RequestID string `json:"request_id"`
-}
-
 type AgentResponse struct {
 	Data AgentSnapshot `json:"data"`
 }
@@ -259,12 +232,6 @@ type ConversationPage struct {
 	HasMore       bool           `json:"has_more"`
 }
 
-type SendMessageInput struct {
-	Message string            `json:"message"`
-	Content json.RawMessage   `json:"content,omitempty"`
-	Parts   []json.RawMessage `json:"parts,omitempty"`
-}
-
 type Message struct {
 	ID                    string                        `json:"id"`
 	ConversationID        string                        `json:"conversation_id"`
@@ -282,10 +249,6 @@ type Message struct {
 	UpdatedAt             *string                       `json:"updated_at,omitempty"`
 	RuntimeDispatch       map[string]JSONValue          `json:"runtime_dispatch,omitempty"`
 	RealtimePublishStatus *MessageRealtimePublishStatus `json:"realtime_publish_status,omitempty"`
-}
-
-type MessageResponse struct {
-	Data Message `json:"data"`
 }
 
 type MessagePage struct {
@@ -349,18 +312,6 @@ type ClearConversationReceiptResponse struct {
 	Data ClearConversationReceipt `json:"data"`
 }
 
-type CreateRealtimeSessionInput struct {
-	TtlSeconds *int64 `json:"ttl_seconds,omitempty"`
-}
-
-type RealtimeSession struct {
-	Token           string   `json:"token"`
-	ServiceURL      string   `json:"service_url"`
-	Identity        string   `json:"identity"`
-	ExpiresAt       int64    `json:"expires_at"`
-	PrivateChannels []string `json:"private_channels"`
-}
-
 type CreateTaskInput struct {
 	Message     string            `json:"message"`
 	ContextID   *string           `json:"context_id,omitempty"`
@@ -418,127 +369,6 @@ type CancelTaskInput struct {
 type ContinueTaskInput struct {
 	Input     json.RawMessage `json:"input,omitempty"`
 	AuthGrant *bool           `json:"auth_grant,omitempty"`
-}
-
-type UsagePage struct {
-	Records []UsageRecord `json:"records"`
-	Total   int64         `json:"total"`
-}
-
-type EffectiveLimits struct {
-	Scope            EffectiveLimitsScope `json:"scope"`
-	SubjectID        string               `json:"subject_id"`
-	Limits           LimitSet             `json:"limits"`
-	CurrentUsage     map[string]int64     `json:"current_usage"`
-	Reservations     map[string]int64     `json:"reservations"`
-	ResetAt          *string              `json:"reset_at,omitempty"`
-	QuotaRevision    string               `json:"quota_revision"`
-	RateCardRevision *string              `json:"rate_card_revision,omitempty"`
-	ResourceVersion  int64                `json:"resource_version"`
-}
-
-type SuccessEnvelope struct {
-	Success SuccessEnvelopeSuccess `json:"success"`
-}
-
-type ServiceRuntimeMethod string
-
-const (
-	ServiceRuntimeMethodSessionSetMode     ServiceRuntimeMethod = "session/set_mode"
-	ServiceRuntimeMethodAgentCreate        ServiceRuntimeMethod = "agent/create"
-	ServiceRuntimeMethodAgentUpdate        ServiceRuntimeMethod = "agent/update"
-	ServiceRuntimeMethodAgentDelete        ServiceRuntimeMethod = "agent/delete"
-	ServiceRuntimeMethodAgentApplyTemplate ServiceRuntimeMethod = "agent/applyTemplate"
-	ServiceRuntimeMethodSkillsList         ServiceRuntimeMethod = "skills/list"
-	ServiceRuntimeMethodSkillsInstall      ServiceRuntimeMethod = "skills/install"
-	ServiceRuntimeMethodSkillsUninstall    ServiceRuntimeMethod = "skills/uninstall"
-	ServiceRuntimeMethodSkillsUpdate       ServiceRuntimeMethod = "skills/update"
-	ServiceRuntimeMethodModelsList         ServiceRuntimeMethod = "models/list"
-	ServiceRuntimeMethodCronList           ServiceRuntimeMethod = "cron/list"
-	ServiceRuntimeMethodCronStatus         ServiceRuntimeMethod = "cron/status"
-	ServiceRuntimeMethodCronAdd            ServiceRuntimeMethod = "cron/add"
-	ServiceRuntimeMethodCronUpdate         ServiceRuntimeMethod = "cron/update"
-	ServiceRuntimeMethodCronRemove         ServiceRuntimeMethod = "cron/remove"
-	ServiceRuntimeMethodCronRun            ServiceRuntimeMethod = "cron/run"
-	ServiceRuntimeMethodCronRuns           ServiceRuntimeMethod = "cron/runs"
-	ServiceRuntimeMethodMcpList            ServiceRuntimeMethod = "mcp/list"
-	ServiceRuntimeMethodMcpPrepare         ServiceRuntimeMethod = "mcp/prepare"
-	ServiceRuntimeMethodMcpSet             ServiceRuntimeMethod = "mcp/set"
-	ServiceRuntimeMethodMcpUnset           ServiceRuntimeMethod = "mcp/unset"
-	ServiceRuntimeMethodSessionClear       ServiceRuntimeMethod = "session/clear"
-	ServiceRuntimeMethodSessionSetModel    ServiceRuntimeMethod = "session/set_model"
-	ServiceRuntimeMethodSessionCancel      ServiceRuntimeMethod = "session/cancel"
-)
-
-type RuntimeOperationError struct {
-	Code        RuntimeOperationErrorCode        `json:"code"`
-	Message     string                           `json:"message"`
-	OperationID string                           `json:"operationId"`
-	RequestID   *string                          `json:"requestId,omitempty"`
-	EffectState RuntimeOperationErrorEffectState `json:"effectState"`
-	RetryMode   RuntimeOperationErrorRetryMode   `json:"retryMode"`
-	Context     *RuntimeOperationErrorContext    `json:"context,omitempty"`
-}
-
-type RuntimeDeliveryFailure struct {
-	Code   RuntimeDeliveryFailureCode  `json:"code"`
-	Phase  RuntimeDeliveryFailurePhase `json:"phase"`
-	Status *int64                      `json:"status,omitempty"`
-}
-
-type ServiceOperationCursorConflict struct {
-	Code         ServiceOperationCursorConflictCode       `json:"code"`
-	OperationID  string                                   `json:"operationId"`
-	Cursor       string                                   `json:"cursor"`
-	LastSequence string                                   `json:"lastSequence"`
-	HTTPStatus   ServiceOperationCursorConflictHTTPStatus `json:"httpStatus"`
-}
-
-type RuntimeOperationEventEnvelope struct {
-	ID          string                             `json:"id"`
-	OperationID string                             `json:"operationId"`
-	Method      ServiceRuntimeMethod               `json:"method"`
-	Event       RuntimeOperationEventEnvelopeEvent `json:"event"`
-}
-
-type ActionResult struct {
-	Ok bool `json:"ok"`
-}
-
-type RegisterTaskWebhookRequest struct {
-	URL    string  `json:"url"`
-	Token  *string `json:"token,omitempty"`
-	Secret *string `json:"secret,omitempty"`
-}
-
-type TaskWebhookResponse struct {
-	Success TaskWebhookResponseSuccess `json:"success"`
-	Data    TaskWebhookResponseData    `json:"data"`
-}
-
-type ListTaskWebhooksResponse struct {
-	Success ListTaskWebhooksResponseSuccess `json:"success"`
-	Data    ListTaskWebhooksResponseData    `json:"data"`
-}
-
-type WebhookDeliveryResponse struct {
-	DeliveryID         string                          `json:"delivery_id"`
-	WebhookID          string                          `json:"webhook_id"`
-	TaskID             string                          `json:"task_id"`
-	Renderer           WebhookDeliveryResponseRenderer `json:"renderer"`
-	Status             WebhookDeliveryResponseStatus   `json:"status"`
-	AttemptNum         int64                           `json:"attempt_num"`
-	LastResponseStatus int64                           `json:"last_response_status"`
-	LastError          *string                         `json:"last_error,omitempty"`
-	NextAttemptAt      string                          `json:"next_attempt_at"`
-	LastAttemptedAt    *string                         `json:"last_attempted_at,omitempty"`
-	CreatedAt          string                          `json:"created_at"`
-	CompletedAt        *string                         `json:"completed_at,omitempty"`
-}
-
-type ListWebhookDeliveriesResponse struct {
-	Success ListWebhookDeliveriesResponseSuccess `json:"success"`
-	Data    ListWebhookDeliveriesResponseData    `json:"data"`
 }
 
 type ErrorResponse struct {
@@ -2455,23 +2285,6 @@ type a2aTaskView struct {
 	CompletedAt       *string              `json:"completed_at,omitempty"`
 }
 
-type ServerEventSessionInput struct {
-	Platform        *string  `json:"platform,omitempty"`
-	EventTypes      []string `json:"event_types,omitempty"`
-	InstanceIds     []string `json:"instance_ids,omitempty"`
-	AgentIds        []string `json:"agent_ids,omitempty"`
-	TaskIds         []string `json:"task_ids,omitempty"`
-	ConversationIds []string `json:"conversation_ids,omitempty"`
-}
-
-type ServerEventConnectionDescriptor struct {
-	Transport string  `json:"transport"`
-	URL       string  `json:"url"`
-	Token     string  `json:"token"`
-	ExpiresAt string  `json:"expires_at"`
-	SessionID *string `json:"session_id,omitempty"`
-}
-
 type CreateServerInstanceInput struct {
 	Name           string                                   `json:"name"`
 	VariantID      *string                                  `json:"variant_id,omitempty"`
@@ -2490,38 +2303,6 @@ type ServerUsageSummary struct {
 type RuntimeInstanceStatusResult struct {
 	Data      RuntimeInstanceStatusResultData `json:"data"`
 	Operation RuntimeOperationSummary         `json:"operation"`
-}
-
-type NonNegativeAmount string
-
-type LimitSet struct {
-	Values       map[string]int64 `json:"values"`
-	Entitlements map[string]bool  `json:"entitlements"`
-}
-
-type UsageRecord struct {
-	ID               string            `json:"id"`
-	DeveloperID      *string           `json:"developer_id,omitempty"`
-	OrganizationID   string            `json:"organization_id"`
-	AppID            string            `json:"app_id"`
-	ExternalUserID   *string           `json:"external_user_id,omitempty"`
-	APIKeyID         *string           `json:"api_key_id,omitempty"`
-	InstanceID       *string           `json:"instance_id,omitempty"`
-	AgentID          *string           `json:"agent_id,omitempty"`
-	TaskID           *string           `json:"task_id,omitempty"`
-	Method           *string           `json:"method,omitempty"`
-	Path             *string           `json:"path,omitempty"`
-	HTTPStatus       *int64            `json:"http_status,omitempty"`
-	LatencyMs        *int64            `json:"latency_ms,omitempty"`
-	RequestID        string            `json:"request_id"`
-	Meter            string            `json:"meter"`
-	Unit             string            `json:"unit"`
-	Amount           NonNegativeAmount `json:"amount"`
-	AmountBc         NonNegativeAmount `json:"amount_bc"`
-	RateCardRevision string            `json:"rate_card_revision"`
-	Reference        string            `json:"reference"`
-	Metadata         map[string]string `json:"metadata"`
-	CreatedAt        string            `json:"created_at"`
 }
 
 type UpdateServerInstanceInput struct {
@@ -3186,20 +2967,6 @@ type StopInstanceOptions struct {
 	IfMatch        string `json:"If-Match"`
 }
 
-type RestartInstanceOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type GetInstanceLogsOptions struct {
-	Since  *string `json:"since,omitempty"`
-	Tail   *int64  `json:"tail,omitempty"`
-	Follow *bool   `json:"follow,omitempty"`
-}
-
-type UpdateInstanceConfigOptions struct {
-	IfMatch string `json:"If-Match"`
-}
-
 type UpgradeInstanceRequest struct {
 	ImageID       *string `json:"image_id,omitempty"`
 	ImageRef      *string `json:"image_ref,omitempty"`
@@ -3238,10 +3005,6 @@ type UpdateConversationOptions struct {
 }
 
 type DeleteConversationOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type SendConversationMessageOptions struct {
 	IdempotencyKey string `json:"Idempotency-Key"`
 }
 
@@ -3297,22 +3060,6 @@ type GetUsageSummaryOptions struct {
 	Category       *string                       `json:"category,omitempty"`
 }
 
-type GetUsageHistoryOptions struct {
-	ExternalUserID *string `json:"external_user_id,omitempty"`
-	Category       *string `json:"category,omitempty"`
-	Limit          *int64  `json:"limit,omitempty"`
-	Offset         *int64  `json:"offset,omitempty"`
-}
-
-type ListWebhookDeliveriesOptions struct {
-	Limit *int64 `json:"limit,omitempty"`
-}
-
-type RedeliverWebhookResponse struct {
-	Success RedeliverWebhookResponseSuccess `json:"success"`
-	Data    WebhookDeliveryResponse         `json:"data"`
-}
-
 type InvokeRuntimeMethodRequest struct {
 	JSONrpc InvokeRuntimeMethodRequestJSONrpc `json:"jsonrpc"`
 	ID      string                            `json:"id"`
@@ -3330,10 +3077,6 @@ type ListRuntimeOperationsOptions struct {
 	Cursor *string                             `json:"cursor,omitempty"`
 	Limit  *int64                              `json:"limit,omitempty"`
 	Method *string                             `json:"method,omitempty"`
-}
-
-type StreamRuntimeOperationEventsOptions struct {
-	LastEventID *string `json:"Last-Event-ID,omitempty"`
 }
 
 type CancelRuntimeOperationResponse struct {
@@ -3356,25 +3099,6 @@ type CreateCanvasSessionRequest struct {
 	PlatformAgentID string  `json:"platformAgentId"`
 	ConversationID  string  `json:"conversationId"`
 	CanvasID        *string `json:"canvasId,omitempty"`
-}
-
-type ListHarnessesResponse struct {
-	Harnesses []UHPHarness `json:"harnesses"`
-}
-
-type CreateResponseOptions struct {
-	IdempotencyKey *string `json:"Idempotency-Key,omitempty"`
-	UHPVersion     *string `json:"UHP-Version,omitempty"`
-}
-
-type DeleteResponseResponse struct {
-	ID      *string `json:"id,omitempty"`
-	Deleted *bool   `json:"deleted,omitempty"`
-}
-
-type GetResponseInputItemsResponse struct {
-	Object *GetResponseInputItemsResponseObject `json:"object,omitempty"`
-	Data   []map[string]JSONValue               `json:"data,omitempty"`
 }
 
 type ExecInstanceRequest struct {
@@ -3411,10 +3135,6 @@ type RenameFileRequest struct {
 }
 
 type DeleteFileOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type CreateEventSessionOptions struct {
 	IdempotencyKey string `json:"Idempotency-Key"`
 }
 
@@ -3488,30 +3208,6 @@ type GetFeaturedSkillsOptions struct {
 	Scope      *string `json:"scope,omitempty"`
 	ScopeValue *string `json:"scope_value,omitempty"`
 	Limit      *int64  `json:"limit,omitempty"`
-}
-
-type CreateImageOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type UpdateImageOptions struct {
-	IfMatch string `json:"If-Match"`
-}
-
-type DeleteImageOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type CreateImageVersionOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type UpdateImageVersionOptions struct {
-	IfMatch string `json:"If-Match"`
-}
-
-type DeleteImageVersionOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
 }
 
 type ListSkillSetsResponse struct {
@@ -3681,11 +3377,6 @@ type ResolveInstallConnectorResponse struct {
 	Data ProtoResolveInstallResponse `json:"data"`
 }
 
-type GetResponseEventsOptions struct {
-	LastEventID *string `json:"Last-Event-ID,omitempty"`
-	UHPVersion  *string `json:"UHP-Version,omitempty"`
-}
-
 type TranscribeAudioRequest struct {
 	File []byte `json:"file"`
 }
@@ -3826,6 +3517,30 @@ type GetA2ATaskOptions struct {
 	HistoryLength *int64 `json:"history_length,omitempty"`
 }
 
+type ListHarnessesResponse struct {
+	Harnesses []UHPHarness `json:"harnesses"`
+}
+
+type CreateResponseOptions struct {
+	IdempotencyKey *string `json:"Idempotency-Key,omitempty"`
+	UHPVersion     *string `json:"UHP-Version,omitempty"`
+}
+
+type DeleteResponseResponse struct {
+	ID      *string `json:"id,omitempty"`
+	Deleted *bool   `json:"deleted,omitempty"`
+}
+
+type GetResponseInputItemsResponse struct {
+	Object *GetResponseInputItemsResponseObject `json:"object,omitempty"`
+	Data   []map[string]JSONValue               `json:"data,omitempty"`
+}
+
+type GetResponseEventsOptions struct {
+	LastEventID *string `json:"Last-Event-ID,omitempty"`
+	UHPVersion  *string `json:"UHP-Version,omitempty"`
+}
+
 type ClientSessionInputClientType string
 
 const (
@@ -3883,178 +3598,6 @@ const (
 	MessageRealtimePublishStatusUnconfirmed    MessageRealtimePublishStatus = "unconfirmed"
 	MessageRealtimePublishStatusNotRepublished MessageRealtimePublishStatus = "not_republished"
 )
-
-type EffectiveLimitsScope string
-
-const (
-	EffectiveLimitsScopeDeveloper    EffectiveLimitsScope = "developer"
-	EffectiveLimitsScopeOrganization EffectiveLimitsScope = "organization"
-	EffectiveLimitsScopeApp          EffectiveLimitsScope = "app"
-)
-
-type SuccessEnvelopeSuccess bool
-
-const (
-	SuccessEnvelopeSuccessTrue SuccessEnvelopeSuccess = true
-)
-
-type RuntimeOperationErrorCode string
-
-const (
-	RuntimeOperationErrorCodeAGENTDEFAULTMODELNOTCONFIGURED RuntimeOperationErrorCode = "AGENT_DEFAULT_MODEL_NOT_CONFIGURED"
-	RuntimeOperationErrorCodeCOMMANDEXPIRED                 RuntimeOperationErrorCode = "COMMAND_EXPIRED"
-	RuntimeOperationErrorCodeCONTRACTVERSIONMISMATCH        RuntimeOperationErrorCode = "CONTRACT_VERSION_MISMATCH"
-	RuntimeOperationErrorCodeCONVERSATIONCLEARING           RuntimeOperationErrorCode = "CONVERSATION_CLEARING"
-	RuntimeOperationErrorCodeHISTORYGENERATIONMISMATCH      RuntimeOperationErrorCode = "HISTORY_GENERATION_MISMATCH"
-	RuntimeOperationErrorCodeIDEMPOTENCYCONFLICT            RuntimeOperationErrorCode = "IDEMPOTENCY_CONFLICT"
-	RuntimeOperationErrorCodeINSTANCEEPOCHMISMATCH          RuntimeOperationErrorCode = "INSTANCE_EPOCH_MISMATCH"
-	RuntimeOperationErrorCodeINSTANCEOFFLINE                RuntimeOperationErrorCode = "INSTANCE_OFFLINE"
-	RuntimeOperationErrorCodeINVALIDEXECUTIONGRANT          RuntimeOperationErrorCode = "INVALID_EXECUTION_GRANT"
-	RuntimeOperationErrorCodeINVALIDINVOCATION              RuntimeOperationErrorCode = "INVALID_INVOCATION"
-	RuntimeOperationErrorCodeMETHODNOTSUPPORTED             RuntimeOperationErrorCode = "METHOD_NOT_SUPPORTED"
-	RuntimeOperationErrorCodeOPERATIONCANCELLED             RuntimeOperationErrorCode = "OPERATION_CANCELLED"
-	RuntimeOperationErrorCodeOPERATIONNOTCANCELLABLE        RuntimeOperationErrorCode = "OPERATION_NOT_CANCELLABLE"
-	RuntimeOperationErrorCodeOPERATIONNOTFOUND              RuntimeOperationErrorCode = "OPERATION_NOT_FOUND"
-	RuntimeOperationErrorCodeOUTCOMEUNKNOWN                 RuntimeOperationErrorCode = "OUTCOME_UNKNOWN"
-	RuntimeOperationErrorCodePROJECTIONBLOCKED              RuntimeOperationErrorCode = "PROJECTION_BLOCKED"
-	RuntimeOperationErrorCodePROJECTIONPENDING              RuntimeOperationErrorCode = "PROJECTION_PENDING"
-	RuntimeOperationErrorCodeRUNTIMEEXECUTIONFAILED         RuntimeOperationErrorCode = "RUNTIME_EXECUTION_FAILED"
-	RuntimeOperationErrorCodeUNAUTHORIZEDPUBLISHER          RuntimeOperationErrorCode = "UNAUTHORIZED_PUBLISHER"
-	RuntimeOperationErrorCodeUNAUTHORIZEDTARGET             RuntimeOperationErrorCode = "UNAUTHORIZED_TARGET"
-	RuntimeOperationErrorCodeUSEAGENTSAPI                   RuntimeOperationErrorCode = "USE_AGENTS_API"
-)
-
-type RuntimeOperationErrorEffectState string
-
-const (
-	RuntimeOperationErrorEffectStateFailed         RuntimeOperationErrorEffectState = "failed"
-	RuntimeOperationErrorEffectStateCancelled      RuntimeOperationErrorEffectState = "cancelled"
-	RuntimeOperationErrorEffectStateExpired        RuntimeOperationErrorEffectState = "expired"
-	RuntimeOperationErrorEffectStateOutcomeUnknown RuntimeOperationErrorEffectState = "outcome_unknown"
-	RuntimeOperationErrorEffectStateCommitted      RuntimeOperationErrorEffectState = "committed"
-)
-
-type RuntimeOperationErrorRetryMode string
-
-const (
-	RuntimeOperationErrorRetryModeNone     RuntimeOperationErrorRetryMode = "none"
-	RuntimeOperationErrorRetryModeResume   RuntimeOperationErrorRetryMode = "resume"
-	RuntimeOperationErrorRetryModeResubmit RuntimeOperationErrorRetryMode = "resubmit"
-)
-
-type RuntimeOperationErrorContext struct {
-	ActiveRuntimeEpoch       *string                 `json:"activeRuntimeEpoch,omitempty"`
-	ProjectionRevision       *string                 `json:"projectionRevision,omitempty"`
-	RetryAfterMs             *int64                  `json:"retryAfterMs,omitempty"`
-	ExpectedContractRevision *string                 `json:"expectedContractRevision,omitempty"`
-	ResourceID               *string                 `json:"resourceId,omitempty"`
-	DeliveryFailure          *RuntimeDeliveryFailure `json:"deliveryFailure,omitempty"`
-}
-
-type RuntimeDeliveryFailureCode string
-
-const (
-	RuntimeDeliveryFailureCodeHTTPREJECTED            RuntimeDeliveryFailureCode = "HTTP_REJECTED"
-	RuntimeDeliveryFailureCodeTRANSPORTFAILED         RuntimeDeliveryFailureCode = "TRANSPORT_FAILED"
-	RuntimeDeliveryFailureCodeLEASEUNAVAILABLE        RuntimeDeliveryFailureCode = "LEASE_UNAVAILABLE"
-	RuntimeDeliveryFailureCodeLEASEEXPIRED            RuntimeDeliveryFailureCode = "LEASE_EXPIRED"
-	RuntimeDeliveryFailureCodeLEASECHANGED            RuntimeDeliveryFailureCode = "LEASE_CHANGED"
-	RuntimeDeliveryFailureCodeORIGINREJECTED          RuntimeDeliveryFailureCode = "ORIGIN_REJECTED"
-	RuntimeDeliveryFailureCodeINVALIDDELIVERYRESPONSE RuntimeDeliveryFailureCode = "INVALID_DELIVERY_RESPONSE"
-	RuntimeDeliveryFailureCodeHISTORYUNAVAILABLE      RuntimeDeliveryFailureCode = "HISTORY_UNAVAILABLE"
-	RuntimeDeliveryFailureCodeOUTCOMEUNKNOWN          RuntimeDeliveryFailureCode = "OUTCOME_UNKNOWN"
-	RuntimeDeliveryFailureCodeEXECUTIONFAILED         RuntimeDeliveryFailureCode = "EXECUTION_FAILED"
-	RuntimeDeliveryFailureCodeREJECTED                RuntimeDeliveryFailureCode = "REJECTED"
-)
-
-type RuntimeDeliveryFailurePhase string
-
-const (
-	RuntimeDeliveryFailurePhaseDeliveryRead     RuntimeDeliveryFailurePhase = "delivery_read"
-	RuntimeDeliveryFailurePhaseDeliveryAck      RuntimeDeliveryFailurePhase = "delivery_ack"
-	RuntimeDeliveryFailurePhaseOperationHistory RuntimeDeliveryFailurePhase = "operation_history"
-	RuntimeDeliveryFailurePhaseOperationAppend  RuntimeDeliveryFailurePhase = "operation_append"
-	RuntimeDeliveryFailurePhaseRunStart         RuntimeDeliveryFailurePhase = "run_start"
-	RuntimeDeliveryFailurePhaseReplyPatch       RuntimeDeliveryFailurePhase = "reply_patch"
-	RuntimeDeliveryFailurePhaseRunFinish        RuntimeDeliveryFailurePhase = "run_finish"
-	RuntimeDeliveryFailurePhaseExecution        RuntimeDeliveryFailurePhase = "execution"
-	RuntimeDeliveryFailurePhaseTerminalAppend   RuntimeDeliveryFailurePhase = "terminal_append"
-)
-
-type ServiceOperationCursorConflictCode string
-
-const (
-	ServiceOperationCursorConflictCodeOPERATIONCURSORAHEAD ServiceOperationCursorConflictCode = "OPERATION_CURSOR_AHEAD"
-)
-
-type ServiceOperationCursorConflictHTTPStatus int64
-
-const (
-	ServiceOperationCursorConflictHTTPStatus409 ServiceOperationCursorConflictHTTPStatus = 409
-)
-
-type RuntimeOperationEventEnvelopeEvent struct {
-	Type       RuntimeOperationEventEnvelopeEventType     `json:"type"`
-	Sequence   string                                     `json:"sequence"`
-	RecordedAt string                                     `json:"recordedAt"`
-	Payload    *RuntimeOperationEventEnvelopeEventPayload `json:"payload,omitempty"`
-	Outcome    *RuntimeOperationEventEnvelopeEventOutcome `json:"outcome,omitempty"`
-	Result     json.RawMessage                            `json:"result,omitempty"`
-	Revision   *string                                    `json:"revision,omitempty"`
-	Error      *RuntimeOperationError                     `json:"error,omitempty"`
-}
-
-type TaskWebhookResponseSuccess bool
-
-const (
-	TaskWebhookResponseSuccessTrue TaskWebhookResponseSuccess = true
-)
-
-type TaskWebhookResponseData struct {
-	WebhookID string  `json:"webhook_id"`
-	TaskID    string  `json:"task_id"`
-	URL       string  `json:"url"`
-	HasSecret bool    `json:"has_secret"`
-	CreatedAt *string `json:"created_at,omitempty"`
-}
-
-type ListTaskWebhooksResponseSuccess bool
-
-const (
-	ListTaskWebhooksResponseSuccessTrue ListTaskWebhooksResponseSuccess = true
-)
-
-type ListTaskWebhooksResponseData struct {
-	Webhooks []ListTaskWebhooksResponseDataWebhooksItem `json:"webhooks"`
-}
-
-type WebhookDeliveryResponseRenderer string
-
-const (
-	WebhookDeliveryResponseRendererOpenapi WebhookDeliveryResponseRenderer = "openapi"
-	WebhookDeliveryResponseRendererA2a     WebhookDeliveryResponseRenderer = "a2a"
-	WebhookDeliveryResponseRendererGeneric WebhookDeliveryResponseRenderer = "generic"
-	WebhookDeliveryResponseRendererMcp     WebhookDeliveryResponseRenderer = "mcp"
-)
-
-type WebhookDeliveryResponseStatus string
-
-const (
-	WebhookDeliveryResponseStatusPending    WebhookDeliveryResponseStatus = "pending"
-	WebhookDeliveryResponseStatusSucceeded  WebhookDeliveryResponseStatus = "succeeded"
-	WebhookDeliveryResponseStatusFailed     WebhookDeliveryResponseStatus = "failed"
-	WebhookDeliveryResponseStatusDeadLetter WebhookDeliveryResponseStatus = "dead_letter"
-)
-
-type ListWebhookDeliveriesResponseSuccess bool
-
-const (
-	ListWebhookDeliveriesResponseSuccessTrue ListWebhookDeliveriesResponseSuccess = true
-)
-
-type ListWebhookDeliveriesResponseData struct {
-	Deliveries []WebhookDeliveryResponse `json:"deliveries"`
-}
 
 type UHPDiscoveryObject string
 
@@ -4622,12 +4165,6 @@ const (
 	GetUsageSummaryOptionsPeriodMonth GetUsageSummaryOptionsPeriod = "month"
 )
 
-type RedeliverWebhookResponseSuccess bool
-
-const (
-	RedeliverWebhookResponseSuccessTrue RedeliverWebhookResponseSuccess = true
-)
-
 type InvokeRuntimeMethodRequestJSONrpc string
 
 const (
@@ -4638,12 +4175,6 @@ type ListRuntimeOperationsOptionsStatus string
 
 const (
 	ListRuntimeOperationsOptionsStatusActive ListRuntimeOperationsOptionsStatus = "active"
-)
-
-type GetResponseInputItemsResponseObject string
-
-const (
-	GetResponseInputItemsResponseObjectList GetResponseInputItemsResponseObject = "list"
 )
 
 type CreateSkillRequestFilesItem struct {
@@ -4699,53 +4230,11 @@ const (
 	InvokeA2ARequestJSONrpc20 InvokeA2ARequestJSONrpc = "2.0"
 )
 
-type RuntimeOperationEventEnvelopeEventType string
+type GetResponseInputItemsResponseObject string
 
 const (
-	RuntimeOperationEventEnvelopeEventTypeRuntimeOperationStarted         RuntimeOperationEventEnvelopeEventType = "runtime_operation_started"
-	RuntimeOperationEventEnvelopeEventTypeRuntimeOperationProgress        RuntimeOperationEventEnvelopeEventType = "runtime_operation_progress"
-	RuntimeOperationEventEnvelopeEventTypeRuntimeEffectCommitted          RuntimeOperationEventEnvelopeEventType = "runtime_effect_committed"
-	RuntimeOperationEventEnvelopeEventTypeRuntimeProjectionPending        RuntimeOperationEventEnvelopeEventType = "runtime_projection_pending"
-	RuntimeOperationEventEnvelopeEventTypeRuntimeProjectionSynced         RuntimeOperationEventEnvelopeEventType = "runtime_projection_synced"
-	RuntimeOperationEventEnvelopeEventTypeRuntimeProjectionBlocked        RuntimeOperationEventEnvelopeEventType = "runtime_projection_blocked"
-	RuntimeOperationEventEnvelopeEventTypeRuntimeOperationCancelRequested RuntimeOperationEventEnvelopeEventType = "runtime_operation_cancel_requested"
-	RuntimeOperationEventEnvelopeEventTypeRuntimeRpcResponse              RuntimeOperationEventEnvelopeEventType = "runtime_rpc_response"
+	GetResponseInputItemsResponseObjectList GetResponseInputItemsResponseObject = "list"
 )
-
-type RuntimeOperationEventEnvelopeEventPayload struct {
-	ClaimedAt          *string                                                 `json:"claimedAt,omitempty"`
-	ExecutionMode      *RuntimeOperationEventEnvelopeEventPayloadExecutionMode `json:"executionMode,omitempty"`
-	Phase              *string                                                 `json:"phase,omitempty"`
-	Current            *float64                                                `json:"current,omitempty"`
-	Total              *float64                                                `json:"total,omitempty"`
-	CommittedAt        *string                                                 `json:"committedAt,omitempty"`
-	ProjectionRevision *string                                                 `json:"projectionRevision,omitempty"`
-	Revision           *string                                                 `json:"revision,omitempty"`
-	PlatformAgentID    *string                                                 `json:"platformAgentId,omitempty"`
-	ErrorCode          *RuntimeOperationEventEnvelopeEventPayloadErrorCode     `json:"errorCode,omitempty"`
-	CauseCode          *RuntimeOperationEventEnvelopeEventPayloadCauseCode     `json:"causeCode,omitempty"`
-	RequestedBy        *string                                                 `json:"requestedBy,omitempty"`
-	Reason             *string                                                 `json:"reason,omitempty"`
-}
-
-type RuntimeOperationEventEnvelopeEventOutcome string
-
-const (
-	RuntimeOperationEventEnvelopeEventOutcomeSucceeded         RuntimeOperationEventEnvelopeEventOutcome = "succeeded"
-	RuntimeOperationEventEnvelopeEventOutcomeFailed            RuntimeOperationEventEnvelopeEventOutcome = "failed"
-	RuntimeOperationEventEnvelopeEventOutcomeCancelled         RuntimeOperationEventEnvelopeEventOutcome = "cancelled"
-	RuntimeOperationEventEnvelopeEventOutcomeExpired           RuntimeOperationEventEnvelopeEventOutcome = "expired"
-	RuntimeOperationEventEnvelopeEventOutcomeOutcomeUnknown    RuntimeOperationEventEnvelopeEventOutcome = "outcome_unknown"
-	RuntimeOperationEventEnvelopeEventOutcomeProjectionBlocked RuntimeOperationEventEnvelopeEventOutcome = "projection_blocked"
-)
-
-type ListTaskWebhooksResponseDataWebhooksItem struct {
-	WebhookID string  `json:"webhook_id"`
-	TaskID    string  `json:"task_id"`
-	URL       string  `json:"url"`
-	HasSecret bool    `json:"has_secret"`
-	CreatedAt *string `json:"created_at,omitempty"`
-}
 
 type ReplyShareResponseDataAgent struct {
 	Name      string `json:"name"`
@@ -4777,201 +4266,140 @@ type ConnectURLResponseDataBrowser struct {
 	Role       string `json:"role"`
 }
 
-type RuntimeOperationEventEnvelopeEventPayloadExecutionMode string
-
-const (
-	RuntimeOperationEventEnvelopeEventPayloadExecutionModeStart RuntimeOperationEventEnvelopeEventPayloadExecutionMode = "start"
-)
-
-type RuntimeOperationEventEnvelopeEventPayloadErrorCode string
-
-const (
-	RuntimeOperationEventEnvelopeEventPayloadErrorCodePROJECTIONBLOCKED RuntimeOperationEventEnvelopeEventPayloadErrorCode = "PROJECTION_BLOCKED"
-)
-
-type RuntimeOperationEventEnvelopeEventPayloadCauseCode string
-
-const (
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeAGENTDEFAULTMODELNOTCONFIGURED RuntimeOperationEventEnvelopeEventPayloadCauseCode = "AGENT_DEFAULT_MODEL_NOT_CONFIGURED"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeCOMMANDEXPIRED                 RuntimeOperationEventEnvelopeEventPayloadCauseCode = "COMMAND_EXPIRED"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeCONTRACTVERSIONMISMATCH        RuntimeOperationEventEnvelopeEventPayloadCauseCode = "CONTRACT_VERSION_MISMATCH"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeCONVERSATIONCLEARING           RuntimeOperationEventEnvelopeEventPayloadCauseCode = "CONVERSATION_CLEARING"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeHISTORYGENERATIONMISMATCH      RuntimeOperationEventEnvelopeEventPayloadCauseCode = "HISTORY_GENERATION_MISMATCH"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeIDEMPOTENCYCONFLICT            RuntimeOperationEventEnvelopeEventPayloadCauseCode = "IDEMPOTENCY_CONFLICT"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeINSTANCEEPOCHMISMATCH          RuntimeOperationEventEnvelopeEventPayloadCauseCode = "INSTANCE_EPOCH_MISMATCH"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeINSTANCEOFFLINE                RuntimeOperationEventEnvelopeEventPayloadCauseCode = "INSTANCE_OFFLINE"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeINVALIDEXECUTIONGRANT          RuntimeOperationEventEnvelopeEventPayloadCauseCode = "INVALID_EXECUTION_GRANT"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeINVALIDINVOCATION              RuntimeOperationEventEnvelopeEventPayloadCauseCode = "INVALID_INVOCATION"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeMETHODNOTSUPPORTED             RuntimeOperationEventEnvelopeEventPayloadCauseCode = "METHOD_NOT_SUPPORTED"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeOPERATIONCANCELLED             RuntimeOperationEventEnvelopeEventPayloadCauseCode = "OPERATION_CANCELLED"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeOPERATIONNOTCANCELLABLE        RuntimeOperationEventEnvelopeEventPayloadCauseCode = "OPERATION_NOT_CANCELLABLE"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeOPERATIONNOTFOUND              RuntimeOperationEventEnvelopeEventPayloadCauseCode = "OPERATION_NOT_FOUND"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeOUTCOMEUNKNOWN                 RuntimeOperationEventEnvelopeEventPayloadCauseCode = "OUTCOME_UNKNOWN"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodePROJECTIONBLOCKED              RuntimeOperationEventEnvelopeEventPayloadCauseCode = "PROJECTION_BLOCKED"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodePROJECTIONPENDING              RuntimeOperationEventEnvelopeEventPayloadCauseCode = "PROJECTION_PENDING"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeRUNTIMEEXECUTIONFAILED         RuntimeOperationEventEnvelopeEventPayloadCauseCode = "RUNTIME_EXECUTION_FAILED"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeUNAUTHORIZEDPUBLISHER          RuntimeOperationEventEnvelopeEventPayloadCauseCode = "UNAUTHORIZED_PUBLISHER"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeUNAUTHORIZEDTARGET             RuntimeOperationEventEnvelopeEventPayloadCauseCode = "UNAUTHORIZED_TARGET"
-	RuntimeOperationEventEnvelopeEventPayloadCauseCodeUSEAGENTSAPI                   RuntimeOperationEventEnvelopeEventPayloadCauseCode = "USE_AGENTS_API"
-)
-
 type ReplyShareResponseDataReplyPartsItem struct {
 	Type string `json:"type"`
 	Text string `json:"text"`
 }
 
 type APIErrorBody interface{ isAPIErrorBody() }
-type HTTPErrorBody struct {
+type InvalidResponseBody struct {
+	Code        string
 	ContentType string
 	Body        string
+	RawBody     []byte
+	Reason      string
 }
 
-func (HTTPErrorBody) isAPIErrorBody()                  {}
-func (ErrorResponse) isAPIErrorBody()                  {}
-func (AgentAPIError) isAPIErrorBody()                  {}
-func (UHPErrorEnvelope) isAPIErrorBody()               {}
-func (ServiceOperationCursorConflict) isAPIErrorBody() {}
-func (DeviceBindingErrorResponse) isAPIErrorBody()     {}
-func decodeErrorBody[T APIErrorBody](payload []byte) (APIErrorBody, error) {
+func (InvalidResponseBody) isAPIErrorBody()        {}
+func (ErrorResponse) isAPIErrorBody()              {}
+func (DeviceBindingErrorResponse) isAPIErrorBody() {}
+func (UHPErrorEnvelope) isAPIErrorBody()           {}
+func jsonString(value json.RawMessage) bool {
+	value = bytes.TrimSpace(value)
+	return len(value) > 0 && value[0] == '"'
+}
+func nonemptyJSONString(value json.RawMessage) bool {
+	var decoded string
+	return json.Unmarshal(value, &decoded) == nil && decoded != ""
+}
+func matchesErrorBody(schema string, payload []byte) bool {
+	var fields map[string]json.RawMessage
+	if json.Unmarshal(payload, &fields) != nil {
+		return false
+	}
+	switch schema {
+	case "UHPErrorEnvelope":
+		var nested map[string]json.RawMessage
+		if json.Unmarshal(fields["error"], &nested) != nil {
+			return false
+		}
+		return nonemptyJSONString(nested["code"]) && jsonString(nested["message"])
+	case "DeviceBindingErrorResponse":
+		return nonemptyJSONString(fields["error"]) && jsonString(fields["message"])
+	default:
+		return nonemptyJSONString(fields["code"]) && jsonString(fields["message"])
+	}
+}
+func decodeErrorBody[T APIErrorBody](schema string, payload []byte) (APIErrorBody, error) {
+	if !matchesErrorBody(schema, payload) {
+		return nil, fmt.Errorf("invalid error envelope")
+	}
 	var body T
 	err := json.Unmarshal(payload, &body)
 	return body, err
 }
 func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody, error) {
 	switch operation {
-	case "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "restartInstance", "getInstanceLogs", "updateInstanceConfig", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "getUsageHistory", "getUsageLimits", "invokeRuntimeMethod", "cancelRuntimeOperation", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "createEventSession", "listMCPServers", "getMCPServer", "resolveMCPServer", "listSkills", "createSkill", "searchSkills", "getSkill", "getSkillBySlug", "listSkillCategories", "getFeaturedSkills", "listImages", "createImage", "getImage", "updateImage", "deleteImage", "listImageVersions", "createImageVersion", "getImageVersion", "updateImageVersion", "deleteImageVersion", "getAgentTemplate", "listSkillSets", "getSkillSet", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "PutConnectorCredentialConnector", "DeleteConnectorCredentialConnector", "ListInstanceConnectorsConnector", "InstallManagedConnectorConnector", "UpdateManagedConnectorConnector", "UninstallManagedConnectorConnector", "ListMcpServersConnector", "GetMcpServerConnector", "ListCategoriesConnector", "ResolvePreparationConnector", "ResolveInstallConnector", "getResponseEvents", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
+	case "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "invokeRuntimeMethod", "cancelRuntimeOperation", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "listMCPServers", "getMCPServer", "resolveMCPServer", "listSkills", "createSkill", "searchSkills", "getSkill", "getSkillBySlug", "listSkillCategories", "getFeaturedSkills", "getAgentTemplate", "listSkillSets", "getSkillSet", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "PutConnectorCredentialConnector", "DeleteConnectorCredentialConnector", "ListInstanceConnectorsConnector", "InstallManagedConnectorConnector", "UpdateManagedConnectorConnector", "UninstallManagedConnectorConnector", "ListMcpServersConnector", "GetMcpServerConnector", "ListCategoriesConnector", "ResolvePreparationConnector", "ResolveInstallConnector", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
 
-		return decodeErrorBody[ErrorResponse](payload)
-	case "sendConversationMessage", "createRealtimeSession":
-
-		return decodeErrorBody[AgentAPIError](payload)
-	case "registerTaskWebhook", "listWebhookDeliveries":
-		if status == 400 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 401 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 403 {
-			return decodeErrorBody[ErrorResponse](payload)
-		}
-		if status == 404 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 429 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		return decodeErrorBody[ErrorResponse](payload)
-	case "listTaskWebhooks", "deleteTaskWebhook":
-		if status == 401 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 403 {
-			return decodeErrorBody[ErrorResponse](payload)
-		}
-		if status == 404 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 429 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		return decodeErrorBody[ErrorResponse](payload)
-	case "redeliverWebhook":
-		if status == 400 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 401 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 403 {
-			return decodeErrorBody[ErrorResponse](payload)
-		}
-		if status == 404 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 409 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 429 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		return decodeErrorBody[ErrorResponse](payload)
+		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "getRuntimeCapabilities":
 		if status == 401 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
 		if status == 404 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
-		return decodeErrorBody[ErrorResponse](payload)
+		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "listRuntimeOperations":
 		if status == 400 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
 		if status == 401 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
 		if status == 404 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
-		return decodeErrorBody[ErrorResponse](payload)
+		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "getRuntimeOperation":
 		if status == 404 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
-		return decodeErrorBody[ErrorResponse](payload)
-	case "streamRuntimeOperationEvents":
-		if status == 409 {
-			return decodeErrorBody[ServiceOperationCursorConflict](payload)
-		}
-		break
+		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "createTerminalSession", "createCanvasSession":
 		if status == 400 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
 		if status == 401 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
 		if status == 404 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
 		if status == 429 {
-			return decodeErrorBody[ErrorResponse](payload)
+			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 		}
-		return decodeErrorBody[ErrorResponse](payload)
-	case "getDiscovery":
-
-		break
-	case "listHarnesses", "listModels":
-		if status == 401 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		break
-	case "getHarness", "listHarnessModels", "getResponse", "deleteResponse", "getResponseInputItems", "cancelResponse":
-		if status == 404 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		break
-	case "createResponse":
-		if status == 401 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 404 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 409 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 422 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		if status == 429 {
-			return decodeErrorBody[UHPErrorEnvelope](payload)
-		}
-		break
+		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "getAgentBindDetails", "confirmAgentBind", "createPortalBind", "getPortalBind", "revokePortalBind", "resolvePortalBind":
 
-		return decodeErrorBody[DeviceBindingErrorResponse](payload)
+		return decodeErrorBody[DeviceBindingErrorResponse]("DeviceBindingErrorResponse", payload)
+	case "getDiscovery", "getResponseEvents":
+
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "listHarnesses", "listModels":
+		if status == 401 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "getHarness", "listHarnessModels", "getResponse", "deleteResponse", "getResponseInputItems", "cancelResponse":
+		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "createResponse":
+		if status == 400 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 401 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 409 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 422 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 429 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 503 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 	}
 	return nil, fmt.Errorf("BeeOS API %s HTTP %d: undocumented error response", operation, status)
 }
@@ -4991,23 +4419,16 @@ type BeeOSClient struct {
 	Identity       *IdentityResource
 	Catalog        *CatalogResource
 	Instances      *InstancesResource
-	Runtime        *RuntimeResource
 	Agents         *AgentsResource
 	Conversations  *ConversationsResource
 	Messages       *MessagesResource
 	Tasks          *TasksResource
 	Usage          *UsageResource
-	TaskWebhooks   *TaskWebhooksResource
 	Methods        *MethodsResource
 	Operations     *OperationsResource
-	Harnesses      *HarnessesResource
-	Responses      *ResponsesResource
 	Files          *FilesResource
-	EventSessions  *EventSessionsResource
 	Mcp            *McpResource
 	Skills         *SkillsResource
-	Images         *ImagesResource
-	ImageVersions  *ImageVersionsResource
 	SkillSets      *SkillSetsResource
 	Automations    *AutomationsResource
 	Connectors     *ConnectorsResource
@@ -5015,6 +4436,8 @@ type BeeOSClient struct {
 	Canvases       *CanvasesResource
 	DeviceBindings *DeviceBindingsResource
 	A2a            *A2aResource
+	Harnesses      *HarnessesResource
+	Responses      *ResponsesResource
 }
 
 func NewBeeOSClient(baseURL string, keyProvider func() string, transport *http.Client) (*BeeOSClient, error) {
@@ -5029,23 +4452,16 @@ func (c *BeeOSClient) initResources() {
 	c.Identity = &IdentityResource{client: c}
 	c.Catalog = &CatalogResource{client: c}
 	c.Instances = &InstancesResource{client: c}
-	c.Runtime = &RuntimeResource{client: c}
 	c.Agents = &AgentsResource{client: c}
 	c.Conversations = &ConversationsResource{client: c}
 	c.Messages = &MessagesResource{client: c}
 	c.Tasks = &TasksResource{client: c}
 	c.Usage = &UsageResource{client: c}
-	c.TaskWebhooks = &TaskWebhooksResource{client: c}
 	c.Methods = &MethodsResource{client: c}
 	c.Operations = &OperationsResource{client: c}
-	c.Harnesses = &HarnessesResource{client: c}
-	c.Responses = &ResponsesResource{client: c}
 	c.Files = &FilesResource{client: c}
-	c.EventSessions = &EventSessionsResource{client: c}
 	c.Mcp = &McpResource{client: c}
 	c.Skills = &SkillsResource{client: c}
-	c.Images = &ImagesResource{client: c}
-	c.ImageVersions = &ImageVersionsResource{client: c}
 	c.SkillSets = &SkillSetsResource{client: c}
 	c.Automations = &AutomationsResource{client: c}
 	c.Connectors = &ConnectorsResource{client: c}
@@ -5053,6 +4469,8 @@ func (c *BeeOSClient) initResources() {
 	c.Canvases = &CanvasesResource{client: c}
 	c.DeviceBindings = &DeviceBindingsResource{client: c}
 	c.A2a = &A2aResource{client: c}
+	c.Harnesses = &HarnessesResource{client: c}
+	c.Responses = &ResponsesResource{client: c}
 }
 func (c *BeeOSClient) WithExternalUser(externalUserID string) *BeeOSClient {
 	copy := *c
@@ -5099,12 +4517,17 @@ func (c *BeeOSClient) send(ctx context.Context, operation, method, path, basePat
 		}
 		contentType := response.Header.Get("Content-Type")
 		mediaType := strings.ToLower(strings.TrimSpace(strings.Split(contentType, ";")[0]))
+		invalid := InvalidResponseBody{Code: "invalid_response", ContentType: contentType, Body: string(payload), RawBody: payload, Reason: "non_json_error"}
 		if mediaType != "application/json" && !strings.HasSuffix(mediaType, "+json") {
-			return nil, &APIError{Status: response.StatusCode, Body: HTTPErrorBody{ContentType: contentType, Body: string(payload)}}
+			return nil, &APIError{Status: response.StatusCode, Body: invalid}
 		}
 		body, err := decodeAPIError(operation, response.StatusCode, payload)
 		if err != nil {
-			return nil, fmt.Errorf("BeeOS API HTTP %d: decode error body: %w", response.StatusCode, err)
+			invalid.Reason = "invalid_error_shape"
+			if !json.Valid(payload) {
+				invalid.Reason = "invalid_json_error"
+			}
+			return nil, &APIError{Status: response.StatusCode, Body: invalid}
 		}
 		return nil, &APIError{Status: response.StatusCode, Body: body}
 	}
@@ -5136,9 +4559,7 @@ func encodeFileMultipart(file []byte) ([]byte, string, error) {
 	return body.Bytes(), writer.FormDataContentType(), nil
 }
 
-type StreamEvent interface {
-	UHPEvent | RuntimeOperationEventEnvelope
-}
+type StreamEvent interface{ UHPEvent }
 type EventStream[T StreamEvent] struct {
 	body   io.ReadCloser
 	reader *bufio.Reader
@@ -5378,20 +4799,6 @@ func (r *CatalogResource) ListAgentTemplates(ctx context.Context, options ListAg
 	return output, err
 }
 
-func (r *CatalogResource) GetDiscovery(ctx context.Context) (UHPDiscovery, error) {
-	path := "/uhp"
-	query := url.Values{}
-	headers := http.Header{}
-	var output UHPDiscovery
-	var body []byte
-	payload, err := r.client.request(ctx, "getDiscovery", "GET", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 func (r *CatalogResource) GetAgentTemplate(ctx context.Context, id string) (agentTemplateCatalogView, error) {
 	path := "/agent-templates/" + url.PathEscape(fmt.Sprint(id)) + ""
 	query := url.Values{}
@@ -5399,6 +4806,20 @@ func (r *CatalogResource) GetAgentTemplate(ctx context.Context, id string) (agen
 	var output agentTemplateCatalogView
 	var body []byte
 	payload, err := r.client.request(ctx, "getAgentTemplate", "GET", path, "", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *CatalogResource) GetDiscovery(ctx context.Context) (UHPDiscovery, error) {
+	path := "/uhp"
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPDiscovery
+	var body []byte
+	payload, err := r.client.request(ctx, "getDiscovery", "GET", path, "/uhp/v1", query, headers, body, "")
 	if err != nil {
 		return output, err
 	}
@@ -5699,85 +5120,6 @@ func (r *InstancesResource) GetStreamURL(ctx context.Context, instanceId string,
 	return output, err
 }
 
-type RuntimeResource struct{ client *BeeOSClient }
-
-func (r *RuntimeResource) RestartInstance(ctx context.Context, instanceId string, options RestartInstanceOptions) (InstanceResult, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/restart"
-	query := url.Values{}
-	headers := http.Header{}
-	var output InstanceResult
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	payload, err := r.client.request(ctx, "restartInstance", "POST", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *RuntimeResource) GetInstanceLogs(ctx context.Context, instanceId string, options GetInstanceLogsOptions) (InstanceLogPage, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/logs"
-	query := url.Values{}
-	headers := http.Header{}
-	var output InstanceLogPage
-	if options.Since != nil {
-		query.Set("since", fmt.Sprint(*options.Since))
-	}
-	if options.Tail != nil {
-		query.Set("tail", fmt.Sprint(*options.Tail))
-	}
-	if options.Follow != nil {
-		query.Set("follow", fmt.Sprint(*options.Follow))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "getInstanceLogs", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *RuntimeResource) UpdateInstanceConfig(ctx context.Context, instanceId string, input InstanceConfigPatch, options UpdateInstanceConfigOptions) (InstanceSummary, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/config"
-	query := url.Values{}
-	headers := http.Header{}
-	var output InstanceSummary
-	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "updateInstanceConfig", "PATCH", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *RuntimeResource) CreateRealtimeSession(ctx context.Context, input CreateRealtimeSessionInput) (RealtimeSession, error) {
-	path := "/realtime/sessions"
-	query := url.Values{}
-	headers := http.Header{}
-	var output RealtimeSession
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "createRealtimeSession", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 type AgentsResource struct{ client *BeeOSClient }
 
 func (r *AgentsResource) List(ctx context.Context, options ListAgentsOptions) (AgentPage, error) {
@@ -6027,26 +5369,6 @@ func (r *ConversationsResource) Resume(ctx context.Context, agentId string, conv
 
 type MessagesResource struct{ client *BeeOSClient }
 
-func (r *MessagesResource) Send(ctx context.Context, agentId string, conversationId string, input SendMessageInput, options SendConversationMessageOptions) (MessageResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/messages"
-	query := url.Values{}
-	headers := http.Header{}
-	var output MessageResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "sendConversationMessage", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 func (r *MessagesResource) List(ctx context.Context, agentId string, conversationId string, options ListConversationMessagesOptions) (MessagePage, error) {
 	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/messages"
 	query := url.Values{}
@@ -6286,121 +5608,6 @@ func (r *UsageResource) GetSummary(ctx context.Context, options GetUsageSummaryO
 	return output, err
 }
 
-func (r *UsageResource) GetHistory(ctx context.Context, options GetUsageHistoryOptions) (UsagePage, error) {
-	path := "/usage/history"
-	query := url.Values{}
-	headers := http.Header{}
-	var output UsagePage
-	if options.ExternalUserID != nil {
-		query.Set("external_user_id", fmt.Sprint(*options.ExternalUserID))
-	}
-	if options.Category != nil {
-		query.Set("category", fmt.Sprint(*options.Category))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	if options.Offset != nil {
-		query.Set("offset", fmt.Sprint(*options.Offset))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "getUsageHistory", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *UsageResource) GetLimits(ctx context.Context) (EffectiveLimits, error) {
-	path := "/usage/limits"
-	query := url.Values{}
-	headers := http.Header{}
-	var output EffectiveLimits
-	var body []byte
-	payload, err := r.client.request(ctx, "getUsageLimits", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type TaskWebhooksResource struct{ client *BeeOSClient }
-
-func (r *TaskWebhooksResource) Create(ctx context.Context, taskId string, agentId string, input RegisterTaskWebhookRequest) (TaskWebhookResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + "/webhooks"
-	query := url.Values{}
-	headers := http.Header{}
-	var output TaskWebhookResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "registerTaskWebhook", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *TaskWebhooksResource) List(ctx context.Context, taskId string, agentId string) (ListTaskWebhooksResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + "/webhooks"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListTaskWebhooksResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "listTaskWebhooks", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *TaskWebhooksResource) Delete(ctx context.Context, webhookId string, taskId string, agentId string) error {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + "/webhooks/" + url.PathEscape(fmt.Sprint(webhookId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var body []byte
-	_, err := r.client.request(ctx, "deleteTaskWebhook", "DELETE", path, "", query, headers, body, "")
-	return err
-}
-
-func (r *TaskWebhooksResource) ListDeliveries(ctx context.Context, webhookId string, taskId string, agentId string, options ListWebhookDeliveriesOptions) (ListWebhookDeliveriesResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + "/webhooks/" + url.PathEscape(fmt.Sprint(webhookId)) + "/deliveries"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListWebhookDeliveriesResponse
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "listWebhookDeliveries", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *TaskWebhooksResource) Redeliver(ctx context.Context, deliveryId string, webhookId string, taskId string, agentId string) (RedeliverWebhookResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + "/webhooks/" + url.PathEscape(fmt.Sprint(webhookId)) + "/deliveries/" + url.PathEscape(fmt.Sprint(deliveryId)) + "/redeliver"
-	query := url.Values{}
-	headers := http.Header{}
-	var output RedeliverWebhookResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "redeliverWebhook", "POST", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 type MethodsResource struct{ client *BeeOSClient }
 
 func (r *MethodsResource) GetCapabilities(ctx context.Context, instanceId string) (RuntimeCapabilityDocument, error) {
@@ -6482,21 +5689,6 @@ func (r *OperationsResource) Get(ctx context.Context, operationId string, instan
 	return output, err
 }
 
-func (r *OperationsResource) GetEvents(ctx context.Context, operationId string, instanceId string, options StreamRuntimeOperationEventsOptions) (*EventStream[RuntimeOperationEventEnvelope], error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/operations/" + url.PathEscape(fmt.Sprint(operationId)) + "/events"
-	query := url.Values{}
-	headers := http.Header{}
-	if options.LastEventID != nil {
-		headers.Set("Last-Event-ID", fmt.Sprint(*options.LastEventID))
-	}
-	var body []byte
-	response, err := r.client.send(ctx, "streamRuntimeOperationEvents", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return nil, err
-	}
-	return &EventStream[RuntimeOperationEventEnvelope]{body: response.Body, reader: bufio.NewReader(response.Body)}, nil
-}
-
 func (r *OperationsResource) Cancel(ctx context.Context, operationId string, instanceId string, options CancelRuntimeOperationOptions) (CancelRuntimeOperationResponse, error) {
 	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/operations/" + url.PathEscape(fmt.Sprint(operationId)) + "/cancel"
 	query := url.Values{}
@@ -6513,193 +5705,6 @@ func (r *OperationsResource) Cancel(ctx context.Context, operationId string, ins
 	}
 	err = json.Unmarshal(payload, &output)
 	return output, err
-}
-
-type HarnessesResource struct{ client *BeeOSClient }
-
-func (r *HarnessesResource) List(ctx context.Context) (ListHarnessesResponse, error) {
-	path := "/harnesses"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListHarnessesResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "listHarnesses", "GET", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *HarnessesResource) Get(ctx context.Context, harnessid string) (UHPHarness, error) {
-	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output UHPHarness
-	var body []byte
-	payload, err := r.client.request(ctx, "getHarness", "GET", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *HarnessesResource) ListAllModels(ctx context.Context) (UHPModelCatalog, error) {
-	path := "/models"
-	query := url.Values{}
-	headers := http.Header{}
-	var output UHPModelCatalog
-	var body []byte
-	payload, err := r.client.request(ctx, "listModels", "GET", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *HarnessesResource) ListModels(ctx context.Context, harnessid string) (UHPHarnessModels, error) {
-	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + "/models"
-	query := url.Values{}
-	headers := http.Header{}
-	var output UHPHarnessModels
-	var body []byte
-	payload, err := r.client.request(ctx, "listHarnessModels", "GET", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type ResponsesResource struct{ client *BeeOSClient }
-
-func (r *ResponsesResource) Create(ctx context.Context, input UHPCreateResponseJSONRequest, options CreateResponseOptions) (UHPResponse, error) {
-	path := "/responses"
-	query := url.Values{}
-	headers := http.Header{}
-	var output UHPResponse
-	if options.IdempotencyKey != nil {
-		headers.Set("Idempotency-Key", fmt.Sprint(*options.IdempotencyKey))
-	}
-	if options.UHPVersion != nil {
-		headers.Set("UHP-Version", fmt.Sprint(*options.UHPVersion))
-	}
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "createResponse", "POST", path, "/uhp/v1", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ResponsesResource) Get(ctx context.Context, responseid string) (UHPResponse, error) {
-	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output UHPResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "getResponse", "GET", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ResponsesResource) Delete(ctx context.Context, responseid string) (DeleteResponseResponse, error) {
-	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output DeleteResponseResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "deleteResponse", "DELETE", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ResponsesResource) GetInputItems(ctx context.Context, responseid string) (GetResponseInputItemsResponse, error) {
-	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + "/input_items"
-	query := url.Values{}
-	headers := http.Header{}
-	var output GetResponseInputItemsResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "getResponseInputItems", "GET", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ResponsesResource) Cancel(ctx context.Context, responseid string) (UHPResponse, error) {
-	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + "/cancel"
-	query := url.Values{}
-	headers := http.Header{}
-	var output UHPResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "cancelResponse", "POST", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ResponsesResource) GetEvents(ctx context.Context, responseid string, options GetResponseEventsOptions) (*EventStream[UHPEvent], error) {
-	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + "/events"
-	query := url.Values{}
-	headers := http.Header{}
-	if options.LastEventID != nil {
-		headers.Set("Last-Event-ID", fmt.Sprint(*options.LastEventID))
-	}
-	if options.UHPVersion != nil {
-		headers.Set("UHP-Version", fmt.Sprint(*options.UHPVersion))
-	}
-	var body []byte
-	response, err := r.client.send(ctx, "getResponseEvents", "GET", path, "/uhp/v1", query, headers, body, "")
-	if err != nil {
-		return nil, err
-	}
-	return &EventStream[UHPEvent]{body: response.Body, reader: bufio.NewReader(response.Body)}, nil
-}
-
-func (r *ResponsesResource) CreateStream(ctx context.Context, input UHPCreateResponseJSONRequest, options CreateResponseOptions) (*UHPEventStream, error) {
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return nil, err
-	}
-	var body map[string]json.RawMessage
-	if err := json.Unmarshal(encoded, &body); err != nil {
-		return nil, err
-	}
-	body["stream"] = json.RawMessage("true")
-	encoded, err = json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	headers := http.Header{}
-	if options.IdempotencyKey != nil {
-		headers.Set("Idempotency-Key", *options.IdempotencyKey)
-	}
-	if options.UHPVersion != nil {
-		headers.Set("UHP-Version", *options.UHPVersion)
-	}
-	response, err := r.client.send(ctx, "createResponse", "POST", "/responses", "/uhp/v1", url.Values{}, headers, encoded, "application/json")
-	if err != nil {
-		return nil, err
-	}
-	return &UHPEventStream{body: response.Body, reader: bufio.NewReader(response.Body)}, nil
 }
 
 type FilesResource struct{ client *BeeOSClient }
@@ -6906,28 +5911,6 @@ func (r *FilesResource) GetSummary(ctx context.Context) (FileSummary, error) {
 	return output, err
 }
 
-type EventSessionsResource struct{ client *BeeOSClient }
-
-func (r *EventSessionsResource) Create(ctx context.Context, input ServerEventSessionInput, options CreateEventSessionOptions) (ServerEventConnectionDescriptor, error) {
-	path := "/events/session"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ServerEventConnectionDescriptor
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "createEventSession", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 type McpResource struct{ client *BeeOSClient }
 
 func (r *McpResource) List(ctx context.Context) (ListMCPServersResponse, error) {
@@ -7121,176 +6104,6 @@ func (r *SkillsResource) Featured(ctx context.Context, options GetFeaturedSkills
 	}
 	var body []byte
 	payload, err := r.client.request(ctx, "getFeaturedSkills", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type ImagesResource struct{ client *BeeOSClient }
-
-func (r *ImagesResource) List(ctx context.Context) (JSONValue, error) {
-	path := "/images"
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	var body []byte
-	payload, err := r.client.request(ctx, "listImages", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ImagesResource) Create(ctx context.Context, input JSONValue, options CreateImageOptions) (JSONValue, error) {
-	path := "/images"
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "createImage", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ImagesResource) Get(ctx context.Context, imageId string) (JSONValue, error) {
-	path := "/images/" + url.PathEscape(fmt.Sprint(imageId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	var body []byte
-	payload, err := r.client.request(ctx, "getImage", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ImagesResource) Update(ctx context.Context, imageId string, input JSONValue, options UpdateImageOptions) (JSONValue, error) {
-	path := "/images/" + url.PathEscape(fmt.Sprint(imageId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "updateImage", "PUT", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ImagesResource) Delete(ctx context.Context, imageId string, options DeleteImageOptions) (JSONValue, error) {
-	path := "/images/" + url.PathEscape(fmt.Sprint(imageId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	payload, err := r.client.request(ctx, "deleteImage", "DELETE", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ImagesResource) ListVersions(ctx context.Context, imageId string) (JSONValue, error) {
-	path := "/images/" + url.PathEscape(fmt.Sprint(imageId)) + "/versions"
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	var body []byte
-	payload, err := r.client.request(ctx, "listImageVersions", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ImagesResource) CreateVersion(ctx context.Context, imageId string, input JSONValue, options CreateImageVersionOptions) (JSONValue, error) {
-	path := "/images/" + url.PathEscape(fmt.Sprint(imageId)) + "/versions"
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "createImageVersion", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type ImageVersionsResource struct{ client *BeeOSClient }
-
-func (r *ImageVersionsResource) Get(ctx context.Context, versionId string) (JSONValue, error) {
-	path := "/image-versions/" + url.PathEscape(fmt.Sprint(versionId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	var body []byte
-	payload, err := r.client.request(ctx, "getImageVersion", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ImageVersionsResource) Update(ctx context.Context, versionId string, input JSONValue, options UpdateImageVersionOptions) (JSONValue, error) {
-	path := "/image-versions/" + url.PathEscape(fmt.Sprint(versionId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "updateImageVersion", "PUT", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ImageVersionsResource) Delete(ctx context.Context, versionId string, options DeleteImageVersionOptions) (JSONValue, error) {
-	path := "/image-versions/" + url.PathEscape(fmt.Sprint(versionId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output JSONValue
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	payload, err := r.client.request(ctx, "deleteImageVersion", "DELETE", path, "", query, headers, body, "")
 	if err != nil {
 		return output, err
 	}
@@ -8062,4 +6875,191 @@ func (r *A2aResource) CancelTask(ctx context.Context, agentId string, taskId str
 	}
 	err = json.Unmarshal(payload, &output)
 	return output, err
+}
+
+type HarnessesResource struct{ client *BeeOSClient }
+
+func (r *HarnessesResource) List(ctx context.Context) (ListHarnessesResponse, error) {
+	path := "/harnesses"
+	query := url.Values{}
+	headers := http.Header{}
+	var output ListHarnessesResponse
+	var body []byte
+	payload, err := r.client.request(ctx, "listHarnesses", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *HarnessesResource) Get(ctx context.Context, harnessid string) (UHPHarness, error) {
+	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPHarness
+	var body []byte
+	payload, err := r.client.request(ctx, "getHarness", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *HarnessesResource) ListAllModels(ctx context.Context) (UHPModelCatalog, error) {
+	path := "/models"
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPModelCatalog
+	var body []byte
+	payload, err := r.client.request(ctx, "listModels", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *HarnessesResource) ListModels(ctx context.Context, harnessid string) (UHPHarnessModels, error) {
+	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + "/models"
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPHarnessModels
+	var body []byte
+	payload, err := r.client.request(ctx, "listHarnessModels", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+type ResponsesResource struct{ client *BeeOSClient }
+
+func (r *ResponsesResource) Create(ctx context.Context, input UHPCreateResponseJSONRequest, options CreateResponseOptions) (UHPResponse, error) {
+	path := "/responses"
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPResponse
+	if options.IdempotencyKey != nil {
+		headers.Set("Idempotency-Key", fmt.Sprint(*options.IdempotencyKey))
+	}
+	if options.UHPVersion != nil {
+		headers.Set("UHP-Version", fmt.Sprint(*options.UHPVersion))
+	}
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "createResponse", "POST", path, "/uhp/v1", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ResponsesResource) Get(ctx context.Context, responseid string) (UHPResponse, error) {
+	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPResponse
+	var body []byte
+	payload, err := r.client.request(ctx, "getResponse", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ResponsesResource) Delete(ctx context.Context, responseid string) (DeleteResponseResponse, error) {
+	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output DeleteResponseResponse
+	var body []byte
+	payload, err := r.client.request(ctx, "deleteResponse", "DELETE", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ResponsesResource) GetInputItems(ctx context.Context, responseid string) (GetResponseInputItemsResponse, error) {
+	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + "/input_items"
+	query := url.Values{}
+	headers := http.Header{}
+	var output GetResponseInputItemsResponse
+	var body []byte
+	payload, err := r.client.request(ctx, "getResponseInputItems", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ResponsesResource) Cancel(ctx context.Context, responseid string) (UHPResponse, error) {
+	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + "/cancel"
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPResponse
+	var body []byte
+	payload, err := r.client.request(ctx, "cancelResponse", "POST", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ResponsesResource) GetEvents(ctx context.Context, responseid string, options GetResponseEventsOptions) (*EventStream[UHPEvent], error) {
+	path := "/responses/" + url.PathEscape(fmt.Sprint(responseid)) + "/events"
+	query := url.Values{}
+	headers := http.Header{}
+	if options.LastEventID != nil {
+		headers.Set("Last-Event-ID", fmt.Sprint(*options.LastEventID))
+	}
+	if options.UHPVersion != nil {
+		headers.Set("UHP-Version", fmt.Sprint(*options.UHPVersion))
+	}
+	var body []byte
+	response, err := r.client.send(ctx, "getResponseEvents", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return nil, err
+	}
+	return &EventStream[UHPEvent]{body: response.Body, reader: bufio.NewReader(response.Body)}, nil
+}
+
+func (r *ResponsesResource) CreateStream(ctx context.Context, input UHPCreateResponseJSONRequest, options CreateResponseOptions) (*UHPEventStream, error) {
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return nil, err
+	}
+	var body map[string]json.RawMessage
+	if err := json.Unmarshal(encoded, &body); err != nil {
+		return nil, err
+	}
+	body["stream"] = json.RawMessage("true")
+	encoded, err = json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	headers := http.Header{}
+	if options.IdempotencyKey != nil {
+		headers.Set("Idempotency-Key", *options.IdempotencyKey)
+	}
+	if options.UHPVersion != nil {
+		headers.Set("UHP-Version", *options.UHPVersion)
+	}
+	response, err := r.client.send(ctx, "createResponse", "POST", "/responses", "/uhp/v1", url.Values{}, headers, encoded, "application/json")
+	if err != nil {
+		return nil, err
+	}
+	return &UHPEventStream{body: response.Body, reader: bufio.NewReader(response.Body)}, nil
 }

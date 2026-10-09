@@ -3,7 +3,7 @@ package main
 
 import (
 	"context"
-	sdk "github.com/beeos-ai/beeos-cloud-sdks/go"
+	sdk "github.com/beeos-ai/beeos-cloud-sdks/go/v2"
 )
 
 func typedUsage(ctx context.Context, client *sdk.BeeOSClient) (sdk.RuntimeInstanceResult, error) {

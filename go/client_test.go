@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"mime"
 	"mime/multipart"
@@ -204,24 +205,6 @@ func TestResponseEventsAreIncrementalAndTyped(t *testing.T) {
 	}
 }
 
-func TestRuntimeEventsKeepV1BasePath(t *testing.T) {
-	client := testClient(t, func(request *http.Request) (*http.Response, error) {
-		if request.URL.String() != "https://cloud.example/v1/instances/instance-1/operations/op-1/events" {
-			t.Fatalf("unexpected URL %s", request.URL)
-		}
-		return mockResponse(200, "data: {\"id\":\"1\",\"operationId\":\"op-1\",\"method\":\"agent.invoke\",\"event\":{\"type\":\"runtime_operation_started\",\"sequence\":\"1\",\"recordedAt\":\"2026-10-09T00:00:00Z\"}}\n\n"), nil
-	})
-	stream, err := client.Operations.GetEvents(context.Background(), "op-1", "instance-1", StreamRuntimeOperationEventsOptions{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stream.Close()
-	event, err := stream.Next()
-	if err != nil || event.Event.Sequence != "1" {
-		t.Fatalf("runtime event decoding failed: %v", err)
-	}
-}
-
 func TestRPCStringIDAndRequiredIdempotency(t *testing.T) {
 	client := testClient(t, func(request *http.Request) (*http.Response, error) {
 		if request.Header.Get("Idempotency-Key") != "operation-1" {
@@ -289,7 +272,7 @@ func TestPlaintextHTTPErrorKeepsStatusAndBody(t *testing.T) {
 	if !errors.As(err, &apiError) || apiError.Status != 404 {
 		t.Fatalf("status missing: %v", err)
 	}
-	if body, ok := apiError.Body.(HTTPErrorBody); !ok || body.Body != "404 page not found\n" || body.ContentType != "text/plain; charset=utf-8" {
+	if body, ok := apiError.Body.(InvalidResponseBody); !ok || body.Body != "404 page not found\n" || body.ContentType != "text/plain; charset=utf-8" {
 		t.Fatalf("plaintext body missing: %T", apiError.Body)
 	}
 }
@@ -297,9 +280,12 @@ func TestPlaintextHTTPErrorKeepsStatusAndBody(t *testing.T) {
 func TestMalformedJSONErrorRemainsVisible(t *testing.T) {
 	client := testClient(t, func(*http.Request) (*http.Response, error) { return mockResponse(400, "not-json"), nil })
 	_, err := client.Catalog.ListRegions(context.Background(), ListDeployRegionsOptions{})
-	var decodeError *json.SyntaxError
-	if !errors.As(err, &decodeError) {
-		t.Fatalf("JSON decode failure missing: %v", err)
+	var apiError *APIError
+	if !errors.As(err, &apiError) || apiError.Status != 400 {
+		t.Fatalf("HTTP error missing: %v", err)
+	}
+	if body, ok := apiError.Body.(InvalidResponseBody); !ok || body.Code != "invalid_response" || string(body.RawBody) != "not-json" {
+		t.Fatalf("raw diagnostic missing: %T", apiError.Body)
 	}
 }
 
@@ -314,5 +300,110 @@ func TestA2ADataPartPreservesDataVariant(t *testing.T) {
 	encoded, err := json.Marshal(part)
 	if err != nil || !strings.Contains(string(encoded), `"data":{"value":42}`) {
 		t.Fatalf("data part lost on serialization: %s: %v", encoded, err)
+	}
+}
+
+func TestErrorNormalizationMatrix(t *testing.T) {
+	cases := []struct {
+		surface              string
+		status               int
+		contentType, payload string
+	}{
+		{"cloud", 502, "application/json", `{"message":"upstream unavailable"}`},
+		{"cloud", 429, "application/json", `{"error":"rate limited"}`},
+		{"cloud", 502, "application/json", "not-json"},
+		{"cloud", 404, "text/plain", "404 page not found"},
+		{"cloud", 500, "application/json", `[]`},
+		{"cloud", 400, "application/json", `{"code":7,"message":"bad"}`},
+		{"cloud", 400, "application/json", `{"code":"","message":"bad"}`},
+		{"cloud", 400, "application/json", `{"code":"bad"}`},
+		{"uhp", 503, "application/json", `{"code":"upstream","message":"unavailable"}`},
+		{"uhp", 429, "application/json", `{"error":"rate limited"}`},
+		{"uhp", 400, "application/json", `{"error":{"code":false,"message":"bad"}}`},
+		{"uhp", 400, "application/json", `{"error":{"code":"","message":"bad"}}`},
+		{"uhp", 502, "application/json", "not-json"},
+		{"uhp", 404, "text/plain", "404 page not found"},
+	}
+	for _, testcase := range cases {
+		t.Run(fmt.Sprintf("%s_%d_%s", testcase.surface, testcase.status, testcase.contentType), func(t *testing.T) {
+			client := testClient(t, func(*http.Request) (*http.Response, error) {
+				response := mockResponse(testcase.status, testcase.payload)
+				response.Header.Set("Content-Type", testcase.contentType)
+				return response, nil
+			})
+			var err error
+			if testcase.surface == "cloud" {
+				_, err = client.Catalog.ListRegions(context.Background(), ListDeployRegionsOptions{})
+			} else {
+				_, err = client.Responses.Get(context.Background(), "response-1")
+			}
+			var apiError *APIError
+			if !errors.As(err, &apiError) || apiError.Status != testcase.status {
+				t.Fatalf("HTTP error status lost: %v", err)
+			}
+			if body, ok := apiError.Body.(InvalidResponseBody); !ok || body.Code != "invalid_response" || string(body.RawBody) != testcase.payload {
+				t.Fatalf("raw diagnostic lost: %T", apiError.Body)
+			}
+		})
+	}
+}
+
+func TestResponseEvents404RetainsUHPErrorBody(t *testing.T) {
+	client := testClient(t, func(request *http.Request) (*http.Response, error) {
+		if request.URL.String() != "https://cloud.example/uhp/v1/responses/response-1/events" {
+			t.Fatalf("unexpected URL %s", request.URL)
+		}
+		return mockResponse(404, `{"error":{"type":"invalid_request_error","code":"not_found","message":"missing"}}`), nil
+	})
+	_, err := client.Responses.GetEvents(context.Background(), "response-1", GetResponseEventsOptions{})
+	var apiError *APIError
+	if !errors.As(err, &apiError) || apiError.Status != 404 {
+		t.Fatalf("HTTP error status lost: %v", err)
+	}
+	if body, ok := apiError.Body.(UHPErrorEnvelope); !ok || body.Error.Code != "not_found" {
+		t.Fatalf("typed UHP error lost: %T", apiError.Body)
+	}
+}
+
+func TestDiscoveryAndJSONCreateUseSpecServerPath(t *testing.T) {
+	paths := []string{"https://cloud.example/uhp/v1/uhp", "https://cloud.example/uhp/v1/responses"}
+	index := 0
+	client := testClient(t, func(request *http.Request) (*http.Response, error) {
+		if request.URL.String() != paths[index] {
+			t.Fatalf("unexpected URL %s", request.URL)
+		}
+		index++
+		return mockResponse(200, `{}`), nil
+	})
+	if _, err := client.Catalog.GetDiscovery(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	input := "hello"
+	if _, err := client.Responses.Create(context.Background(), UHPCreateResponseJSONRequest{Input: UHPCreateResponseJSONRequestInput{Variant1: &input}}, CreateResponseOptions{}); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestNetworkErrorWithoutHTTPStatusRemainsOriginal(t *testing.T) {
+	original := errors.New("connection unavailable")
+	client := testClient(t, func(*http.Request) (*http.Response, error) { return nil, original })
+	_, err := client.Catalog.ListRegions(context.Background(), ListDeployRegionsOptions{})
+	var apiError *APIError
+	if !errors.Is(err, original) || errors.As(err, &apiError) {
+		t.Fatalf("network error was changed into HTTP error: %v", err)
+	}
+}
+
+func TestSafeErrorFieldsDoNotRequireRequestID(t *testing.T) {
+	client := testClient(t, func(*http.Request) (*http.Response, error) {
+		return mockResponse(400, `{"code":"bad_request","message":"bad"}`), nil
+	})
+	_, err := client.Catalog.ListRegions(context.Background(), ListDeployRegionsOptions{})
+	var apiError *APIError
+	if !errors.As(err, &apiError) || apiError.Status != 400 {
+		t.Fatalf("HTTP status lost: %v", err)
+	}
+	if body, ok := apiError.Body.(ErrorResponse); !ok || body.Code != "bad_request" {
+		t.Fatalf("safe code/message envelope lost: %T", apiError.Body)
 	}
 }

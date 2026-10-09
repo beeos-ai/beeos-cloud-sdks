@@ -23,7 +23,7 @@ def read(path):
 import json,yaml,re,copy
 from pathlib import Path
 B=Path(args.producer_root).resolve(); V=Path(args.app_sdk_root).resolve(); OUT=Path(args.output).resolve()
-spec={'openapi':'3.1.0','info':{'title':'BeeOS Cloud Server API','version':'1.1.0'},'servers':[{'url':'https://api.cloud.beeos.ai/v1'}],'security':[{'ServerAPIKey':[]}],'paths':{},'components':{'schemas':{},'parameters':{},'responses':{},'securitySchemes':{'ServerAPIKey':{'type':'http','scheme':'bearer','description':'BeeOS Server API key (bsk_).'}}},'x-producer-repository':'beeos-ai/beeos-cloud-backend','x-producer-revision':args.producer_ref}
+spec={'openapi':'3.1.0','info':{'title':'BeeOS Cloud Server API','version':'2.0.0'},'servers':[{'url':'https://api.cloud.beeos.ai/v1'}],'security':[{'ServerAPIKey':[]}],'paths':{},'components':{'schemas':{},'parameters':{},'responses':{},'securitySchemes':{'ServerAPIKey':{'type':'http','scheme':'bearer','description':'BeeOS Server API key (bsk_).'}}},'x-producer-repository':'beeos-ai/beeos-cloud-backend','x-producer-revision':args.producer_ref}
 S=spec['components']['schemas']
 def load(p): return yaml.safe_load(read(p))
 def ref(n):return {'$ref':'#/components/schemas/'+n}
@@ -133,8 +133,6 @@ op('/instances/{instanceId}/exec','post','execInstance','instances','exec','Runt
 op('/usage/summary','get','getUsageSummary','usage','getSummary','ServerUsageSummary',query=[param('period',typ={'type':'string','enum':['day','week','month']}),param('external_user_id'),param('category')])
 # Files are not enveloped: exact service projections.
 for path,method,oid,name,res,body,query,headers,status in [('/files/presign-upload','post','presignFileUpload','prepareUpload','FileTransferDescriptor','FilePrepareUploadInput',None,[idem],'201'),('/files/{fileId}/confirm','post','confirmFileUpload','confirmUpload','FileFile','FileConfirmInput',None,[idem],'200'),('/files','get','listFiles','list','FilePage',None,[param(n) for n in ['content_type','since','status','file_type','category','source','q','instance_id','agent_id','sort','sort_dir']]+[param(n,typ=ints) for n in ['limit','offset']],None,'200'),('/files/{fileId}','get','getFile','get','FileResolution',None,None,None,'200'),('/files/{fileId}','patch','renameFile','rename','FileFile',obj({'title':strs}),None,None,'200'),('/files/{fileId}','delete','deleteFile','delete',None,None,None,[idem],'204')]:op(path,method,oid,'files',name,res,body,query,headers,status)
-# Retained previously documented but currently unmounted methods.
-op('/events/session','post','createEventSession','eventSessions','create','ServerEventConnectionDescriptor','ServerEventSessionInput',headers=[idem],activation='not-routed')
 # Common catalog resources.
 for path,method,oid,resource,name,res,req in [('/mcp/servers','get','listMCPServers','mcp','list','MCPServer',None),('/mcp/servers/{serverId}','get','getMCPServer','mcp','get','MCPServer',None),('/mcp/servers/{serverId}/resolve','post','resolveMCPServer','mcp','resolve','MCPServerResolution',None),('/skills','get','listSkills','skills','list','SkillPage',None),('/skills/search','get','searchSkills','skills','search','SkillPage',None),('/skills/{id}','get','getSkill','skills','get','Skill',None),('/skills/by-slug/{slug}','get','getSkillBySlug','skills','getBySlug','Skill',None),('/skills/categories','get','listSkillCategories','skills','categories','SkillCategory',None),('/featured','get','getFeaturedSkills','skills','featured','Skill',None)]:
  response=ref(res) if res=='SkillPage' else obj({'data':arr(ref(res)), 'total':ints}) if path in ['/mcp/servers','/featured'] else obj({'data':arr(ref(res))}) if path=='/skills/categories' else obj({'data':ref(res)})
@@ -187,10 +185,7 @@ S['ErrorResponse']=obj({'code':strs,'message':strs,'request_id':strs},['code','m
 spec['components']['responses']['Error']={'description':'Cloud Server error envelope. UHP operations use the protocol envelope.','content':{'application/json':{'schema':ref('ErrorResponse')}}}
 # Remove optional upstream Harness CRUD absent in BeeOS producer (not legacy methods).
 spec['paths']['/uhp/v1/harnesses'].pop('post',None);spec['paths']['/uhp/v1/harnesses/{harness_id}'].pop('delete',None)
-# Retained legacy resources have no defined producer wire schema. Do not fabricate it.
-for path,method,oid,resource,name,req,headers in [('/images','get','listImages','images','list',None,[]),('/images','post','createImage','images','create','JSONValue',[idem]),('/images/{imageId}','get','getImage','images','get',None,[]),('/images/{imageId}','put','updateImage','images','update','JSONValue',[version]),('/images/{imageId}','delete','deleteImage','images','delete',None,[idem]),('/images/{imageId}/versions','get','listImageVersions','images','listVersions',None,[]),('/images/{imageId}/versions','post','createImageVersion','images','createVersion','JSONValue',[idem]),('/image-versions/{versionId}','get','getImageVersion','imageVersions','get',None,[]),('/image-versions/{versionId}','put','updateImageVersion','imageVersions','update','JSONValue',[version]),('/image-versions/{versionId}','delete','deleteImageVersion','imageVersions','delete',None,[idem])]:
- op(path,method,oid,resource,name,'JSONValue',req,headers=headers,activation='legacy-undocumented')
-# Correct legacy operation resource names from the vendored profile.
+# Resource names from the producer/vendored wire profile.
 extra_mapping={'createAgentConversation':('conversations','create'),'listAgentConversations':('conversations','list'),'getConversationMessage':('messages','get'),'createAgentTask':('tasks','create'),'getAgentTask':('tasks','get'),'listAgentTaskMessages':('tasks','listMessages'),'cancelAgentTask':('tasks','cancel'),'continueAgentTask':('tasks','continueTask'),'listRuntimeOperations':('operations','list'),'getRuntimeOperation':('operations','get'),'cancelRuntimeOperation':('operations','cancel'),'streamRuntimeOperationEvents':('operations','getEvents'),'createTerminalSession':('instances','createTerminalSession'),'createCanvasSession':('instances','createCanvasSession')}
 for path,ops in spec['paths'].items():
  for m,o in ops.items():
@@ -354,23 +349,43 @@ for path,ops in spec['paths'].items():
    if status=='default' or status.startswith(('4','5')):o['responses'][status]=response
   o['responses'].setdefault('default',response)
   if o['x-sdk-resource']=='deviceBindings':o['x-sdk-error-code-field']='error'
-# Keep only reachable schemas: excludes internal-only producer structs and unused upstream APIs.
-roots=[]
+# Version 2 exports exactly the live Server producer surface.
+for path in list(spec['paths']):
+ spec['paths'][path]={method:operation for method,operation in spec['paths'][path].items() if operation['x-sdk-activation']=='live'}
+ if not spec['paths'][path]:del spec['paths'][path]
+# UHP URLs are standard OpenAPI server + relative path, alongside SDK host override.
+for path in list(spec['paths']):
+ if not path.startswith('/uhp/v1/'):continue
+ ops=spec['paths'].pop(path)
+ for operation in ops.values():
+  operation['servers']=[{'url':'https://api.cloud.beeos.ai/uhp/v1'}]
+  operation['x-sdk-base-path']='/uhp/v1'
+  uhp_error={'description':'UHP protocol error envelope','content':{'application/json':{'schema':ref('UHPErrorEnvelope')}}}
+  operation['responses']['default']=uhp_error
+  if operation['operationId']=='createResponse':
+   operation['responses']['400']=uhp_error
+   operation['responses']['503']=uhp_error
+ spec['paths'][path[len('/uhp/v1'):]]=ops
+# Retain only components transitively reachable from live public operations.
+needed={section:set() for section in spec['components']}
+needed['securitySchemes'].add('ServerAPIKey')
+pending=[]
 def collect(x):
  if isinstance(x,list):
-  for i in x:collect(i)
+  for value in x:collect(value)
  elif isinstance(x,dict):
-  if '$ref' in x and x['$ref'].startswith('#/components/schemas/'):roots.append(x['$ref'].split('/')[-1])
-  for v in x.values():collect(v)
-collect(spec['paths']);collect(spec['components'].get('responses',{}));collect(spec['components'].get('parameters',{}));collect(spec['components'].get('headers',{}));roots+=['ErrorResponse','JSONValue']
-seen=set()
-while roots:
- name=roots.pop()
- if name in seen:continue
- seen.add(name)
- if name not in S:raise Exception('missing schema '+name)
- collect(S[name])
-spec['components']['schemas']={n:v for n,v in S.items() if n in seen}
+  if '$ref' in x and x['$ref'].startswith('#/components/'):
+   parts=x['$ref'].split('/')
+   pending.append((parts[2],parts[3]))
+  for value in x.values():collect(value)
+collect(spec['paths'])
+while pending:
+ section,name=pending.pop()
+ if name in needed[section]:continue
+ needed[section].add(name)
+ if name not in spec['components'][section]:raise Exception('missing component '+section+'/'+name)
+ collect(spec['components'][section][name])
+spec['components']={section:{name:value for name,value in values.items() if name in needed[section]} for section,values in spec['components'].items() if needed[section]}
 spec=normalize(spec)
 OUT.write_text(json.dumps(spec,indent=2)+'\n')
 print('paths',len(spec['paths']),'operations',sum(len(v) for v in spec['paths'].values()),'schemas',len(spec['components']['schemas']))
@@ -378,9 +393,10 @@ print('paths',len(spec['paths']),'operations',sum(len(v) for v in spec['paths'].
 manifest={
  'spec':'server.openapi.json',
  'producer':{'repository':'beeos-ai/beeos-cloud-backend','revision':args.producer_ref,'read_method':'git show <revision>:<path> (producer checkout never modified)'},
- 'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':subprocess.check_output(['git','-C',str(V),'rev-parse','HEAD'],text=True).strip(),'directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'documented legacy Server wire types, retained with activation metadata; producer implementations override live shapes'},
+ 'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':subprocess.check_output(['git','-C',str(V),'rev-parse','HEAD'],text=True).strip(),'directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'reference wire types for live Server operations; producer implementations override the public shapes'},
  'canvas':{'repository':'beeos-ai/beeos-cloud-canvas','revision':'55a9822c96958bb1b70b04751cef3c39e1abb6ce','files':['pkg/infrastructure/server/http/handler.go','pkg/domain/canvas.go','pkg/domain/share.go'],'role':'persisted Canvas public response projections forwarded verbatim by backend runtime_canvas_rest.go'},
  'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go','dependency':'PyYAML==6.0.3','procedure':'Fetch the split producer remote, review changes in public route registrations and schema producers, update --producer-ref to the reviewed full commit SHA; refresh; npm run generate; run all language strict checks and tests. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes.'},
- 'activation':{'live':'Registered Server-key producer route','not-routed':'Previously documented Server operation, currently absent from Server composition','legacy-undocumented':'Published 1.0.0 method without a producer wire schema; genuinely unconstrained JSON is preserved'},
+ 'version':'2.0.0',
+ 'activation':{'live':'Registered Server-key producer route; all non-live operations are excluded'},
  'input_sha256':dict(sorted(inputs.items()))}
 OUT.with_name('sources.json').write_text(json.dumps(manifest,indent=2)+'\n')

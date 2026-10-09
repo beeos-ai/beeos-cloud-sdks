@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "BeeOS Cloud Server API",
-    "version": "1.1.0"
+    "version": "2.0.0"
   },
   "servers": [
     {
@@ -1162,186 +1162,6 @@
         }
       }
     },
-    "/instances/{instanceId}/restart": {
-      "post": {
-        "operationId": "restartInstance",
-        "x-beeos-api-id": "INST-API-008",
-        "x-beeos-sdk-symbol": "SDK-SERVER-RAW-INST-API-008",
-        "security": [
-          {
-            "serverKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 256
-            }
-          }
-        ],
-        "responses": {
-          "202": {
-            "description": "Restart accepted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstanceResult"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-sdk-provenance": "App vendored/t06-server.openapi.json",
-        "x-sdk-resource": "runtime",
-        "x-sdk-method": "restartInstance",
-        "x-sdk-activation": "not-routed"
-      }
-    },
-    "/instances/{instanceId}/logs": {
-      "get": {
-        "operationId": "getInstanceLogs",
-        "x-beeos-api-id": "INST-API-010",
-        "x-beeos-sdk-symbol": "SDK-SERVER-RAW-INST-API-010",
-        "security": [
-          {
-            "serverKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            }
-          },
-          {
-            "name": "since",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "tail",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 10000
-            }
-          },
-          {
-            "name": "follow",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "JSON log page; follow=true is consumed by streamLogs over SSE",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstanceLogPage"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-sdk-provenance": "App vendored/t06-server.openapi.json",
-        "x-sdk-resource": "runtime",
-        "x-sdk-method": "getInstanceLogs",
-        "x-sdk-activation": "not-routed"
-      }
-    },
-    "/instances/{instanceId}/config": {
-      "patch": {
-        "operationId": "updateInstanceConfig",
-        "x-beeos-api-id": "INST-API-011",
-        "x-beeos-sdk-symbol": "SDK-SERVER-RAW-INST-API-011",
-        "security": [
-          {
-            "serverKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            }
-          },
-          {
-            "name": "If-Match",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InstanceConfigPatch"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Updated Instance",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InstanceSummary"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-sdk-provenance": "App vendored/t06-server.openapi.json",
-        "x-sdk-resource": "runtime",
-        "x-sdk-method": "updateInstanceConfig",
-        "x-sdk-activation": "not-routed"
-      }
-    },
     "/instances/{instanceId}/upgrade": {
       "post": {
         "operationId": "upgradeInstance",
@@ -2030,87 +1850,6 @@
       }
     },
     "/agents/{agentId}/conversations/{conversationId}/messages": {
-      "post": {
-        "operationId": "sendConversationMessage",
-        "x-beeos-api-id": "MESSAGE-API-001",
-        "x-required-scopes": [
-          "messages:write"
-        ],
-        "parameters": [
-          {
-            "name": "agentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "conversationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendMessageInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "202": {
-            "description": "Message durably accepted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Stable error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AgentAPIError"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-provenance": "App vendored/t07-server.openapi.json",
-        "x-sdk-resource": "messages",
-        "x-sdk-method": "send",
-        "x-sdk-activation": "not-routed"
-      },
       "get": {
         "operationId": "listConversationMessages",
         "x-beeos-api-id": "MESSAGE-API-002",
@@ -2995,64 +2734,6 @@
         "x-sdk-activation": "live"
       }
     },
-    "/realtime/sessions": {
-      "post": {
-        "operationId": "createRealtimeSession",
-        "x-beeos-api-id": "REALTIME-API-001",
-        "x-required-scopes": [
-          "events:subscribe"
-        ],
-        "parameters": [
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRealtimeSessionInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Personal realtime transport session",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RealtimeSession"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Stable error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AgentAPIError"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-provenance": "App vendored/t07-server.openapi.json",
-        "x-sdk-resource": "runtime",
-        "x-sdk-method": "createRealtimeSession",
-        "x-sdk-activation": "not-routed"
-      }
-    },
     "/agents/{agentId}/invoke": {
       "post": {
         "operationId": "invokeAgent",
@@ -3172,459 +2853,6 @@
             }
           }
         }
-      }
-    },
-    "/usage/history": {
-      "get": {
-        "operationId": "getUsageHistory",
-        "x-beeos-api-id": "USAGE-API-002",
-        "x-beeos-sdk-symbol": "SDK-SERVER-RAW-USAGE-API-002",
-        "parameters": [
-          {
-            "name": "external_user_id",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "category",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100
-            }
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Key-owned App usage history",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UsagePage"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-sdk-provenance": "openapi/beeos-cloud/t04/server-openapi.json",
-        "x-sdk-resource": "usage",
-        "x-sdk-method": "getHistory",
-        "x-sdk-activation": "not-routed"
-      }
-    },
-    "/usage/limits": {
-      "get": {
-        "operationId": "getUsageLimits",
-        "x-beeos-api-id": "USAGE-API-003",
-        "x-beeos-sdk-symbol": "SDK-SERVER-RAW-USAGE-API-003",
-        "responses": {
-          "200": {
-            "description": "Key-owned App effective limits; never includes Wallet, price, or Order",
-            "headers": {
-              "ETag": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EffectiveLimits"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-sdk-provenance": "openapi/beeos-cloud/t04/server-openapi.json",
-        "x-sdk-resource": "usage",
-        "x-sdk-method": "getLimits",
-        "x-sdk-activation": "not-routed",
-        "parameters": []
-      }
-    },
-    "/agents/{agentId}/tasks/{taskId}/webhooks": {
-      "post": {
-        "operationId": "registerTaskWebhook",
-        "tags": [
-          "tasks"
-        ],
-        "summary": "Register a webhook callback for terminal task events.",
-        "description": "Subscribes a caller-supplied HTTPS endpoint to receive POST\ncallbacks when the task reaches a terminal state (`completed` /\n`failed` / `canceled` / `timeout` / `rejected`). Idempotent on\n`(task_id, url)` \u2014 re-registering the same URL updates the token.\n\nImplementation note: openapi-gateway is zero-DB; the underlying\nsubscription is stored by A2A Service in its `webhooks` table.\nThe webhook fires regardless of which protocol created the task\n(OpenAPI / A2A / MCP) \u2014 same row, different `protocol_filter`.\n",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterTaskWebhookRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Webhook registered.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskWebhookResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/RateLimited"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/ServerError"
-          }
-        },
-        "x-sdk-resource": "taskWebhooks",
-        "x-sdk-method": "create",
-        "x-sdk-activation": "not-routed",
-        "parameters": [
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "agentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      },
-      "get": {
-        "operationId": "listTaskWebhooks",
-        "tags": [
-          "tasks"
-        ],
-        "summary": "List registered webhooks for a task.",
-        "responses": {
-          "200": {
-            "description": "Webhook list.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListTaskWebhooksResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/RateLimited"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/ServerError"
-          }
-        },
-        "x-sdk-resource": "taskWebhooks",
-        "x-sdk-method": "list",
-        "x-sdk-activation": "not-routed",
-        "parameters": [
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "agentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/agents/{agentId}/tasks/{taskId}/webhooks/{webhookId}": {
-      "delete": {
-        "operationId": "deleteTaskWebhook",
-        "tags": [
-          "tasks"
-        ],
-        "summary": "Unsubscribe a webhook.",
-        "responses": {
-          "204": {
-            "description": "Webhook removed."
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/RateLimited"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/ServerError"
-          }
-        },
-        "x-sdk-resource": "taskWebhooks",
-        "x-sdk-method": "delete",
-        "x-sdk-activation": "not-routed",
-        "parameters": [
-          {
-            "name": "webhookId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "agentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/agents/{agentId}/tasks/{taskId}/webhooks/{webhookId}/deliveries": {
-      "get": {
-        "operationId": "listWebhookDeliveries",
-        "tags": [
-          "tasks"
-        ],
-        "summary": "List webhook delivery attempts (audit log).",
-        "description": "Returns the most recent per-attempt rows for this webhook\nsubscription, newest first. P2-A \u2014 durable delivery audit\nlog + retry queue.\n\nEach row carries the lifecycle status (`pending` /\n`succeeded` / `failed` / `dead_letter`), the most recent\nHTTP status code, the truncated last error, and the\nscheduled time of the next attempt while the row is still\nin-flight. Sensitive fields \u2014 the rendered payload bytes,\nthe optional bearer `token`, and the HMAC `secret` \u2014 are\nNEVER returned.\n\nUse this endpoint when:\n  * a callback didn't arrive and you need to confirm\n    whether BeeOS attempted it (`status=failed` /\n    `dead_letter` with a populated `last_error`);\n  * you're reconciling a missed webhook against\n    `GET /tasks/{id}` and want a definitive audit trail;\n  * you intend to manually replay a dead-lettered row via\n    `POST .../redeliver`.\n",
-        "parameters": [
-          {
-            "name": "webhookId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "agentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "description": "Maximum number of delivery rows to return. Clamped to\n[1, 200]; default 50.\n",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 200,
-              "default": 50
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of recent delivery attempts.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListWebhookDeliveriesResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/RateLimited"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/ServerError"
-          }
-        },
-        "x-sdk-resource": "taskWebhooks",
-        "x-sdk-method": "listDeliveries",
-        "x-sdk-activation": "not-routed"
-      }
-    },
-    "/agents/{agentId}/tasks/{taskId}/webhooks/{webhookId}/deliveries/{deliveryId}/redeliver": {
-      "post": {
-        "operationId": "redeliverWebhook",
-        "tags": [
-          "tasks"
-        ],
-        "summary": "Manually replay a webhook delivery.",
-        "description": "Clones a terminal-failure or dead-lettered delivery row\ninto a fresh `pending` row that the background dispatcher\nwill pick up on its next poll. The original row is\npreserved for audit. The returned `WebhookDeliveryResponse`\nis the new pending row \u2014 poll the delivery list or watch\nthe callback URL itself to observe outcome.\n\nThe source row MUST be in status `failed` or\n`dead_letter`; replaying `pending` or `succeeded` rows\nreturns `409 conflict` with code\n`conflict.invalid_state`. The clone replays the EXACT\npayload bytes the receiver should have seen the first\ntime \u2014 HMAC signatures, headers, body \u2014 so receivers can\ntreat redeliver attempts identically to original\nattempts.\n\nCaveat: each redeliver call enqueues a NEW pending row,\nso repeated clicks produce repeated deliveries. This\nendpoint is for manual rescue, not for caller-side\nretry-on-network-error.\n",
-        "responses": {
-          "202": {
-            "description": "Replay enqueued. Returns the new pending row.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "success",
-                    "data"
-                  ],
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "enum": [
-                        true
-                      ]
-                    },
-                    "data": {
-                      "$ref": "#/components/schemas/WebhookDeliveryResponse"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "429": {
-            "$ref": "#/components/responses/RateLimited"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/ServerError"
-          }
-        },
-        "x-sdk-resource": "taskWebhooks",
-        "x-sdk-method": "redeliver",
-        "x-sdk-activation": "not-routed",
-        "parameters": [
-          {
-            "name": "deliveryId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "webhookId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "agentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
       }
     },
     "/instances/{instanceId}/runtime-capabilities": {
@@ -3958,66 +3186,6 @@
         ]
       }
     },
-    "/instances/{instanceId}/operations/{operationId}/events": {
-      "get": {
-        "operationId": "streamRuntimeOperationEvents",
-        "summary": "Stream runtime operation events",
-        "parameters": [
-          {
-            "name": "operationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Last-Event-ID",
-            "in": "header",
-            "schema": {
-              "type": "string",
-              "maxLength": 128
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Durable resumable operation events. Every event data field is a RuntimeOperationEventEnvelope.",
-            "content": {
-              "text/event-stream": {
-                "schema": {
-                  "type": "string",
-                  "x-event-data-schema": {
-                    "$ref": "#/components/schemas/RuntimeOperationEventEnvelope"
-                  }
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Last-Event-ID is ahead of the authoritative public sequence.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceOperationCursorConflict"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-resource": "operations",
-        "x-sdk-method": "getEvents",
-        "x-sdk-activation": "not-routed"
-      }
-    },
     "/instances/{instanceId}/operations/{operationId}/cancel": {
       "post": {
         "operationId": "cancelRuntimeOperation",
@@ -4332,460 +3500,6 @@
         "parameters": [
           {
             "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/uhp/v1/uhp": {
-      "get": {
-        "tags": [
-          "Discovery"
-        ],
-        "operationId": "getDiscovery",
-        "summary": "Protocol discovery document",
-        "description": "Served without authentication: a client must be able to learn whether it is talking to a UHP\nserver, and which versions it speaks, before presenting credentials. The document contains\nnothing principal-specific.\n",
-        "security": [],
-        "responses": {
-          "200": {
-            "description": "The discovery document",
-            "headers": {
-              "UHP-Version": {
-                "$ref": "#/components/headers/UHPVersion"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPDiscovery"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "catalog",
-        "x-sdk-method": "getDiscovery",
-        "x-sdk-activation": "live",
-        "parameters": []
-      }
-    },
-    "/uhp/v1/harnesses": {
-      "get": {
-        "tags": [
-          "Harnesses"
-        ],
-        "operationId": "listHarnesses",
-        "summary": "List configured harnesses",
-        "responses": {
-          "200": {
-            "description": "Harnesses within the caller's scope. May be empty.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "harnesses"
-                  ],
-                  "properties": {
-                    "harnesses": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/UHPHarness"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "harnesses",
-        "x-sdk-method": "list",
-        "x-sdk-activation": "live",
-        "parameters": []
-      }
-    },
-    "/uhp/v1/harnesses/{harness_id}": {
-      "get": {
-        "tags": [
-          "Harnesses"
-        ],
-        "operationId": "getHarness",
-        "summary": "Get one harness",
-        "responses": {
-          "200": {
-            "description": "The harness",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPHarness"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "harnesses",
-        "x-sdk-method": "get",
-        "x-sdk-activation": "live",
-        "parameters": [
-          {
-            "name": "harness_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/uhp/v1/models": {
-      "get": {
-        "tags": [
-          "Harnesses"
-        ],
-        "operationId": "listModels",
-        "summary": "The model catalogue, by backend",
-        "responses": {
-          "200": {
-            "description": "Models grouped by backend, each with computed availability",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPModelCatalog"
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "harnesses",
-        "x-sdk-method": "listAllModels",
-        "x-sdk-activation": "live",
-        "parameters": []
-      }
-    },
-    "/uhp/v1/harnesses/{harness_id}/models": {
-      "get": {
-        "tags": [
-          "Harnesses"
-        ],
-        "operationId": "listHarnessModels",
-        "summary": "Models this harness can run",
-        "responses": {
-          "200": {
-            "description": "The harness's allowed models, default and authorized fallback",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPHarnessModels"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "harnesses",
-        "x-sdk-method": "listModels",
-        "x-sdk-activation": "live",
-        "parameters": [
-          {
-            "name": "harness_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/uhp/v1/responses": {
-      "post": {
-        "tags": [
-          "Tasks"
-        ],
-        "operationId": "createResponse",
-        "summary": "Run a task",
-        "description": "The core of the protocol. With `stream: false` the server returns one Response object when\nthe task reaches a terminal state. With `stream: true` it returns `text/event-stream`\ncarrying the events defined in the Streaming chapter.\n\nRetries MUST carry `Idempotency-Key`: without one, a retry after a timeout runs the task a\nsecond time while the first may still be running.\n",
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "maxLength": 255
-            },
-            "description": "Repeating a key returns the first request's result and does not re-execute."
-          },
-          {
-            "name": "UHP-Version",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "examples": [
-                "2026-08-11"
-              ]
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UHPCreateResponseRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The finished Response (non-streaming), or the event stream (streaming).\n",
-            "headers": {
-              "UHP-Version": {
-                "$ref": "#/components/headers/UHPVersion"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPResponse"
-                }
-              },
-              "text/event-stream": {
-                "schema": {
-                  "type": "string",
-                  "description": "SSE; each `data:` line is one Event object."
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity"
-          },
-          "429": {
-            "$ref": "#/components/responses/RateLimited"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "responses",
-        "x-sdk-method": "create",
-        "x-sdk-activation": "live",
-        "x-sdk-response-stream": "stream=true returns text/event-stream; stream=false returns UHPResponse",
-        "x-sdk-event-schema": {
-          "$ref": "#/components/schemas/UHPEvent"
-        }
-      }
-    },
-    "/uhp/v1/responses/{response_id}": {
-      "get": {
-        "tags": [
-          "Tasks"
-        ],
-        "operationId": "getResponse",
-        "summary": "Read a task back",
-        "responses": {
-          "200": {
-            "description": "The Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "responses",
-        "x-sdk-method": "get",
-        "x-sdk-activation": "live",
-        "parameters": [
-          {
-            "name": "response_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Tasks"
-        ],
-        "operationId": "deleteResponse",
-        "summary": "Delete a stored response",
-        "description": "Must not cancel a running task \u2014 deletion and cancellation are different intentions.",
-        "responses": {
-          "200": {
-            "description": "Deleted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "deleted": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "responses",
-        "x-sdk-method": "delete",
-        "x-sdk-activation": "live",
-        "parameters": [
-          {
-            "name": "response_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/uhp/v1/responses/{response_id}/input_items": {
-      "get": {
-        "tags": [
-          "Tasks"
-        ],
-        "operationId": "getResponseInputItems",
-        "summary": "The input the task was created with",
-        "responses": {
-          "200": {
-            "description": "Input items",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "object": {
-                      "type": "string",
-                      "enum": [
-                        "list"
-                      ]
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "additionalProperties": {
-                          "$ref": "#/components/schemas/JSONValue"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "responses",
-        "x-sdk-method": "getInputItems",
-        "x-sdk-activation": "live",
-        "parameters": [
-          {
-            "name": "response_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/uhp/v1/responses/{response_id}/cancel": {
-      "post": {
-        "tags": [
-          "Sessions"
-        ],
-        "operationId": "cancelResponse",
-        "summary": "Cancel a running task",
-        "description": "Idempotent. Cancelling an already-terminal task succeeds and changes nothing \u2014 a client\nretrying a cancel after a dropped connection must not be punished for having succeeded.\n",
-        "responses": {
-          "200": {
-            "description": "The Response, now cancelling or terminal",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
-        "x-sdk-resource": "responses",
-        "x-sdk-method": "cancel",
-        "x-sdk-activation": "live",
-        "parameters": [
-          {
-            "name": "response_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -5241,50 +3955,6 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/events/session": {
-      "post": {
-        "operationId": "createEventSession",
-        "x-sdk-resource": "eventSessions",
-        "x-sdk-method": "create",
-        "x-sdk-activation": "not-routed",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerEventConnectionDescriptor"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServerEventSessionInput"
               }
             }
           }
@@ -5935,405 +4605,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/images": {
-      "get": {
-        "operationId": "listImages",
-        "x-sdk-resource": "images",
-        "x-sdk-method": "list",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "post": {
-        "operationId": "createImage",
-        "x-sdk-resource": "images",
-        "x-sdk-method": "create",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/JSONValue"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/images/{imageId}": {
-      "get": {
-        "operationId": "getImage",
-        "x-sdk-resource": "images",
-        "x-sdk-method": "get",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "imageId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "put": {
-        "operationId": "updateImage",
-        "x-sdk-resource": "images",
-        "x-sdk-method": "update",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "imageId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "If-Match",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/JSONValue"
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "operationId": "deleteImage",
-        "x-sdk-resource": "images",
-        "x-sdk-method": "delete",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "imageId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/images/{imageId}/versions": {
-      "get": {
-        "operationId": "listImageVersions",
-        "x-sdk-resource": "images",
-        "x-sdk-method": "listVersions",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "imageId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "post": {
-        "operationId": "createImageVersion",
-        "x-sdk-resource": "images",
-        "x-sdk-method": "createVersion",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "imageId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/JSONValue"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/image-versions/{versionId}": {
-      "get": {
-        "operationId": "getImageVersion",
-        "x-sdk-resource": "imageVersions",
-        "x-sdk-method": "get",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "versionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "put": {
-        "operationId": "updateImageVersion",
-        "x-sdk-resource": "imageVersions",
-        "x-sdk-method": "update",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "versionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "If-Match",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/JSONValue"
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "operationId": "deleteImageVersion",
-        "x-sdk-resource": "imageVersions",
-        "x-sdk-method": "delete",
-        "x-sdk-activation": "legacy-undocumented",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "versionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JSONValue"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
           }
         }
       }
@@ -8391,58 +6662,6 @@
         }
       }
     },
-    "/uhp/v1/responses/{response_id}/events": {
-      "get": {
-        "operationId": "getResponseEvents",
-        "x-sdk-resource": "responses",
-        "x-sdk-method": "getEvents",
-        "x-sdk-activation": "live",
-        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
-        "parameters": [
-          {
-            "name": "response_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Last-Event-ID",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "UHP-Version",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Server-sent protocol events",
-            "content": {
-              "text/event-stream": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPEvent"
-                }
-              }
-            }
-          },
-          "default": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-sdk-base-path": "/uhp/v1",
-        "x-sdk-stream": true
-      }
-    },
     "/audio/transcribe": {
       "post": {
         "operationId": "transcribeAudio",
@@ -9812,6 +8031,694 @@
           }
         }
       }
+    },
+    "/uhp": {
+      "get": {
+        "tags": [
+          "Discovery"
+        ],
+        "operationId": "getDiscovery",
+        "summary": "Protocol discovery document",
+        "description": "Served without authentication: a client must be able to learn whether it is talking to a UHP\nserver, and which versions it speaks, before presenting credentials. The document contains\nnothing principal-specific.\n",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "The discovery document",
+            "headers": {
+              "UHP-Version": {
+                "$ref": "#/components/headers/UHPVersion"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPDiscovery"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "catalog",
+        "x-sdk-method": "getDiscovery",
+        "x-sdk-activation": "live",
+        "parameters": [],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/harnesses": {
+      "get": {
+        "tags": [
+          "Harnesses"
+        ],
+        "operationId": "listHarnesses",
+        "summary": "List configured harnesses",
+        "responses": {
+          "200": {
+            "description": "Harnesses within the caller's scope. May be empty.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "harnesses"
+                  ],
+                  "properties": {
+                    "harnesses": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UHPHarness"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "harnesses",
+        "x-sdk-method": "list",
+        "x-sdk-activation": "live",
+        "parameters": [],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/harnesses/{harness_id}": {
+      "get": {
+        "tags": [
+          "Harnesses"
+        ],
+        "operationId": "getHarness",
+        "summary": "Get one harness",
+        "responses": {
+          "200": {
+            "description": "The harness",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPHarness"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "harnesses",
+        "x-sdk-method": "get",
+        "x-sdk-activation": "live",
+        "parameters": [
+          {
+            "name": "harness_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/models": {
+      "get": {
+        "tags": [
+          "Harnesses"
+        ],
+        "operationId": "listModels",
+        "summary": "The model catalogue, by backend",
+        "responses": {
+          "200": {
+            "description": "Models grouped by backend, each with computed availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPModelCatalog"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "harnesses",
+        "x-sdk-method": "listAllModels",
+        "x-sdk-activation": "live",
+        "parameters": [],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/harnesses/{harness_id}/models": {
+      "get": {
+        "tags": [
+          "Harnesses"
+        ],
+        "operationId": "listHarnessModels",
+        "summary": "Models this harness can run",
+        "responses": {
+          "200": {
+            "description": "The harness's allowed models, default and authorized fallback",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPHarnessModels"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "harnesses",
+        "x-sdk-method": "listModels",
+        "x-sdk-activation": "live",
+        "parameters": [
+          {
+            "name": "harness_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/responses": {
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "createResponse",
+        "summary": "Run a task",
+        "description": "The core of the protocol. With `stream: false` the server returns one Response object when\nthe task reaches a terminal state. With `stream: true` it returns `text/event-stream`\ncarrying the events defined in the Streaming chapter.\n\nRetries MUST carry `Idempotency-Key`: without one, a retry after a timeout runs the task a\nsecond time while the first may still be running.\n",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Repeating a key returns the first request's result and does not re-execute."
+          },
+          {
+            "name": "UHP-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "2026-08-11"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UHPCreateResponseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The finished Response (non-streaming), or the event stream (streaming).\n",
+            "headers": {
+              "UHP-Version": {
+                "$ref": "#/components/headers/UHPVersion"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPResponse"
+                }
+              },
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "SSE; each `data:` line is one Event object."
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "responses",
+        "x-sdk-method": "create",
+        "x-sdk-activation": "live",
+        "x-sdk-response-stream": "stream=true returns text/event-stream; stream=false returns UHPResponse",
+        "x-sdk-event-schema": {
+          "$ref": "#/components/schemas/UHPEvent"
+        },
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/responses/{response_id}": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "getResponse",
+        "summary": "Read a task back",
+        "responses": {
+          "200": {
+            "description": "The Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "responses",
+        "x-sdk-method": "get",
+        "x-sdk-activation": "live",
+        "parameters": [
+          {
+            "name": "response_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "deleteResponse",
+        "summary": "Delete a stored response",
+        "description": "Must not cancel a running task \u2014 deletion and cancellation are different intentions.",
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "responses",
+        "x-sdk-method": "delete",
+        "x-sdk-activation": "live",
+        "parameters": [
+          {
+            "name": "response_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/responses/{response_id}/input_items": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "getResponseInputItems",
+        "summary": "The input the task was created with",
+        "responses": {
+          "200": {
+            "description": "Input items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "list"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "$ref": "#/components/schemas/JSONValue"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "responses",
+        "x-sdk-method": "getInputItems",
+        "x-sdk-activation": "live",
+        "parameters": [
+          {
+            "name": "response_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/responses/{response_id}/cancel": {
+      "post": {
+        "tags": [
+          "Sessions"
+        ],
+        "operationId": "cancelResponse",
+        "summary": "Cancel a running task",
+        "description": "Idempotent. Cancelling an already-terminal task succeeds and changes nothing \u2014 a client\nretrying a cancel after a dropped connection must not be punished for having succeeded.\n",
+        "responses": {
+          "200": {
+            "description": "The Response, now cancelling or terminal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "responses",
+        "x-sdk-method": "cancel",
+        "x-sdk-activation": "live",
+        "parameters": [
+          {
+            "name": "response_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
+    },
+    "/responses/{response_id}/events": {
+      "get": {
+        "operationId": "getResponseEvents",
+        "x-sdk-resource": "responses",
+        "x-sdk-method": "getEvents",
+        "x-sdk-activation": "live",
+        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
+        "parameters": [
+          {
+            "name": "response_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Last-Event-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "UHP-Version",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server-sent protocol events",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPEvent"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-stream": true,
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -10245,77 +9152,6 @@
           }
         }
       },
-      "InstanceResult": {
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/InstanceSummary"
-          }
-        }
-      },
-      "InstanceConfigPatch": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "model_primary": {
-            "type": "string"
-          },
-          "models": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "system_prompt": {
-            "type": "string"
-          },
-          "mcp_servers": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/components/schemas/JSONValue"
-              }
-            }
-          }
-        }
-      },
-      "InstanceLogEntry": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "timestamp",
-          "message"
-        ],
-        "properties": {
-          "timestamp": {
-            "type": "string"
-          },
-          "stream": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      },
-      "InstanceLogPage": {
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InstanceLogEntry"
-            }
-          }
-        }
-      },
       "ProviderCapabilities": {
         "type": "object",
         "properties": {
@@ -10579,25 +9415,6 @@
           }
         }
       },
-      "AgentAPIError": {
-        "type": "object",
-        "required": [
-          "code",
-          "message",
-          "request_id"
-        ],
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "request_id": {
-            "type": "string"
-          }
-        }
-      },
       "AgentResponse": {
         "type": "object",
         "required": [
@@ -10742,29 +9559,6 @@
           }
         }
       },
-      "SendMessageInput": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "message"
-        ],
-        "properties": {
-          "message": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 65536
-          },
-          "content": {
-            "x-go-type": "json.RawMessage"
-          },
-          "parts": {
-            "type": "array",
-            "items": {
-              "x-go-type": "json.RawMessage"
-            }
-          }
-        }
-      },
       "Message": {
         "type": "object",
         "required": [
@@ -10844,17 +9638,6 @@
               "unconfirmed",
               "not_republished"
             ]
-          }
-        }
-      },
-      "MessageResponse": {
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/Message"
           }
         }
       },
@@ -11079,55 +9862,6 @@
           }
         }
       },
-      "CreateRealtimeSessionInput": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "ttl_seconds": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": 1
-          }
-        }
-      },
-      "RealtimeSession": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "token",
-          "service_url",
-          "identity",
-          "expires_at",
-          "private_channels"
-        ],
-        "properties": {
-          "token": {
-            "type": "string",
-            "minLength": 1
-          },
-          "service_url": {
-            "type": "string",
-            "minLength": 1
-          },
-          "identity": {
-            "type": "string",
-            "minLength": 1
-          },
-          "expires_at": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "private_channels": {
-            "type": "array",
-            "minItems": 1,
-            "maxItems": 1,
-            "items": {
-              "type": "string",
-              "minLength": 1
-            }
-          }
-        }
-      },
       "CreateTaskInput": {
         "type": "object",
         "additionalProperties": false,
@@ -11322,702 +10056,6 @@
             "type": "boolean"
           }
         }
-      },
-      "UsagePage": {
-        "type": "object",
-        "required": [
-          "records",
-          "total"
-        ],
-        "properties": {
-          "records": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UsageRecord"
-            }
-          },
-          "total": {
-            "type": "integer",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "EffectiveLimits": {
-        "type": "object",
-        "required": [
-          "scope",
-          "subject_id",
-          "limits",
-          "current_usage",
-          "reservations",
-          "quota_revision",
-          "resource_version"
-        ],
-        "properties": {
-          "scope": {
-            "type": "string",
-            "enum": [
-              "developer",
-              "organization",
-              "app"
-            ]
-          },
-          "subject_id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "limits": {
-            "$ref": "#/components/schemas/LimitSet"
-          },
-          "current_usage": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "minimum": 0
-            }
-          },
-          "reservations": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "minimum": 0
-            }
-          },
-          "reset_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "quota_revision": {
-            "type": "string",
-            "minLength": 1
-          },
-          "rate_card_revision": {
-            "type": "string"
-          },
-          "resource_version": {
-            "type": "integer",
-            "minimum": 0
-          }
-        },
-        "additionalProperties": false
-      },
-      "SuccessEnvelope": {
-        "type": "object",
-        "required": [
-          "success"
-        ],
-        "properties": {
-          "success": {
-            "type": "boolean",
-            "enum": [
-              true
-            ]
-          }
-        }
-      },
-      "ServiceRuntimeMethod": {
-        "type": "string",
-        "enum": [
-          "session/set_mode",
-          "agent/create",
-          "agent/update",
-          "agent/delete",
-          "agent/applyTemplate",
-          "skills/list",
-          "skills/install",
-          "skills/uninstall",
-          "skills/update",
-          "models/list",
-          "cron/list",
-          "cron/status",
-          "cron/add",
-          "cron/update",
-          "cron/remove",
-          "cron/run",
-          "cron/runs",
-          "mcp/list",
-          "mcp/prepare",
-          "mcp/set",
-          "mcp/unset",
-          "session/clear",
-          "session/set_model",
-          "session/cancel"
-        ]
-      },
-      "RuntimeOperationError": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "code",
-          "message",
-          "operationId",
-          "effectState",
-          "retryMode"
-        ],
-        "properties": {
-          "code": {
-            "$schema": "https://json-schema.org/draft/2020-12/schema",
-            "enum": [
-              "AGENT_DEFAULT_MODEL_NOT_CONFIGURED",
-              "COMMAND_EXPIRED",
-              "CONTRACT_VERSION_MISMATCH",
-              "CONVERSATION_CLEARING",
-              "HISTORY_GENERATION_MISMATCH",
-              "IDEMPOTENCY_CONFLICT",
-              "INSTANCE_EPOCH_MISMATCH",
-              "INSTANCE_OFFLINE",
-              "INVALID_EXECUTION_GRANT",
-              "INVALID_INVOCATION",
-              "METHOD_NOT_SUPPORTED",
-              "OPERATION_CANCELLED",
-              "OPERATION_NOT_CANCELLABLE",
-              "OPERATION_NOT_FOUND",
-              "OUTCOME_UNKNOWN",
-              "PROJECTION_BLOCKED",
-              "PROJECTION_PENDING",
-              "RUNTIME_EXECUTION_FAILED",
-              "UNAUTHORIZED_PUBLISHER",
-              "UNAUTHORIZED_TARGET",
-              "USE_AGENTS_API"
-            ],
-            "title": "RuntimeErrorCode",
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "operationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "requestId": {
-            "type": "string"
-          },
-          "effectState": {
-            "type": "string",
-            "enum": [
-              "failed",
-              "cancelled",
-              "expired",
-              "outcome_unknown",
-              "committed"
-            ]
-          },
-          "retryMode": {
-            "type": "string",
-            "enum": [
-              "none",
-              "resume",
-              "resubmit"
-            ]
-          },
-          "context": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "activeRuntimeEpoch": {
-                "type": "string",
-                "pattern": "^(0|[1-9][0-9]*)$"
-              },
-              "projectionRevision": {
-                "type": "string",
-                "pattern": "^(0|[1-9][0-9]*)$"
-              },
-              "retryAfterMs": {
-                "type": "integer",
-                "minimum": 0
-              },
-              "expectedContractRevision": {
-                "type": "string"
-              },
-              "resourceId": {
-                "type": "string"
-              },
-              "deliveryFailure": {
-                "$ref": "#/components/schemas/RuntimeDeliveryFailure"
-              }
-            }
-          }
-        }
-      },
-      "RuntimeDeliveryFailure": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "code",
-          "phase"
-        ],
-        "properties": {
-          "code": {
-            "type": "string",
-            "enum": [
-              "HTTP_REJECTED",
-              "TRANSPORT_FAILED",
-              "LEASE_UNAVAILABLE",
-              "LEASE_EXPIRED",
-              "LEASE_CHANGED",
-              "ORIGIN_REJECTED",
-              "INVALID_DELIVERY_RESPONSE",
-              "HISTORY_UNAVAILABLE",
-              "OUTCOME_UNKNOWN",
-              "EXECUTION_FAILED",
-              "REJECTED"
-            ]
-          },
-          "phase": {
-            "type": "string",
-            "enum": [
-              "delivery_read",
-              "delivery_ack",
-              "operation_history",
-              "operation_append",
-              "run_start",
-              "reply_patch",
-              "run_finish",
-              "execution",
-              "terminal_append"
-            ]
-          },
-          "status": {
-            "type": "integer",
-            "minimum": 100,
-            "maximum": 599
-          }
-        }
-      },
-      "ServiceOperationCursorConflict": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "code",
-          "operationId",
-          "cursor",
-          "lastSequence",
-          "httpStatus"
-        ],
-        "properties": {
-          "code": {
-            "enum": [
-              "OPERATION_CURSOR_AHEAD"
-            ]
-          },
-          "operationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "cursor": {
-            "type": "string",
-            "pattern": "^(0|[1-9][0-9]*)$"
-          },
-          "lastSequence": {
-            "type": "string",
-            "pattern": "^(0|[1-9][0-9]*)$"
-          },
-          "httpStatus": {
-            "enum": [
-              409
-            ]
-          }
-        }
-      },
-      "RuntimeOperationEventEnvelope": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "id",
-          "operationId",
-          "method",
-          "event"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^(0|[1-9][0-9]*)$"
-          },
-          "operationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "method": {
-            "$ref": "#/components/schemas/ServiceRuntimeMethod"
-          },
-          "event": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "type",
-              "sequence",
-              "recordedAt"
-            ],
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "runtime_operation_started",
-                  "runtime_operation_progress",
-                  "runtime_effect_committed",
-                  "runtime_projection_pending",
-                  "runtime_projection_synced",
-                  "runtime_projection_blocked",
-                  "runtime_operation_cancel_requested",
-                  "runtime_rpc_response"
-                ]
-              },
-              "sequence": {
-                "type": "string",
-                "pattern": "^(0|[1-9][0-9]*)$"
-              },
-              "recordedAt": {
-                "type": "string",
-                "format": "date-time"
-              },
-              "payload": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "claimedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "executionMode": {
-                    "type": "string",
-                    "enum": [
-                      "start"
-                    ]
-                  },
-                  "phase": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "current": {
-                    "type": "number",
-                    "minimum": 0
-                  },
-                  "total": {
-                    "type": "number",
-                    "minimum": 0
-                  },
-                  "committedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "projectionRevision": {
-                    "type": "string",
-                    "pattern": "^(0|[1-9][0-9]*)$"
-                  },
-                  "revision": {
-                    "type": "string",
-                    "pattern": "^(0|[1-9][0-9]*)$"
-                  },
-                  "platformAgentId": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "errorCode": {
-                    "type": "string",
-                    "enum": [
-                      "PROJECTION_BLOCKED"
-                    ]
-                  },
-                  "causeCode": {
-                    "$schema": "https://json-schema.org/draft/2020-12/schema",
-                    "enum": [
-                      "AGENT_DEFAULT_MODEL_NOT_CONFIGURED",
-                      "COMMAND_EXPIRED",
-                      "CONTRACT_VERSION_MISMATCH",
-                      "CONVERSATION_CLEARING",
-                      "HISTORY_GENERATION_MISMATCH",
-                      "IDEMPOTENCY_CONFLICT",
-                      "INSTANCE_EPOCH_MISMATCH",
-                      "INSTANCE_OFFLINE",
-                      "INVALID_EXECUTION_GRANT",
-                      "INVALID_INVOCATION",
-                      "METHOD_NOT_SUPPORTED",
-                      "OPERATION_CANCELLED",
-                      "OPERATION_NOT_CANCELLABLE",
-                      "OPERATION_NOT_FOUND",
-                      "OUTCOME_UNKNOWN",
-                      "PROJECTION_BLOCKED",
-                      "PROJECTION_PENDING",
-                      "RUNTIME_EXECUTION_FAILED",
-                      "UNAUTHORIZED_PUBLISHER",
-                      "UNAUTHORIZED_TARGET",
-                      "USE_AGENTS_API"
-                    ],
-                    "title": "RuntimeErrorCode",
-                    "type": "string"
-                  },
-                  "requestedBy": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "reason": {
-                    "type": "string"
-                  }
-                }
-              },
-              "outcome": {
-                "type": "string",
-                "enum": [
-                  "succeeded",
-                  "failed",
-                  "cancelled",
-                  "expired",
-                  "outcome_unknown",
-                  "projection_blocked"
-                ]
-              },
-              "result": {},
-              "revision": {
-                "type": "string",
-                "pattern": "^(0|[1-9][0-9]*)$"
-              },
-              "error": {
-                "$ref": "#/components/schemas/RuntimeOperationError"
-              }
-            }
-          }
-        }
-      },
-      "ActionResult": {
-        "type": "object",
-        "title": "ActionResult",
-        "description": "Generic acknowledgement that a mutating control action completed.",
-        "required": [
-          "ok"
-        ],
-        "properties": {
-          "ok": {
-            "type": "boolean"
-          }
-        }
-      },
-      "RegisterTaskWebhookRequest": {
-        "type": "object",
-        "required": [
-          "url"
-        ],
-        "properties": {
-          "url": {
-            "type": "string",
-            "format": "uri",
-            "description": "Absolute HTTPS endpoint to POST callbacks to. The receiver\ngets the protocol-specific payload (OpenAPI: a task event\nenvelope; A2A: JSON-RPC StreamResponse; MCP: notification).\n"
-          },
-          "token": {
-            "type": "string",
-            "description": "Optional bearer token sent as `Authorization: Bearer <token>`\non each callback so the receiver can verify the call.\n"
-          },
-          "secret": {
-            "type": "string",
-            "description": "P2-A \u2014 HMAC-SHA256 signing key. When set, the deliverer\nsigns every callback body and emits\n`X-BeeOS-Signature: t=<unix>,v1=<hex>` where\n`hex = hmac_sha256(secret, t || \".\" || body)`. The receiver\nshould re-run the same HMAC to authenticate; mismatched\ntimestamps (\u00b15 min recommended tolerance) should be\nrejected to defend against replay.\n\n**Write-only**. Never echoed on Get / List responses; the\n`has_secret` boolean on `TaskWebhookResponse` is the only\nobservable signal. Rotate by Set-ing a fresh value;\npassing `\"\"` on update preserves the existing secret (use\nDELETE + re-register to clear).\n",
-            "minLength": 16,
-            "maxLength": 256
-          }
-        }
-      },
-      "TaskWebhookResponse": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/SuccessEnvelope"
-          },
-          {
-            "type": "object",
-            "required": [
-              "data"
-            ],
-            "properties": {
-              "data": {
-                "type": "object",
-                "required": [
-                  "webhook_id",
-                  "task_id",
-                  "url",
-                  "has_secret"
-                ],
-                "properties": {
-                  "webhook_id": {
-                    "type": "string"
-                  },
-                  "task_id": {
-                    "type": "string"
-                  },
-                  "url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "has_secret": {
-                    "type": "boolean",
-                    "description": "`true` when an HMAC signing secret is configured\nfor this webhook (P2-A). The raw secret is never\nreturned \u2014 receivers verify against the secret\nthey originally registered.\n"
-                  },
-                  "created_at": {
-                    "type": "string",
-                    "format": "date-time"
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "ListTaskWebhooksResponse": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/SuccessEnvelope"
-          },
-          {
-            "type": "object",
-            "required": [
-              "data"
-            ],
-            "properties": {
-              "data": {
-                "type": "object",
-                "required": [
-                  "webhooks"
-                ],
-                "properties": {
-                  "webhooks": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "required": [
-                        "webhook_id",
-                        "task_id",
-                        "url",
-                        "has_secret"
-                      ],
-                      "properties": {
-                        "webhook_id": {
-                          "type": "string"
-                        },
-                        "task_id": {
-                          "type": "string"
-                        },
-                        "url": {
-                          "type": "string",
-                          "format": "uri"
-                        },
-                        "has_secret": {
-                          "type": "boolean"
-                        },
-                        "created_at": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ]
-      },
-      "WebhookDeliveryResponse": {
-        "type": "object",
-        "required": [
-          "delivery_id",
-          "webhook_id",
-          "task_id",
-          "renderer",
-          "status",
-          "attempt_num",
-          "last_response_status",
-          "next_attempt_at",
-          "created_at"
-        ],
-        "properties": {
-          "delivery_id": {
-            "type": "string"
-          },
-          "webhook_id": {
-            "type": "string"
-          },
-          "task_id": {
-            "type": "string"
-          },
-          "renderer": {
-            "type": "string",
-            "enum": [
-              "openapi",
-              "a2a",
-              "generic",
-              "mcp"
-            ],
-            "description": "Payload format used at delivery time. OpenAPI callbacks\nregistered through this gateway use the `openapi`\nrenderer (TaskEvent envelope).\n"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "succeeded",
-              "failed",
-              "dead_letter"
-            ],
-            "description": "Lifecycle of this attempt.\n* `pending` \u2014 queued for first attempt or awaiting retry\n* `succeeded` \u2014 receiver returned 2xx (terminal)\n* `failed` \u2014 last attempt errored / non-2xx, will be\n  retried per the backoff schedule (intermediate)\n* `dead_letter` \u2014 exhausted retry schedule (terminal).\n  Recoverable via `POST .../redeliver`.\n"
-          },
-          "attempt_num": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "1-indexed count of attempts already made. New rows\nsurface as 0 until the dispatcher claims them.\n"
-          },
-          "last_response_status": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "HTTP status of the most recent attempt. `0` means\n\"never attempted\" (transport or pre-flight error\nbefore any HTTP response).\n"
-          },
-          "last_error": {
-            "type": "string",
-            "description": "Truncated copy (\u2264 2 KiB) of the most recent failure\nreason \u2014 either a transport error\n(`transport: connection refused`) or\n`http_status: <code>`. Empty on success / never\nattempted.\n"
-          },
-          "next_attempt_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Scheduled time for the next attempt while `status` is\n`pending`. On terminal rows this carries the last\nscheduled value (no longer meaningful for retries).\n"
-          },
-          "last_attempted_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "completed_at": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "ListWebhookDeliveriesResponse": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/SuccessEnvelope"
-          },
-          {
-            "type": "object",
-            "required": [
-              "data"
-            ],
-            "properties": {
-              "data": {
-                "type": "object",
-                "required": [
-                  "deliveries"
-                ],
-                "properties": {
-                  "deliveries": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/WebhookDeliveryResponse"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ]
       },
       "ErrorResponse": {
         "type": "object",
@@ -15367,74 +13405,6 @@
         ],
         "additionalProperties": false
       },
-      "ServerEventSessionInput": {
-        "type": "object",
-        "properties": {
-          "platform": {
-            "type": "string"
-          },
-          "event_types": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "instance_ids": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "agent_ids": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "task_ids": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "conversation_ids": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [],
-        "additionalProperties": false
-      },
-      "ServerEventConnectionDescriptor": {
-        "type": "object",
-        "properties": {
-          "transport": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
-          },
-          "expires_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "session_id": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "transport",
-          "url",
-          "token",
-          "expires_at"
-        ],
-        "additionalProperties": false
-      },
       "CreateServerInstanceInput": {
         "type": "object",
         "properties": {
@@ -15541,125 +13511,6 @@
           "data",
           "operation"
         ],
-        "additionalProperties": false
-      },
-      "NonNegativeAmount": {
-        "type": "string",
-        "pattern": "^(0|[1-9][0-9]*)$",
-        "description": "Non-negative integer amount encoded as a decimal string."
-      },
-      "LimitSet": {
-        "type": "object",
-        "required": [
-          "values",
-          "entitlements"
-        ],
-        "properties": {
-          "values": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "integer",
-              "minimum": 0
-            }
-          },
-          "entitlements": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "boolean"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "UsageRecord": {
-        "type": "object",
-        "required": [
-          "id",
-          "organization_id",
-          "app_id",
-          "request_id",
-          "meter",
-          "unit",
-          "amount",
-          "amount_bc",
-          "rate_card_revision",
-          "reference",
-          "metadata",
-          "created_at"
-        ],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "developer_id": {
-            "type": "string"
-          },
-          "organization_id": {
-            "type": "string"
-          },
-          "app_id": {
-            "type": "string"
-          },
-          "external_user_id": {
-            "type": "string"
-          },
-          "api_key_id": {
-            "type": "string"
-          },
-          "instance_id": {
-            "type": "string"
-          },
-          "agent_id": {
-            "type": "string"
-          },
-          "task_id": {
-            "type": "string"
-          },
-          "method": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          },
-          "http_status": {
-            "type": "integer"
-          },
-          "latency_ms": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "request_id": {
-            "type": "string"
-          },
-          "meter": {
-            "type": "string"
-          },
-          "unit": {
-            "type": "string"
-          },
-          "amount": {
-            "$ref": "#/components/schemas/NonNegativeAmount"
-          },
-          "amount_bc": {
-            "$ref": "#/components/schemas/NonNegativeAmount"
-          },
-          "rate_card_revision": {
-            "type": "string"
-          },
-          "reference": {
-            "type": "string"
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
         "additionalProperties": false
       },
       "UpdateServerInstanceInput": {
@@ -17288,229 +15139,7 @@
         "additionalProperties": false
       }
     },
-    "parameters": {
-      "ExternalUserID": {
-        "name": "X-BeeOS-External-User-ID",
-        "in": "header",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/ExternalUserID"
-        }
-      },
-      "ExternalUserPathID": {
-        "name": "externalUserId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "$ref": "#/components/schemas/ExternalUserID"
-        }
-      },
-      "SessionID": {
-        "name": "sessionId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "DeletionID": {
-        "name": "deletionId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "IdempotencyKey": {
-        "name": "Idempotency-Key",
-        "in": "header",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
-        }
-      },
-      "Status": {
-        "name": "status",
-        "in": "query",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "Capability": {
-        "name": "capability",
-        "in": "query",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ProviderID": {
-        "name": "provider_id",
-        "in": "query",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "Region": {
-        "name": "region",
-        "in": "query",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "InstanceId": {
-        "name": "instanceId",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128
-        }
-      },
-      "IfMatch": {
-        "name": "If-Match",
-        "in": "header",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "MemoryId": {
-        "name": "memory_id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "MemoryRecordId": {
-        "name": "record_id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "EnvironmentId": {
-        "name": "environment_id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "pattern": "^henv_"
-        }
-      },
-      "EnvironmentPath": {
-        "name": "path",
-        "in": "path",
-        "required": true,
-        "description": "A path relative to the environment's root. A trailing slash names a directory.",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "BuildVersion": {
-        "name": "version",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "integer",
-          "minimum": 1
-        }
-      },
-      "HarnessId": {
-        "name": "harness_id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "pattern": "^chrn_"
-        }
-      },
-      "SkillName": {
-        "name": "skill_name",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "PluginName": {
-        "name": "plugin_name",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ResponseId": {
-        "name": "response_id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "pattern": "^resp_"
-        }
-      },
-      "SessionId": {
-        "name": "session_id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "ContainerId": {
-        "name": "container_id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "FileId": {
-        "name": "file_id",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        }
-      },
-      "BrowserIdempotencyKey": {
-        "name": "Idempotency-Key",
-        "in": "header",
-        "description": "Browser tasks require this header or the idempotency_key body field.\nIf both are present they must agree. Reuse identical input and key\nafter ambiguous failures; never retry with a replacement key.\nDoes not apply to continuing an existing browser task.\n",
-        "schema": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 128,
-          "pattern": "^[!-~]+$"
-        }
-      }
-    },
     "responses": {
-      "Error": {
-        "description": "Cloud Server error envelope. UHP operations use the protocol envelope.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            }
-          }
-        }
-      },
-      "BadRequest": {
-        "description": "The request was malformed, or a field has the wrong type.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/UHPErrorEnvelope"
-            }
-          }
-        }
-      },
       "Unauthorized": {
         "description": "Missing, malformed or unknown credential",
         "content": {
@@ -17551,16 +15180,6 @@
           }
         }
       },
-      "PayloadTooLarge": {
-        "description": "`file_too_large`",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/UHPErrorEnvelope"
-            }
-          }
-        }
-      },
       "RateLimited": {
         "description": "`rate_limited` or `quota_exhausted`",
         "headers": {
@@ -17574,51 +15193,6 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/UHPErrorEnvelope"
-            }
-          }
-        }
-      },
-      "ControlActionOK": {
-        "description": "Standard `{ success, data }` envelope; `data` is an\n[`ActionResult`](#/components/schemas/ActionResult) (`{ ok: true }`)\nacknowledging the device action completed. Device-reported\nfailures map to 400 `action_unsupported` / `invalid_param`,\n409 `device_busy`, 503 `device_offline`, or 504 `service_timeout`.\n",
-        "content": {
-          "application/json": {
-            "schema": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "data"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/ActionResult"
-                    }
-                  }
-                }
-              ]
-            }
-          }
-        }
-      },
-      "Forbidden": {
-        "description": "Caller doesn't own the resource. `code` is `forbidden`.",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            }
-          }
-        }
-      },
-      "ServerError": {
-        "description": "Server-side fault. `code` is one of:\n\n- `internal_error` (500) \u2014 unexpected\n- `agent_offline` / `agent_service_unavailable` (503) \u2014 agent or messaging\n  subsystem unreachable\n- `auth_unavailable` / `auth_transient` (503) \u2014 Auth gRPC transient\n- `service_timeout` (504) \u2014 gateway gave up waiting for the agent\n- `control_rate_limit_unavailable` (503) \u2014 atomic control admission\n  could not be checked; no device command was dispatched\n\nSee [docs/reference/errors.md](https://github.com/beeos-ai/beeos/blob/main/docs/reference/errors.md).\n",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
             }
           }
         }

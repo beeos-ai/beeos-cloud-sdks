@@ -9,7 +9,7 @@
     "repository": "beeos-ai/beeos-app-backend",
     "revision": "793c79ef0e0a68f9b55cdf9ee627fdf8c94e9870",
     "directory": "services/beeos-app-service/third_party/beeos-cloud-sdk-go",
-    "role": "documented legacy Server wire types, retained with activation metadata; producer implementations override live shapes"
+    "role": "reference wire types for live Server operations; producer implementations override the public shapes"
   },
   "canvas": {
     "repository": "beeos-ai/beeos-cloud-canvas",
@@ -26,10 +26,9 @@
     "dependency": "PyYAML==6.0.3",
     "procedure": "Fetch the split producer remote, review changes in public route registrations and schema producers, update --producer-ref to the reviewed full commit SHA; refresh; npm run generate; run all language strict checks and tests. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes."
   },
+  "version": "2.0.0",
   "activation": {
-    "live": "Registered Server-key producer route",
-    "not-routed": "Previously documented Server operation, currently absent from Server composition",
-    "legacy-undocumented": "Published 1.0.0 method without a producer wire schema; genuinely unconstrained JSON is preserved"
+    "live": "Registered Server-key producer route; all non-live operations are excluded"
   },
   "input_sha256": {
     "app-sdk/client.go": "b816f06153a238e72f621b8cafa1cb4d03007b89e9fe29d12d46bdc5a37a03f5",

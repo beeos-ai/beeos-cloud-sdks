@@ -260,54 +260,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/instances/{instanceId}/restart": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["restartInstance"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/logs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getInstanceLogs"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/config": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["updateInstanceConfig"];
-        trace?: never;
-    };
     "/instances/{instanceId}/upgrade": {
         parameters: {
             query?: never;
@@ -413,7 +365,7 @@ export interface paths {
         };
         get: operations["listConversationMessages"];
         put?: never;
-        post: operations["sendConversationMessage"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -564,22 +516,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/realtime/sessions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["createRealtimeSession"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/agents/{agentId}/invoke": {
         parameters: {
             query?: never;
@@ -606,162 +542,6 @@ export interface paths {
         get: operations["getUsageSummary"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/usage/history": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getUsageHistory"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/usage/limits": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getUsageLimits"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/agents/{agentId}/tasks/{taskId}/webhooks": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List registered webhooks for a task. */
-        get: operations["listTaskWebhooks"];
-        put?: never;
-        /**
-         * Register a webhook callback for terminal task events.
-         * @description Subscribes a caller-supplied HTTPS endpoint to receive POST
-         *     callbacks when the task reaches a terminal state (`completed` /
-         *     `failed` / `canceled` / `timeout` / `rejected`). Idempotent on
-         *     `(task_id, url)` — re-registering the same URL updates the token.
-         *
-         *     Implementation note: openapi-gateway is zero-DB; the underlying
-         *     subscription is stored by A2A Service in its `webhooks` table.
-         *     The webhook fires regardless of which protocol created the task
-         *     (OpenAPI / A2A / MCP) — same row, different `protocol_filter`.
-         */
-        post: operations["registerTaskWebhook"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/agents/{agentId}/tasks/{taskId}/webhooks/{webhookId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Unsubscribe a webhook. */
-        delete: operations["deleteTaskWebhook"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/agents/{agentId}/tasks/{taskId}/webhooks/{webhookId}/deliveries": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List webhook delivery attempts (audit log).
-         * @description Returns the most recent per-attempt rows for this webhook
-         *     subscription, newest first. P2-A — durable delivery audit
-         *     log + retry queue.
-         *
-         *     Each row carries the lifecycle status (`pending` /
-         *     `succeeded` / `failed` / `dead_letter`), the most recent
-         *     HTTP status code, the truncated last error, and the
-         *     scheduled time of the next attempt while the row is still
-         *     in-flight. Sensitive fields — the rendered payload bytes,
-         *     the optional bearer `token`, and the HMAC `secret` — are
-         *     NEVER returned.
-         *
-         *     Use this endpoint when:
-         *       * a callback didn't arrive and you need to confirm
-         *         whether BeeOS attempted it (`status=failed` /
-         *         `dead_letter` with a populated `last_error`);
-         *       * you're reconciling a missed webhook against
-         *         `GET /tasks/{id}` and want a definitive audit trail;
-         *       * you intend to manually replay a dead-lettered row via
-         *         `POST .../redeliver`.
-         */
-        get: operations["listWebhookDeliveries"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/agents/{agentId}/tasks/{taskId}/webhooks/{webhookId}/deliveries/{deliveryId}/redeliver": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Manually replay a webhook delivery.
-         * @description Clones a terminal-failure or dead-lettered delivery row
-         *     into a fresh `pending` row that the background dispatcher
-         *     will pick up on its next poll. The original row is
-         *     preserved for audit. The returned `WebhookDeliveryResponse`
-         *     is the new pending row — poll the delivery list or watch
-         *     the callback URL itself to observe outcome.
-         *
-         *     The source row MUST be in status `failed` or
-         *     `dead_letter`; replaying `pending` or `succeeded` rows
-         *     returns `409 conflict` with code
-         *     `conflict.invalid_state`. The clone replays the EXACT
-         *     payload bytes the receiver should have seen the first
-         *     time — HMAC signatures, headers, body — so receivers can
-         *     treat redeliver attempts identically to original
-         *     attempts.
-         *
-         *     Caveat: each redeliver call enqueues a NEW pending row,
-         *     so repeated clicks produce repeated deliveries. This
-         *     endpoint is for manual rescue, not for caller-side
-         *     retry-on-network-error.
-         */
-        post: operations["redeliverWebhook"];
         delete?: never;
         options?: never;
         head?: never;
@@ -836,23 +616,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/instances/{instanceId}/operations/{operationId}/events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Stream runtime operation events */
-        get: operations["streamRuntimeOperationEvents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/instances/{instanceId}/operations/{operationId}/cancel": {
         parameters: {
             query?: never;
@@ -898,180 +661,6 @@ export interface paths {
         put?: never;
         /** Create a canvas session */
         post: operations["createCanvasSession"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/uhp": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Protocol discovery document
-         * @description Served without authentication: a client must be able to learn whether it is talking to a UHP
-         *     server, and which versions it speaks, before presenting credentials. The document contains
-         *     nothing principal-specific.
-         */
-        get: operations["getDiscovery"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/harnesses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List configured harnesses */
-        get: operations["listHarnesses"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/harnesses/{harness_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get one harness */
-        get: operations["getHarness"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/models": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The model catalogue, by backend */
-        get: operations["listModels"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/harnesses/{harness_id}/models": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Models this harness can run */
-        get: operations["listHarnessModels"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/responses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Run a task
-         * @description The core of the protocol. With `stream: false` the server returns one Response object when
-         *     the task reaches a terminal state. With `stream: true` it returns `text/event-stream`
-         *     carrying the events defined in the Streaming chapter.
-         *
-         *     Retries MUST carry `Idempotency-Key`: without one, a retry after a timeout runs the task a
-         *     second time while the first may still be running.
-         */
-        post: operations["createResponse"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/responses/{response_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Read a task back */
-        get: operations["getResponse"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete a stored response
-         * @description Must not cancel a running task — deletion and cancellation are different intentions.
-         */
-        delete: operations["deleteResponse"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/responses/{response_id}/input_items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The input the task was created with */
-        get: operations["getResponseInputItems"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/uhp/v1/responses/{response_id}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Cancel a running task
-         * @description Idempotent. Cancelling an already-terminal task succeeds and changes nothing — a client
-         *     retrying a cancel after a dropped connection must not be punished for having succeeded.
-         */
-        post: operations["cancelResponse"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1156,22 +745,6 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["renameFile"];
-        trace?: never;
-    };
-    "/events/session": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["createEventSession"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
         trace?: never;
     };
     "/mcp/servers": {
@@ -1313,70 +886,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/images": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listImages"];
-        put?: never;
-        post: operations["createImage"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/images/{imageId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getImage"];
-        put: operations["updateImage"];
-        post?: never;
-        delete: operations["deleteImage"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/images/{imageId}/versions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listImageVersions"];
-        put?: never;
-        post: operations["createImageVersion"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/image-versions/{versionId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getImageVersion"];
-        put: operations["updateImageVersion"];
-        post?: never;
-        delete: operations["deleteImageVersion"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1846,22 +1355,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/uhp/v1/responses/{response_id}/events": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getResponseEvents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/audio/transcribe": {
         parameters: {
             query?: never;
@@ -2134,6 +1627,196 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/uhp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Protocol discovery document
+         * @description Served without authentication: a client must be able to learn whether it is talking to a UHP
+         *     server, and which versions it speaks, before presenting credentials. The document contains
+         *     nothing principal-specific.
+         */
+        get: operations["getDiscovery"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/harnesses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List configured harnesses */
+        get: operations["listHarnesses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/harnesses/{harness_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one harness */
+        get: operations["getHarness"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The model catalogue, by backend */
+        get: operations["listModels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/harnesses/{harness_id}/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Models this harness can run */
+        get: operations["listHarnessModels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/responses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run a task
+         * @description The core of the protocol. With `stream: false` the server returns one Response object when
+         *     the task reaches a terminal state. With `stream: true` it returns `text/event-stream`
+         *     carrying the events defined in the Streaming chapter.
+         *
+         *     Retries MUST carry `Idempotency-Key`: without one, a retry after a timeout runs the task a
+         *     second time while the first may still be running.
+         */
+        post: operations["createResponse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/responses/{response_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read a task back */
+        get: operations["getResponse"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a stored response
+         * @description Must not cancel a running task — deletion and cancellation are different intentions.
+         */
+        delete: operations["deleteResponse"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/responses/{response_id}/input_items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The input the task was created with */
+        get: operations["getResponseInputItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/responses/{response_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a running task
+         * @description Idempotent. Cancelling an already-terminal task succeeds and changes nothing — a client
+         *     retrying a cancel after a dropped connection must not be punished for having succeeded.
+         */
+        post: operations["cancelResponse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/responses/{response_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getResponseEvents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2254,25 +1937,6 @@ export interface components {
             data: components["schemas"]["InstanceSummary"][];
             total: number;
         };
-        InstanceResult: {
-            data: components["schemas"]["InstanceSummary"];
-        };
-        InstanceConfigPatch: {
-            model_primary?: string;
-            models?: string[];
-            system_prompt?: string;
-            mcp_servers?: {
-                [key: string]: JSONValue;
-            }[];
-        };
-        InstanceLogEntry: {
-            timestamp: string;
-            stream?: string;
-            message: string;
-        };
-        InstanceLogPage: {
-            data: components["schemas"]["InstanceLogEntry"][];
-        };
         ProviderCapabilities: {
             long_running: boolean;
             browser_use: boolean;
@@ -2339,11 +2003,6 @@ export interface components {
             mcp_enabled?: boolean;
             a2a_enabled?: boolean;
         };
-        AgentAPIError: {
-            code: string;
-            message: string;
-            request_id: string;
-        };
         AgentResponse: {
             data: components["schemas"]["AgentSnapshot"];
         };
@@ -2384,11 +2043,6 @@ export interface components {
             next_cursor?: string;
             has_more: boolean;
         };
-        SendMessageInput: {
-            message: string;
-            content?: JSONValue;
-            parts?: JSONValue[];
-        };
         Message: {
             id: string;
             conversation_id: string;
@@ -2415,9 +2069,6 @@ export interface components {
             };
             /** @enum {string} */
             realtime_publish_status?: "published" | "unconfirmed" | "not_republished";
-        };
-        MessageResponse: {
-            data: components["schemas"]["Message"];
         };
         MessagePage: {
             messages: components["schemas"]["Message"][];
@@ -2478,18 +2129,6 @@ export interface components {
         ClearConversationReceiptResponse: {
             data: components["schemas"]["ClearConversationReceipt"];
         };
-        CreateRealtimeSessionInput: {
-            /** Format: int64 */
-            ttl_seconds?: number;
-        };
-        RealtimeSession: {
-            token: string;
-            service_url: string;
-            identity: string;
-            /** Format: int64 */
-            expires_at: number;
-            private_channels: string[];
-        };
         CreateTaskInput: {
             message: string;
             context_id?: string;
@@ -2547,241 +2186,6 @@ export interface components {
         ContinueTaskInput: {
             input?: JSONValue;
             auth_grant?: boolean;
-        };
-        UsagePage: {
-            records: components["schemas"]["UsageRecord"][];
-            total: number;
-        };
-        EffectiveLimits: {
-            /** @enum {string} */
-            scope: "developer" | "organization" | "app";
-            subject_id: string;
-            limits: components["schemas"]["LimitSet"];
-            current_usage: {
-                [key: string]: number;
-            };
-            reservations: {
-                [key: string]: number;
-            };
-            /** Format: date-time */
-            reset_at?: string;
-            quota_revision: string;
-            rate_card_revision?: string;
-            resource_version: number;
-        };
-        SuccessEnvelope: {
-            /** @enum {boolean} */
-            success: true;
-        };
-        /** @enum {string} */
-        ServiceRuntimeMethod: "session/set_mode" | "agent/create" | "agent/update" | "agent/delete" | "agent/applyTemplate" | "skills/list" | "skills/install" | "skills/uninstall" | "skills/update" | "models/list" | "cron/list" | "cron/status" | "cron/add" | "cron/update" | "cron/remove" | "cron/run" | "cron/runs" | "mcp/list" | "mcp/prepare" | "mcp/set" | "mcp/unset" | "session/clear" | "session/set_model" | "session/cancel";
-        RuntimeOperationError: {
-            /**
-             * RuntimeErrorCode
-             * @enum {string}
-             */
-            code: "AGENT_DEFAULT_MODEL_NOT_CONFIGURED" | "COMMAND_EXPIRED" | "CONTRACT_VERSION_MISMATCH" | "CONVERSATION_CLEARING" | "HISTORY_GENERATION_MISMATCH" | "IDEMPOTENCY_CONFLICT" | "INSTANCE_EPOCH_MISMATCH" | "INSTANCE_OFFLINE" | "INVALID_EXECUTION_GRANT" | "INVALID_INVOCATION" | "METHOD_NOT_SUPPORTED" | "OPERATION_CANCELLED" | "OPERATION_NOT_CANCELLABLE" | "OPERATION_NOT_FOUND" | "OUTCOME_UNKNOWN" | "PROJECTION_BLOCKED" | "PROJECTION_PENDING" | "RUNTIME_EXECUTION_FAILED" | "UNAUTHORIZED_PUBLISHER" | "UNAUTHORIZED_TARGET" | "USE_AGENTS_API";
-            message: string;
-            /** Format: uuid */
-            operationId: string;
-            requestId?: string;
-            /** @enum {string} */
-            effectState: "failed" | "cancelled" | "expired" | "outcome_unknown" | "committed";
-            /** @enum {string} */
-            retryMode: "none" | "resume" | "resubmit";
-            context?: {
-                activeRuntimeEpoch?: string;
-                projectionRevision?: string;
-                retryAfterMs?: number;
-                expectedContractRevision?: string;
-                resourceId?: string;
-                deliveryFailure?: components["schemas"]["RuntimeDeliveryFailure"];
-            };
-        };
-        RuntimeDeliveryFailure: {
-            /** @enum {string} */
-            code: "HTTP_REJECTED" | "TRANSPORT_FAILED" | "LEASE_UNAVAILABLE" | "LEASE_EXPIRED" | "LEASE_CHANGED" | "ORIGIN_REJECTED" | "INVALID_DELIVERY_RESPONSE" | "HISTORY_UNAVAILABLE" | "OUTCOME_UNKNOWN" | "EXECUTION_FAILED" | "REJECTED";
-            /** @enum {string} */
-            phase: "delivery_read" | "delivery_ack" | "operation_history" | "operation_append" | "run_start" | "reply_patch" | "run_finish" | "execution" | "terminal_append";
-            status?: number;
-        };
-        ServiceOperationCursorConflict: {
-            /** @enum {unknown} */
-            code: "OPERATION_CURSOR_AHEAD";
-            /** Format: uuid */
-            operationId: string;
-            cursor: string;
-            lastSequence: string;
-            /** @enum {unknown} */
-            httpStatus: 409;
-        };
-        RuntimeOperationEventEnvelope: {
-            id: string;
-            /** Format: uuid */
-            operationId: string;
-            method: components["schemas"]["ServiceRuntimeMethod"];
-            event: {
-                /** @enum {string} */
-                type: "runtime_operation_started" | "runtime_operation_progress" | "runtime_effect_committed" | "runtime_projection_pending" | "runtime_projection_synced" | "runtime_projection_blocked" | "runtime_operation_cancel_requested" | "runtime_rpc_response";
-                sequence: string;
-                /** Format: date-time */
-                recordedAt: string;
-                payload?: {
-                    /** Format: date-time */
-                    claimedAt?: string;
-                    /** @enum {string} */
-                    executionMode?: "start";
-                    phase?: string;
-                    current?: number;
-                    total?: number;
-                    /** Format: date-time */
-                    committedAt?: string;
-                    projectionRevision?: string;
-                    revision?: string;
-                    platformAgentId?: string;
-                    /** @enum {string} */
-                    errorCode?: "PROJECTION_BLOCKED";
-                    /**
-                     * RuntimeErrorCode
-                     * @enum {string}
-                     */
-                    causeCode?: "AGENT_DEFAULT_MODEL_NOT_CONFIGURED" | "COMMAND_EXPIRED" | "CONTRACT_VERSION_MISMATCH" | "CONVERSATION_CLEARING" | "HISTORY_GENERATION_MISMATCH" | "IDEMPOTENCY_CONFLICT" | "INSTANCE_EPOCH_MISMATCH" | "INSTANCE_OFFLINE" | "INVALID_EXECUTION_GRANT" | "INVALID_INVOCATION" | "METHOD_NOT_SUPPORTED" | "OPERATION_CANCELLED" | "OPERATION_NOT_CANCELLABLE" | "OPERATION_NOT_FOUND" | "OUTCOME_UNKNOWN" | "PROJECTION_BLOCKED" | "PROJECTION_PENDING" | "RUNTIME_EXECUTION_FAILED" | "UNAUTHORIZED_PUBLISHER" | "UNAUTHORIZED_TARGET" | "USE_AGENTS_API";
-                    requestedBy?: string;
-                    reason?: string;
-                };
-                /** @enum {string} */
-                outcome?: "succeeded" | "failed" | "cancelled" | "expired" | "outcome_unknown" | "projection_blocked";
-                result?: JSONValue;
-                revision?: string;
-                error?: components["schemas"]["RuntimeOperationError"];
-            };
-        };
-        /**
-         * ActionResult
-         * @description Generic acknowledgement that a mutating control action completed.
-         */
-        ActionResult: {
-            ok: boolean;
-        };
-        RegisterTaskWebhookRequest: {
-            /**
-             * Format: uri
-             * @description Absolute HTTPS endpoint to POST callbacks to. The receiver
-             *     gets the protocol-specific payload (OpenAPI: a task event
-             *     envelope; A2A: JSON-RPC StreamResponse; MCP: notification).
-             */
-            url: string;
-            /**
-             * @description Optional bearer token sent as `Authorization: Bearer <token>`
-             *     on each callback so the receiver can verify the call.
-             */
-            token?: string;
-            /**
-             * @description P2-A — HMAC-SHA256 signing key. When set, the deliverer
-             *     signs every callback body and emits
-             *     `X-BeeOS-Signature: t=<unix>,v1=<hex>` where
-             *     `hex = hmac_sha256(secret, t || "." || body)`. The receiver
-             *     should re-run the same HMAC to authenticate; mismatched
-             *     timestamps (±5 min recommended tolerance) should be
-             *     rejected to defend against replay.
-             *
-             *     **Write-only**. Never echoed on Get / List responses; the
-             *     `has_secret` boolean on `TaskWebhookResponse` is the only
-             *     observable signal. Rotate by Set-ing a fresh value;
-             *     passing `""` on update preserves the existing secret (use
-             *     DELETE + re-register to clear).
-             */
-            secret?: string;
-        };
-        TaskWebhookResponse: components["schemas"]["SuccessEnvelope"] & {
-            data: {
-                webhook_id: string;
-                task_id: string;
-                /** Format: uri */
-                url: string;
-                /**
-                 * @description `true` when an HMAC signing secret is configured
-                 *     for this webhook (P2-A). The raw secret is never
-                 *     returned — receivers verify against the secret
-                 *     they originally registered.
-                 */
-                has_secret: boolean;
-                /** Format: date-time */
-                created_at?: string;
-            };
-        };
-        ListTaskWebhooksResponse: components["schemas"]["SuccessEnvelope"] & {
-            data: {
-                webhooks: {
-                    webhook_id: string;
-                    task_id: string;
-                    /** Format: uri */
-                    url: string;
-                    has_secret: boolean;
-                    /** Format: date-time */
-                    created_at?: string;
-                }[];
-            };
-        };
-        WebhookDeliveryResponse: {
-            delivery_id: string;
-            webhook_id: string;
-            task_id: string;
-            /**
-             * @description Payload format used at delivery time. OpenAPI callbacks
-             *     registered through this gateway use the `openapi`
-             *     renderer (TaskEvent envelope).
-             * @enum {string}
-             */
-            renderer: "openapi" | "a2a" | "generic" | "mcp";
-            /**
-             * @description Lifecycle of this attempt.
-             *     * `pending` — queued for first attempt or awaiting retry
-             *     * `succeeded` — receiver returned 2xx (terminal)
-             *     * `failed` — last attempt errored / non-2xx, will be
-             *       retried per the backoff schedule (intermediate)
-             *     * `dead_letter` — exhausted retry schedule (terminal).
-             *       Recoverable via `POST .../redeliver`.
-             * @enum {string}
-             */
-            status: "pending" | "succeeded" | "failed" | "dead_letter";
-            /**
-             * @description 1-indexed count of attempts already made. New rows
-             *     surface as 0 until the dispatcher claims them.
-             */
-            attempt_num: number;
-            /**
-             * @description HTTP status of the most recent attempt. `0` means
-             *     "never attempted" (transport or pre-flight error
-             *     before any HTTP response).
-             */
-            last_response_status: number;
-            /**
-             * @description Truncated copy (≤ 2 KiB) of the most recent failure
-             *     reason — either a transport error
-             *     (`transport: connection refused`) or
-             *     `http_status: <code>`. Empty on success / never
-             *     attempted.
-             */
-            last_error?: string;
-            /**
-             * Format: date-time
-             * @description Scheduled time for the next attempt while `status` is
-             *     `pending`. On terminal rows this carries the last
-             *     scheduled value (no longer meaningful for retries).
-             */
-            next_attempt_at: string;
-            /** Format: date-time */
-            last_attempted_at?: string;
-            /** Format: date-time */
-            created_at: string;
-            /** Format: date-time */
-            completed_at?: string;
-        };
-        ListWebhookDeliveriesResponse: components["schemas"]["SuccessEnvelope"] & {
-            data: {
-                deliveries: components["schemas"]["WebhookDeliveryResponse"][];
-            };
         };
         ErrorResponse: {
             code: string;
@@ -3924,22 +3328,6 @@ export interface components {
             updated_at?: string;
             completed_at?: string;
         };
-        ServerEventSessionInput: {
-            platform?: string;
-            event_types?: string[];
-            instance_ids?: string[];
-            agent_ids?: string[];
-            task_ids?: string[];
-            conversation_ids?: string[];
-        };
-        ServerEventConnectionDescriptor: {
-            transport: string;
-            url: string;
-            token: string;
-            /** Format: date-time */
-            expires_at: string;
-            session_id?: string;
-        };
         CreateServerInstanceInput: {
             name: string;
             variant_id?: string;
@@ -3969,43 +3357,6 @@ export interface components {
                 connectivity: string;
             };
             operation: components["schemas"]["RuntimeOperationSummary"];
-        };
-        /** @description Non-negative integer amount encoded as a decimal string. */
-        NonNegativeAmount: string;
-        LimitSet: {
-            values: {
-                [key: string]: number;
-            };
-            entitlements: {
-                [key: string]: boolean;
-            };
-        };
-        UsageRecord: {
-            id: string;
-            developer_id?: string;
-            organization_id: string;
-            app_id: string;
-            external_user_id?: string;
-            api_key_id?: string;
-            instance_id?: string;
-            agent_id?: string;
-            task_id?: string;
-            method?: string;
-            path?: string;
-            http_status?: number;
-            latency_ms?: number;
-            request_id: string;
-            meter: string;
-            unit: string;
-            amount: components["schemas"]["NonNegativeAmount"];
-            amount_bc: components["schemas"]["NonNegativeAmount"];
-            rate_card_revision: string;
-            reference: string;
-            metadata: {
-                [key: string]: string;
-            };
-            /** Format: date-time */
-            created_at: string;
         };
         UpdateServerInstanceInput: {
             name?: string;
@@ -4572,24 +3923,6 @@ export interface components {
         };
     };
     responses: {
-        /** @description Cloud Server error envelope. UHP operations use the protocol envelope. */
-        Error: {
-            headers: {
-                [name: string]: JSONValue | undefined;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description The request was malformed, or a field has the wrong type. */
-        BadRequest: {
-            headers: {
-                [name: string]: JSONValue | undefined;
-            };
-            content: {
-                "application/json": components["schemas"]["UHPErrorEnvelope"];
-            };
-        };
         /** @description Missing, malformed or unknown credential */
         Unauthorized: {
             headers: {
@@ -4629,15 +3962,6 @@ export interface components {
                 "application/json": components["schemas"]["UHPErrorEnvelope"];
             };
         };
-        /** @description `file_too_large` */
-        PayloadTooLarge: {
-            headers: {
-                [name: string]: JSONValue | undefined;
-            };
-            content: {
-                "application/json": components["schemas"]["UHPErrorEnvelope"];
-            };
-        };
         /** @description `rate_limited` or `quota_exhausted` */
         RateLimited: {
             headers: {
@@ -4648,87 +3972,8 @@ export interface components {
                 "application/json": components["schemas"]["UHPErrorEnvelope"];
             };
         };
-        /**
-         * @description Standard `{ success, data }` envelope; `data` is an
-         *     [`ActionResult`](#/components/schemas/ActionResult) (`{ ok: true }`)
-         *     acknowledging the device action completed. Device-reported
-         *     failures map to 400 `action_unsupported` / `invalid_param`,
-         *     409 `device_busy`, 503 `device_offline`, or 504 `service_timeout`.
-         */
-        ControlActionOK: {
-            headers: {
-                [name: string]: JSONValue | undefined;
-            };
-            content: {
-                "application/json": components["schemas"]["SuccessEnvelope"] & {
-                    data: components["schemas"]["ActionResult"];
-                };
-            };
-        };
-        /** @description Caller doesn't own the resource. `code` is `forbidden`. */
-        Forbidden: {
-            headers: {
-                [name: string]: JSONValue | undefined;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /**
-         * @description Server-side fault. `code` is one of:
-         *
-         *     - `internal_error` (500) — unexpected
-         *     - `agent_offline` / `agent_service_unavailable` (503) — agent or messaging
-         *       subsystem unreachable
-         *     - `auth_unavailable` / `auth_transient` (503) — Auth gRPC transient
-         *     - `service_timeout` (504) — gateway gave up waiting for the agent
-         *     - `control_rate_limit_unavailable` (503) — atomic control admission
-         *       could not be checked; no device command was dispatched
-         *
-         *     See [docs/reference/errors.md](https://github.com/beeos-ai/beeos/blob/main/docs/reference/errors.md).
-         */
-        ServerError: {
-            headers: {
-                [name: string]: JSONValue | undefined;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
     };
-    parameters: {
-        ExternalUserID: components["schemas"]["ExternalUserID"];
-        ExternalUserPathID: components["schemas"]["ExternalUserID"];
-        SessionID: string;
-        DeletionID: string;
-        IdempotencyKey: string;
-        Status: string;
-        Capability: string;
-        ProviderID: string;
-        Region: string;
-        InstanceId: string;
-        IfMatch: string;
-        MemoryId: string;
-        MemoryRecordId: string;
-        EnvironmentId: string;
-        /** @description A path relative to the environment's root. A trailing slash names a directory. */
-        EnvironmentPath: string;
-        BuildVersion: number;
-        HarnessId: string;
-        SkillName: string;
-        PluginName: string;
-        ResponseId: string;
-        SessionId: string;
-        ContainerId: string;
-        FileId: string;
-        /**
-         * @description Browser tasks require this header or the idempotency_key body field.
-         *     If both are present they must agree. Reuse identical input and key
-         *     after ambiguous failures; never retry with a replacement key.
-         *     Does not apply to continuing an existing browser task.
-         */
-        BrowserIdempotencyKey: string;
-    };
+    parameters: never;
     requestBodies: never;
     headers: {
         /** @description The protocol version actually used to serve this response. */
@@ -5389,87 +4634,6 @@ export interface operations {
             };
         };
     };
-    restartInstance: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-            };
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Restart accepted */
-            202: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["InstanceResult"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    getInstanceLogs: {
-        parameters: {
-            query?: {
-                since?: string;
-                tail?: number;
-                follow?: boolean;
-            };
-            header?: never;
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description JSON log page; follow=true is consumed by streamLogs over SSE */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["InstanceLogPage"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    updateInstanceConfig: {
-        parameters: {
-            query?: never;
-            header: {
-                "If-Match": string;
-            };
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["InstanceConfigPatch"];
-            };
-        };
-        responses: {
-            /** @description Updated Instance */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["InstanceSummary"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
     upgradeInstance: {
         parameters: {
             query?: never;
@@ -5865,45 +5029,6 @@ export interface operations {
             };
         };
     };
-    sendConversationMessage: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-                "X-BeeOS-External-User-ID": string;
-            };
-            path: {
-                agentId: string;
-                conversationId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SendMessageInput"];
-            };
-        };
-        responses: {
-            /** @description Message durably accepted */
-            202: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageResponse"];
-                };
-            };
-            /** @description Stable error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgentAPIError"];
-                };
-            };
-        };
-    };
     getConversationMessage: {
         parameters: {
             query?: never;
@@ -6278,41 +5403,6 @@ export interface operations {
             };
         };
     };
-    createRealtimeSession: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-BeeOS-External-User-ID": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateRealtimeSessionInput"];
-            };
-        };
-        responses: {
-            /** @description Personal realtime transport session */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["RealtimeSession"];
-                };
-            };
-            /** @description Stable error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgentAPIError"];
-                };
-            };
-        };
-    };
     invokeAgent: {
         parameters: {
             query?: never;
@@ -6381,214 +5471,6 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-        };
-    };
-    getUsageHistory: {
-        parameters: {
-            query?: {
-                external_user_id?: string;
-                category?: string;
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Key-owned App usage history */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UsagePage"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    getUsageLimits: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Key-owned App effective limits; never includes Wallet, price, or Order */
-            200: {
-                headers: {
-                    ETag?: string;
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["EffectiveLimits"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    listTaskWebhooks: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                taskId: string;
-                agentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Webhook list. */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListTaskWebhooksResponse"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["RateLimited"];
-            "5XX": components["responses"]["ServerError"];
-        };
-    };
-    registerTaskWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                taskId: string;
-                agentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterTaskWebhookRequest"];
-            };
-        };
-        responses: {
-            /** @description Webhook registered. */
-            201: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["TaskWebhookResponse"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["RateLimited"];
-            "5XX": components["responses"]["ServerError"];
-        };
-    };
-    deleteTaskWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                webhookId: string;
-                taskId: string;
-                agentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Webhook removed. */
-            204: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content?: never;
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["RateLimited"];
-            "5XX": components["responses"]["ServerError"];
-        };
-    };
-    listWebhookDeliveries: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Maximum number of delivery rows to return. Clamped to
-                 *     [1, 200]; default 50.
-                 */
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                webhookId: string;
-                taskId: string;
-                agentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description List of recent delivery attempts. */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ListWebhookDeliveriesResponse"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["RateLimited"];
-            "5XX": components["responses"]["ServerError"];
-        };
-    };
-    redeliverWebhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                deliveryId: string;
-                webhookId: string;
-                taskId: string;
-                agentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Replay enqueued. Returns the new pending row. */
-            202: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        /** @enum {boolean} */
-                        success: true;
-                        data: components["schemas"]["WebhookDeliveryResponse"];
-                    };
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            429: components["responses"]["RateLimited"];
-            "5XX": components["responses"]["ServerError"];
         };
     };
     getRuntimeCapabilities: {
@@ -6793,40 +5675,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    streamRuntimeOperationEvents: {
-        parameters: {
-            query?: never;
-            header?: {
-                "Last-Event-ID"?: string;
-            };
-            path: {
-                operationId: string;
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Durable resumable operation events. Every event data field is a RuntimeOperationEventEnvelope. */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "text/event-stream": string;
-                };
-            };
-            /** @description Last-Event-ID is ahead of the authoritative public sequence. */
-            409: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ServiceOperationCursorConflict"];
                 };
             };
         };
@@ -7041,253 +5889,6 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-        };
-    };
-    getDiscovery: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The discovery document */
-            200: {
-                headers: {
-                    "UHP-Version": components["headers"]["UHPVersion"];
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPDiscovery"];
-                };
-            };
-        };
-    };
-    listHarnesses: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Harnesses within the caller's scope. May be empty. */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        harnesses: components["schemas"]["UHPHarness"][];
-                    };
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-        };
-    };
-    getHarness: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                harness_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The harness */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPHarness"];
-                };
-            };
-            404: components["responses"]["NotFound"];
-        };
-    };
-    listModels: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Models grouped by backend, each with computed availability */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPModelCatalog"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-        };
-    };
-    listHarnessModels: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                harness_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The harness's allowed models, default and authorized fallback */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPHarnessModels"];
-                };
-            };
-            404: components["responses"]["NotFound"];
-        };
-    };
-    createResponse: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Repeating a key returns the first request's result and does not re-execute. */
-                "Idempotency-Key"?: string;
-                "UHP-Version"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UHPCreateResponseJSONRequest"];
-            };
-        };
-        responses: {
-            /** @description The finished Response (non-streaming), or the event stream (streaming). */
-            200: {
-                headers: {
-                    "UHP-Version": components["headers"]["UHPVersion"];
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPResponse"];
-                    "text/event-stream": string;
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            422: components["responses"]["UnprocessableEntity"];
-            429: components["responses"]["RateLimited"];
-        };
-    };
-    getResponse: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                response_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The Response */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPResponse"];
-                };
-            };
-            404: components["responses"]["NotFound"];
-        };
-    };
-    deleteResponse: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                response_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        id?: string;
-                        deleted?: boolean;
-                    };
-                };
-            };
-            404: components["responses"]["NotFound"];
-        };
-    };
-    getResponseInputItems: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                response_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Input items */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        /** @enum {string} */
-                        object?: "list";
-                        data?: {
-                            [key: string]: JSONValue;
-                        }[];
-                    };
-                };
-            };
-            404: components["responses"]["NotFound"];
-        };
-    };
-    cancelResponse: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                response_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The Response, now cancelling or terminal */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPResponse"];
-                };
-            };
-            404: components["responses"]["NotFound"];
         };
     };
     execInstance: {
@@ -7540,33 +6141,6 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-        };
-    };
-    createEventSession: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ServerEventSessionInput"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ServerEventConnectionDescriptor"];
-                };
-            };
-            default: components["responses"]["Error"];
         };
     };
     listMCPServers: {
@@ -7920,260 +6494,6 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-        };
-    };
-    listImages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    createImage: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": JSONValue;
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    getImage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                imageId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    updateImage: {
-        parameters: {
-            query?: never;
-            header: {
-                "If-Match": string;
-            };
-            path: {
-                imageId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": JSONValue;
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    deleteImage: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-            };
-            path: {
-                imageId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    listImageVersions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                imageId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    createImageVersion: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-            };
-            path: {
-                imageId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": JSONValue;
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    getImageVersion: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                versionId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    updateImageVersion: {
-        parameters: {
-            query?: never;
-            header: {
-                "If-Match": string;
-            };
-            path: {
-                versionId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": JSONValue;
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    deleteImageVersion: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-            };
-            path: {
-                versionId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": JSONValue;
-                };
-            };
-            default: components["responses"]["Error"];
         };
     };
     getAgentTemplate: {
@@ -9459,32 +7779,6 @@ export interface operations {
             };
         };
     };
-    getResponseEvents: {
-        parameters: {
-            query?: never;
-            header?: {
-                "Last-Event-ID"?: string;
-                "UHP-Version"?: string;
-            };
-            path: {
-                response_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Server-sent protocol events */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "text/event-stream": components["schemas"]["UHPEvent"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
     transcribeAudio: {
         parameters: {
             query?: never;
@@ -10204,6 +8498,395 @@ export interface operations {
             };
         };
     };
+    getDiscovery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The discovery document */
+            200: {
+                headers: {
+                    "UHP-Version": components["headers"]["UHPVersion"];
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPDiscovery"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    listHarnesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Harnesses within the caller's scope. May be empty. */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": {
+                        harnesses: components["schemas"]["UHPHarness"][];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getHarness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                harness_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The harness */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPHarness"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    listModels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Models grouped by backend, each with computed availability */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPModelCatalog"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    listHarnessModels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                harness_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The harness's allowed models, default and authorized fallback */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPHarnessModels"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    createResponse: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Repeating a key returns the first request's result and does not re-execute. */
+                "Idempotency-Key"?: string;
+                "UHP-Version"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UHPCreateResponseJSONRequest"];
+            };
+        };
+        responses: {
+            /** @description The finished Response (non-streaming), or the event stream (streaming). */
+            200: {
+                headers: {
+                    "UHP-Version": components["headers"]["UHPVersion"];
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPResponse"];
+                    "text/event-stream": string;
+                };
+            };
+            /** @description UHP protocol error envelope */
+            400: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["UnprocessableEntity"];
+            429: components["responses"]["RateLimited"];
+            /** @description UHP protocol error envelope */
+            503: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getResponse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                response_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Response */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    deleteResponse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                response_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": {
+                        id?: string;
+                        deleted?: boolean;
+                    };
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getResponseInputItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                response_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Input items */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        object?: "list";
+                        data?: {
+                            [key: string]: JSONValue;
+                        }[];
+                    };
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    cancelResponse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                response_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Response, now cancelling or terminal */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    getResponseEvents: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Last-Event-ID"?: string;
+                "UHP-Version"?: string;
+            };
+            path: {
+                response_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Server-sent protocol events */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "text/event-stream": components["schemas"]["UHPEvent"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
 }
 
 export type ExternalUserID = components["schemas"]["ExternalUserID"];
@@ -10221,10 +8904,6 @@ export type RegionPage = components["schemas"]["RegionPage"];
 export type ModelPage = components["schemas"]["ModelPage"];
 export type InstanceSummary = components["schemas"]["InstanceSummary"];
 export type InstancePage = components["schemas"]["InstancePage"];
-export type InstanceResult = components["schemas"]["InstanceResult"];
-export type InstanceConfigPatch = components["schemas"]["InstanceConfigPatch"];
-export type InstanceLogEntry = components["schemas"]["InstanceLogEntry"];
-export type InstanceLogPage = components["schemas"]["InstanceLogPage"];
 export type ProviderCapabilities = components["schemas"]["ProviderCapabilities"];
 export type CatalogSpecValue = components["schemas"]["CatalogSpecValue"];
 export type CatalogSpec = components["schemas"]["CatalogSpec"];
@@ -10233,16 +8912,13 @@ export type InstanceTemplatePage = components["schemas"]["InstanceTemplatePage"]
 export type AgentSnapshot = components["schemas"]["AgentSnapshot"];
 export type AgentSkill = components["schemas"]["AgentSkill"];
 export type AgentPatch = components["schemas"]["AgentPatch"];
-export type AgentAPIError = components["schemas"]["AgentAPIError"];
 export type AgentResponse = components["schemas"]["AgentResponse"];
 export type AgentPage = components["schemas"]["AgentPage"];
 export type CreateConversationInput = components["schemas"]["CreateConversationInput"];
 export type Conversation = components["schemas"]["Conversation"];
 export type ConversationResponse = components["schemas"]["ConversationResponse"];
 export type ConversationPage = components["schemas"]["ConversationPage"];
-export type SendMessageInput = components["schemas"]["SendMessageInput"];
 export type Message = components["schemas"]["Message"];
-export type MessageResponse = components["schemas"]["MessageResponse"];
 export type MessagePage = components["schemas"]["MessagePage"];
 export type MessageEnvelope = components["schemas"]["MessageEnvelope"];
 export type MessageEnvelopeResponse = components["schemas"]["MessageEnvelopeResponse"];
@@ -10250,7 +8926,6 @@ export type CommandReceipt = components["schemas"]["CommandReceipt"];
 export type CommandReceiptResponse = components["schemas"]["CommandReceiptResponse"];
 export type ClearConversationReceipt = components["schemas"]["ClearConversationReceipt"];
 export type ClearConversationReceiptResponse = components["schemas"]["ClearConversationReceiptResponse"];
-export type RealtimeSession = components["schemas"]["RealtimeSession"];
 export type CreateTaskInput = components["schemas"]["CreateTaskInput"];
 export type CreateTaskResult = components["schemas"]["CreateTaskResult"];
 export type CreateTaskResponse = components["schemas"]["CreateTaskResponse"];
@@ -10259,18 +8934,6 @@ export type TaskResponse = components["schemas"]["TaskResponse"];
 export type TaskPage = components["schemas"]["TaskPage"];
 export type CancelTaskInput = components["schemas"]["CancelTaskInput"];
 export type ContinueTaskInput = components["schemas"]["ContinueTaskInput"];
-export type UsagePage = components["schemas"]["UsagePage"];
-export type EffectiveLimits = components["schemas"]["EffectiveLimits"];
-export type SuccessEnvelope = components["schemas"]["SuccessEnvelope"];
-export type ServiceRuntimeMethod = components["schemas"]["ServiceRuntimeMethod"];
-export type RuntimeOperationError = components["schemas"]["RuntimeOperationError"];
-export type RuntimeDeliveryFailure = components["schemas"]["RuntimeDeliveryFailure"];
-export type ServiceOperationCursorConflict = components["schemas"]["ServiceOperationCursorConflict"];
-export type RuntimeOperationEventEnvelope = components["schemas"]["RuntimeOperationEventEnvelope"];
-export type ActionResult = components["schemas"]["ActionResult"];
-export type RegisterTaskWebhookRequest = components["schemas"]["RegisterTaskWebhookRequest"];
-export type TaskWebhookResponse = components["schemas"]["TaskWebhookResponse"];
-export type WebhookDeliveryResponse = components["schemas"]["WebhookDeliveryResponse"];
 export type ErrorResponse = components["schemas"]["ErrorResponse"];
 export type UHPDiscovery = components["schemas"]["UHPDiscovery"];
 export type UHPCapabilities = components["schemas"]["UHPCapabilities"];
@@ -10350,14 +9013,9 @@ export type catalogActionDTO = components["schemas"]["catalogActionDTO"];
 export type MCPServerResolution = components["schemas"]["MCPServerResolution"];
 export type CloudSkillOperationPage = components["schemas"]["CloudSkillOperationPage"];
 export type a2aTaskView = components["schemas"]["a2aTaskView"];
-export type ServerEventSessionInput = components["schemas"]["ServerEventSessionInput"];
-export type ServerEventConnectionDescriptor = components["schemas"]["ServerEventConnectionDescriptor"];
 export type CreateServerInstanceInput = components["schemas"]["CreateServerInstanceInput"];
 export type ServerUsageSummary = components["schemas"]["ServerUsageSummary"];
 export type RuntimeInstanceStatusResult = components["schemas"]["RuntimeInstanceStatusResult"];
-export type NonNegativeAmount = components["schemas"]["NonNegativeAmount"];
-export type LimitSet = components["schemas"]["LimitSet"];
-export type UsageRecord = components["schemas"]["UsageRecord"];
 export type UpdateServerInstanceInput = components["schemas"]["UpdateServerInstanceInput"];
 export type FileShareResponse = components["schemas"]["FileShareResponse"];
 export type ReplyShareResponse = components["schemas"]["ReplyShareResponse"];
@@ -10444,11 +9102,6 @@ export type DeleteInstanceResponse = operations["deleteInstance"]["responses"][2
 export type GetInstanceStatusResponse = operations["getInstanceStatus"]["responses"][200]["content"]["application/json"];
 export type StartInstanceResponse = operations["startInstance"]["responses"][202]["content"]["application/json"];
 export type StopInstanceResponse = operations["stopInstance"]["responses"][202]["content"]["application/json"];
-export type RestartInstanceResponse = operations["restartInstance"]["responses"][202]["content"]["application/json"];
-export type GetInstanceLogsResponse = operations["getInstanceLogs"]["responses"][200]["content"]["application/json"];
-export type GetInstanceLogsQuery = NonNullable<operations["getInstanceLogs"]["parameters"]["query"]>;
-export type UpdateInstanceConfigResponse = operations["updateInstanceConfig"]["responses"][200]["content"]["application/json"];
-export type UpdateInstanceConfigInput = NonNullable<operations["updateInstanceConfig"]["requestBody"]>["content"]["application/json"];
 export type UpgradeInstanceResponse = operations["upgradeInstance"]["responses"][202]["content"]["application/json"];
 export type UpgradeInstanceInput = NonNullable<operations["upgradeInstance"]["requestBody"]>["content"]["application/json"];
 export type GetInstanceUpgradeResponse = operations["getInstanceUpgrade"]["responses"][200]["content"]["application/json"];
@@ -10465,8 +9118,6 @@ export type GetConversationResponse = operations["getConversation"]["responses"]
 export type UpdateConversationResponse = operations["updateConversation"]["responses"][200]["content"]["application/json"];
 export type UpdateConversationInput = NonNullable<operations["updateConversation"]["requestBody"]>["content"]["application/json"];
 export type DeleteConversationResponse = void;
-export type SendConversationMessageResponse = operations["sendConversationMessage"]["responses"][202]["content"]["application/json"];
-export type SendConversationMessageInput = NonNullable<operations["sendConversationMessage"]["requestBody"]>["content"]["application/json"];
 export type ListConversationMessagesResponse = operations["listConversationMessages"]["responses"][200]["content"]["application/json"];
 export type ListConversationMessagesQuery = NonNullable<operations["listConversationMessages"]["parameters"]["query"]>;
 export type GetConversationMessageResponse = operations["getConversationMessage"]["responses"][200]["content"]["application/json"];
@@ -10486,45 +9137,21 @@ export type CancelAgentTaskResponse = operations["cancelAgentTask"]["responses"]
 export type CancelAgentTaskInput = NonNullable<operations["cancelAgentTask"]["requestBody"]>["content"]["application/json"];
 export type ContinueAgentTaskResponse = operations["continueAgentTask"]["responses"][202]["content"]["application/json"];
 export type ContinueAgentTaskInput = NonNullable<operations["continueAgentTask"]["requestBody"]>["content"]["application/json"];
-export type CreateRealtimeSessionResponse = operations["createRealtimeSession"]["responses"][200]["content"]["application/json"];
-export type CreateRealtimeSessionInput = NonNullable<operations["createRealtimeSession"]["requestBody"]>["content"]["application/json"];
 export type InvokeAgentResponse = operations["invokeAgent"]["responses"][200]["content"]["application/json"];
 export type InvokeAgentInput = NonNullable<operations["invokeAgent"]["requestBody"]>["content"]["application/json"];
 export type GetUsageSummaryResponse = operations["getUsageSummary"]["responses"][200]["content"]["application/json"];
 export type GetUsageSummaryQuery = NonNullable<operations["getUsageSummary"]["parameters"]["query"]>;
-export type GetUsageHistoryResponse = operations["getUsageHistory"]["responses"][200]["content"]["application/json"];
-export type GetUsageHistoryQuery = NonNullable<operations["getUsageHistory"]["parameters"]["query"]>;
-export type GetUsageLimitsResponse = operations["getUsageLimits"]["responses"][200]["content"]["application/json"];
-export type RegisterTaskWebhookResponse = operations["registerTaskWebhook"]["responses"][201]["content"]["application/json"];
-export type RegisterTaskWebhookInput = NonNullable<operations["registerTaskWebhook"]["requestBody"]>["content"]["application/json"];
-export type ListTaskWebhooksResponse = operations["listTaskWebhooks"]["responses"][200]["content"]["application/json"];
-export type DeleteTaskWebhookResponse = void;
-export type ListWebhookDeliveriesResponse = operations["listWebhookDeliveries"]["responses"][200]["content"]["application/json"];
-export type ListWebhookDeliveriesQuery = NonNullable<operations["listWebhookDeliveries"]["parameters"]["query"]>;
-export type RedeliverWebhookResponse = operations["redeliverWebhook"]["responses"][202]["content"]["application/json"];
 export type GetRuntimeCapabilitiesResponse = operations["getRuntimeCapabilities"]["responses"][200]["content"]["application/json"];
 export type InvokeRuntimeMethodResponse = operations["invokeRuntimeMethod"]["responses"][200]["content"]["application/json"];
 export type InvokeRuntimeMethodInput = NonNullable<operations["invokeRuntimeMethod"]["requestBody"]>["content"]["application/json"];
 export type ListRuntimeOperationsResponse = operations["listRuntimeOperations"]["responses"][200]["content"]["application/json"];
 export type ListRuntimeOperationsQuery = NonNullable<operations["listRuntimeOperations"]["parameters"]["query"]>;
 export type GetRuntimeOperationResponse = operations["getRuntimeOperation"]["responses"][200]["content"]["application/json"];
-export type StreamRuntimeOperationEventsResponse = AsyncIterable<components["schemas"]["RuntimeOperationEventEnvelope"]>;
 export type CancelRuntimeOperationResponse = operations["cancelRuntimeOperation"]["responses"][202]["content"]["application/json"];
 export type CreateTerminalSessionResponse = operations["createTerminalSession"]["responses"][201]["content"]["application/json"];
 export type CreateTerminalSessionInput = NonNullable<operations["createTerminalSession"]["requestBody"]>["content"]["application/json"];
 export type CreateCanvasSessionResponse = operations["createCanvasSession"]["responses"][201]["content"]["application/json"];
 export type CreateCanvasSessionInput = NonNullable<operations["createCanvasSession"]["requestBody"]>["content"]["application/json"];
-export type GetDiscoveryResponse = operations["getDiscovery"]["responses"][200]["content"]["application/json"];
-export type ListHarnessesResponse = operations["listHarnesses"]["responses"][200]["content"]["application/json"];
-export type GetHarnessResponse = operations["getHarness"]["responses"][200]["content"]["application/json"];
-export type ListModelsResponse = operations["listModels"]["responses"][200]["content"]["application/json"];
-export type ListHarnessModelsResponse = operations["listHarnessModels"]["responses"][200]["content"]["application/json"];
-export type CreateResponseResponse = operations["createResponse"]["responses"][200]["content"]["application/json"];
-export type CreateResponseInput = NonNullable<operations["createResponse"]["requestBody"]>["content"]["application/json"];
-export type GetResponseResponse = operations["getResponse"]["responses"][200]["content"]["application/json"];
-export type DeleteResponseResponse = operations["deleteResponse"]["responses"][200]["content"]["application/json"];
-export type GetResponseInputItemsResponse = operations["getResponseInputItems"]["responses"][200]["content"]["application/json"];
-export type CancelResponseResponse = operations["cancelResponse"]["responses"][200]["content"]["application/json"];
 export type ExecInstanceResponse = operations["execInstance"]["responses"][200]["content"]["application/json"];
 export type ExecInstanceInput = NonNullable<operations["execInstance"]["requestBody"]>["content"]["application/json"];
 export type PresignFileUploadResponse = operations["presignFileUpload"]["responses"][201]["content"]["application/json"];
@@ -10537,8 +9164,6 @@ export type GetFileResponse = operations["getFile"]["responses"][200]["content"]
 export type RenameFileResponse = operations["renameFile"]["responses"][200]["content"]["application/json"];
 export type RenameFileInput = NonNullable<operations["renameFile"]["requestBody"]>["content"]["application/json"];
 export type DeleteFileResponse = void;
-export type CreateEventSessionResponse = operations["createEventSession"]["responses"][200]["content"]["application/json"];
-export type CreateEventSessionInput = NonNullable<operations["createEventSession"]["requestBody"]>["content"]["application/json"];
 export type ListMCPServersResponse = operations["listMCPServers"]["responses"][200]["content"]["application/json"];
 export type GetMCPServerResponse = operations["getMCPServer"]["responses"][200]["content"]["application/json"];
 export type ResolveMCPServerResponse = operations["resolveMCPServer"]["responses"][200]["content"]["application/json"];
@@ -10553,20 +9178,6 @@ export type GetSkillBySlugResponse = operations["getSkillBySlug"]["responses"][2
 export type ListSkillCategoriesResponse = operations["listSkillCategories"]["responses"][200]["content"]["application/json"];
 export type GetFeaturedSkillsResponse = operations["getFeaturedSkills"]["responses"][200]["content"]["application/json"];
 export type GetFeaturedSkillsQuery = NonNullable<operations["getFeaturedSkills"]["parameters"]["query"]>;
-export type ListImagesResponse = operations["listImages"]["responses"][200]["content"]["application/json"];
-export type CreateImageResponse = operations["createImage"]["responses"][200]["content"]["application/json"];
-export type CreateImageInput = NonNullable<operations["createImage"]["requestBody"]>["content"]["application/json"];
-export type GetImageResponse = operations["getImage"]["responses"][200]["content"]["application/json"];
-export type UpdateImageResponse = operations["updateImage"]["responses"][200]["content"]["application/json"];
-export type UpdateImageInput = NonNullable<operations["updateImage"]["requestBody"]>["content"]["application/json"];
-export type DeleteImageResponse = operations["deleteImage"]["responses"][200]["content"]["application/json"];
-export type ListImageVersionsResponse = operations["listImageVersions"]["responses"][200]["content"]["application/json"];
-export type CreateImageVersionResponse = operations["createImageVersion"]["responses"][200]["content"]["application/json"];
-export type CreateImageVersionInput = NonNullable<operations["createImageVersion"]["requestBody"]>["content"]["application/json"];
-export type GetImageVersionResponse = operations["getImageVersion"]["responses"][200]["content"]["application/json"];
-export type UpdateImageVersionResponse = operations["updateImageVersion"]["responses"][200]["content"]["application/json"];
-export type UpdateImageVersionInput = NonNullable<operations["updateImageVersion"]["requestBody"]>["content"]["application/json"];
-export type DeleteImageVersionResponse = operations["deleteImageVersion"]["responses"][200]["content"]["application/json"];
 export type GetAgentTemplateResponse = operations["getAgentTemplate"]["responses"][200]["content"]["application/json"];
 export type ListSkillSetsResponse = operations["listSkillSets"]["responses"][200]["content"]["application/json"];
 export type ListSkillSetsQuery = NonNullable<operations["listSkillSets"]["parameters"]["query"]>;
@@ -10624,7 +9235,6 @@ export type ResolvePreparationConnectorResponse = operations["ResolvePreparation
 export type ResolvePreparationConnectorInput = NonNullable<operations["ResolvePreparationConnector"]["requestBody"]>["content"]["application/json"];
 export type ResolveInstallConnectorResponse = operations["ResolveInstallConnector"]["responses"][200]["content"]["application/json"];
 export type ResolveInstallConnectorInput = NonNullable<operations["ResolveInstallConnector"]["requestBody"]>["content"]["application/json"];
-export type GetResponseEventsResponse = AsyncIterable<components["schemas"]["UHPEvent"]>;
 export type TranscribeAudioResponse = operations["transcribeAudio"]["responses"][200]["content"]["application/json"];
 export type TranscribeAudioInput = NonNullable<operations["transcribeAudio"]["requestBody"]>["content"]["multipart/form-data"];
 export type GetShareCanvasResponse = operations["getShareCanvas"]["responses"][200]["content"]["application/json"];
@@ -10652,4 +9262,16 @@ export type ListA2ATasksQuery = NonNullable<operations["listA2ATasks"]["paramete
 export type GetA2ATaskResponse = operations["getA2ATask"]["responses"][200]["content"]["application/json"];
 export type GetA2ATaskQuery = NonNullable<operations["getA2ATask"]["parameters"]["query"]>;
 export type CancelA2ATaskResponse = operations["cancelA2ATask"]["responses"][200]["content"]["application/json"];
-export type APIErrorBody = components["schemas"]["ErrorResponse"] | components["schemas"]["AgentAPIError"] | components["schemas"]["UHPErrorEnvelope"] | components["schemas"]["ServiceOperationCursorConflict"] | components["schemas"]["DeviceBindingErrorResponse"];
+export type GetDiscoveryResponse = operations["getDiscovery"]["responses"][200]["content"]["application/json"];
+export type ListHarnessesResponse = operations["listHarnesses"]["responses"][200]["content"]["application/json"];
+export type GetHarnessResponse = operations["getHarness"]["responses"][200]["content"]["application/json"];
+export type ListModelsResponse = operations["listModels"]["responses"][200]["content"]["application/json"];
+export type ListHarnessModelsResponse = operations["listHarnessModels"]["responses"][200]["content"]["application/json"];
+export type CreateResponseResponse = operations["createResponse"]["responses"][200]["content"]["application/json"];
+export type CreateResponseInput = NonNullable<operations["createResponse"]["requestBody"]>["content"]["application/json"];
+export type GetResponseResponse = operations["getResponse"]["responses"][200]["content"]["application/json"];
+export type DeleteResponseResponse = operations["deleteResponse"]["responses"][200]["content"]["application/json"];
+export type GetResponseInputItemsResponse = operations["getResponseInputItems"]["responses"][200]["content"]["application/json"];
+export type CancelResponseResponse = operations["cancelResponse"]["responses"][200]["content"]["application/json"];
+export type GetResponseEventsResponse = AsyncIterable<components["schemas"]["UHPEvent"]>;
+export type APIErrorBody = components["schemas"]["ErrorResponse"] | components["schemas"]["DeviceBindingErrorResponse"] | components["schemas"]["UHPErrorEnvelope"];

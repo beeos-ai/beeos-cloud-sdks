@@ -123,27 +123,6 @@ InstancePage = TypedDict("InstancePage", {
     "total": "Required[int]",
 })
 
-InstanceResult = TypedDict("InstanceResult", {
-    "data": "Required[InstanceSummary]",
-})
-
-InstanceConfigPatch = TypedDict("InstanceConfigPatch", {
-    "model_primary": "NotRequired[str]",
-    "models": "NotRequired[list[str]]",
-    "system_prompt": "NotRequired[str]",
-    "mcp_servers": "NotRequired[list[dict[str, JSONValue]]]",
-})
-
-InstanceLogEntry = TypedDict("InstanceLogEntry", {
-    "timestamp": "Required[str]",
-    "stream": "NotRequired[str]",
-    "message": "Required[str]",
-})
-
-InstanceLogPage = TypedDict("InstanceLogPage", {
-    "data": "Required[list[InstanceLogEntry]]",
-})
-
 ProviderCapabilities = TypedDict("ProviderCapabilities", {
     "long_running": "Required[bool]",
     "browser_use": "Required[bool]",
@@ -212,12 +191,6 @@ AgentPatch = TypedDict("AgentPatch", {
     "a2a_enabled": "NotRequired[bool]",
 })
 
-AgentAPIError = TypedDict("AgentAPIError", {
-    "code": "Required[str]",
-    "message": "Required[str]",
-    "request_id": "Required[str]",
-})
-
 AgentResponse = TypedDict("AgentResponse", {
     "data": "Required[AgentSnapshot]",
 })
@@ -257,12 +230,6 @@ ConversationPage = TypedDict("ConversationPage", {
     "has_more": "Required[bool]",
 })
 
-SendMessageInput = TypedDict("SendMessageInput", {
-    "message": "Required[str]",
-    "content": "NotRequired[JSONValue]",
-    "parts": "NotRequired[list[JSONValue]]",
-})
-
 Message = TypedDict("Message", {
     "id": "Required[str]",
     "conversation_id": "Required[str]",
@@ -280,10 +247,6 @@ Message = TypedDict("Message", {
     "updated_at": "NotRequired[str]",
     "runtime_dispatch": "NotRequired[dict[str, JSONValue]]",
     "realtime_publish_status": "NotRequired[Literal[\"published\", \"unconfirmed\", \"not_republished\"]]",
-})
-
-MessageResponse = TypedDict("MessageResponse", {
-    "data": "Required[Message]",
 })
 
 MessagePage = TypedDict("MessagePage", {
@@ -347,18 +310,6 @@ ClearConversationReceiptResponse = TypedDict("ClearConversationReceiptResponse",
     "data": "Required[ClearConversationReceipt]",
 })
 
-CreateRealtimeSessionInput = TypedDict("CreateRealtimeSessionInput", {
-    "ttl_seconds": "NotRequired[int]",
-})
-
-RealtimeSession = TypedDict("RealtimeSession", {
-    "token": "Required[str]",
-    "service_url": "Required[str]",
-    "identity": "Required[str]",
-    "expires_at": "Required[int]",
-    "private_channels": "Required[list[str]]",
-})
-
 CreateTaskInput = TypedDict("CreateTaskInput", {
     "message": "Required[str]",
     "context_id": "NotRequired[str]",
@@ -416,100 +367,6 @@ CancelTaskInput = TypedDict("CancelTaskInput", {
 ContinueTaskInput = TypedDict("ContinueTaskInput", {
     "input": "NotRequired[JSONValue]",
     "auth_grant": "NotRequired[bool]",
-})
-
-UsagePage = TypedDict("UsagePage", {
-    "records": "Required[list[UsageRecord]]",
-    "total": "Required[int]",
-})
-
-EffectiveLimits = TypedDict("EffectiveLimits", {
-    "scope": "Required[Literal[\"developer\", \"organization\", \"app\"]]",
-    "subject_id": "Required[str]",
-    "limits": "Required[LimitSet]",
-    "current_usage": "Required[dict[str, int]]",
-    "reservations": "Required[dict[str, int]]",
-    "reset_at": "NotRequired[str]",
-    "quota_revision": "Required[str]",
-    "rate_card_revision": "NotRequired[str]",
-    "resource_version": "Required[int]",
-})
-
-SuccessEnvelope = TypedDict("SuccessEnvelope", {
-    "success": "Required[Literal[True]]",
-})
-
-ServiceRuntimeMethod: TypeAlias = "Literal[\"session/set_mode\", \"agent/create\", \"agent/update\", \"agent/delete\", \"agent/applyTemplate\", \"skills/list\", \"skills/install\", \"skills/uninstall\", \"skills/update\", \"models/list\", \"cron/list\", \"cron/status\", \"cron/add\", \"cron/update\", \"cron/remove\", \"cron/run\", \"cron/runs\", \"mcp/list\", \"mcp/prepare\", \"mcp/set\", \"mcp/unset\", \"session/clear\", \"session/set_model\", \"session/cancel\"]"
-
-RuntimeOperationError = TypedDict("RuntimeOperationError", {
-    "code": "Required[Literal[\"AGENT_DEFAULT_MODEL_NOT_CONFIGURED\", \"COMMAND_EXPIRED\", \"CONTRACT_VERSION_MISMATCH\", \"CONVERSATION_CLEARING\", \"HISTORY_GENERATION_MISMATCH\", \"IDEMPOTENCY_CONFLICT\", \"INSTANCE_EPOCH_MISMATCH\", \"INSTANCE_OFFLINE\", \"INVALID_EXECUTION_GRANT\", \"INVALID_INVOCATION\", \"METHOD_NOT_SUPPORTED\", \"OPERATION_CANCELLED\", \"OPERATION_NOT_CANCELLABLE\", \"OPERATION_NOT_FOUND\", \"OUTCOME_UNKNOWN\", \"PROJECTION_BLOCKED\", \"PROJECTION_PENDING\", \"RUNTIME_EXECUTION_FAILED\", \"UNAUTHORIZED_PUBLISHER\", \"UNAUTHORIZED_TARGET\", \"USE_AGENTS_API\"]]",
-    "message": "Required[str]",
-    "operationId": "Required[str]",
-    "requestId": "NotRequired[str]",
-    "effectState": "Required[Literal[\"failed\", \"cancelled\", \"expired\", \"outcome_unknown\", \"committed\"]]",
-    "retryMode": "Required[Literal[\"none\", \"resume\", \"resubmit\"]]",
-    "context": "NotRequired[RuntimeOperationErrorContext]",
-})
-
-RuntimeDeliveryFailure = TypedDict("RuntimeDeliveryFailure", {
-    "code": "Required[Literal[\"HTTP_REJECTED\", \"TRANSPORT_FAILED\", \"LEASE_UNAVAILABLE\", \"LEASE_EXPIRED\", \"LEASE_CHANGED\", \"ORIGIN_REJECTED\", \"INVALID_DELIVERY_RESPONSE\", \"HISTORY_UNAVAILABLE\", \"OUTCOME_UNKNOWN\", \"EXECUTION_FAILED\", \"REJECTED\"]]",
-    "phase": "Required[Literal[\"delivery_read\", \"delivery_ack\", \"operation_history\", \"operation_append\", \"run_start\", \"reply_patch\", \"run_finish\", \"execution\", \"terminal_append\"]]",
-    "status": "NotRequired[int]",
-})
-
-ServiceOperationCursorConflict = TypedDict("ServiceOperationCursorConflict", {
-    "code": "Required[Literal[\"OPERATION_CURSOR_AHEAD\"]]",
-    "operationId": "Required[str]",
-    "cursor": "Required[str]",
-    "lastSequence": "Required[str]",
-    "httpStatus": "Required[Literal[409]]",
-})
-
-RuntimeOperationEventEnvelope = TypedDict("RuntimeOperationEventEnvelope", {
-    "id": "Required[str]",
-    "operationId": "Required[str]",
-    "method": "Required[ServiceRuntimeMethod]",
-    "event": "Required[RuntimeOperationEventEnvelopeEvent]",
-})
-
-ActionResult = TypedDict("ActionResult", {
-    "ok": "Required[bool]",
-})
-
-RegisterTaskWebhookRequest = TypedDict("RegisterTaskWebhookRequest", {
-    "url": "Required[str]",
-    "token": "NotRequired[str]",
-    "secret": "NotRequired[str]",
-})
-
-TaskWebhookResponse = TypedDict("TaskWebhookResponse", {
-    "success": "Required[Literal[True]]",
-    "data": "Required[TaskWebhookResponseData]",
-})
-
-ListTaskWebhooksResponse = TypedDict("ListTaskWebhooksResponse", {
-    "success": "Required[Literal[True]]",
-    "data": "Required[ListTaskWebhooksResponseData]",
-})
-
-WebhookDeliveryResponse = TypedDict("WebhookDeliveryResponse", {
-    "delivery_id": "Required[str]",
-    "webhook_id": "Required[str]",
-    "task_id": "Required[str]",
-    "renderer": "Required[Literal[\"openapi\", \"a2a\", \"generic\", \"mcp\"]]",
-    "status": "Required[Literal[\"pending\", \"succeeded\", \"failed\", \"dead_letter\"]]",
-    "attempt_num": "Required[int]",
-    "last_response_status": "Required[int]",
-    "last_error": "NotRequired[str]",
-    "next_attempt_at": "Required[str]",
-    "last_attempted_at": "NotRequired[str]",
-    "created_at": "Required[str]",
-    "completed_at": "NotRequired[str]",
-})
-
-ListWebhookDeliveriesResponse = TypedDict("ListWebhookDeliveriesResponse", {
-    "success": "Required[Literal[True]]",
-    "data": "Required[ListWebhookDeliveriesResponseData]",
 })
 
 ErrorResponse = TypedDict("ErrorResponse", {
@@ -1291,23 +1148,6 @@ a2aTaskView = TypedDict("a2aTaskView", {
     "completed_at": "NotRequired[str]",
 })
 
-ServerEventSessionInput = TypedDict("ServerEventSessionInput", {
-    "platform": "NotRequired[str]",
-    "event_types": "NotRequired[list[str]]",
-    "instance_ids": "NotRequired[list[str]]",
-    "agent_ids": "NotRequired[list[str]]",
-    "task_ids": "NotRequired[list[str]]",
-    "conversation_ids": "NotRequired[list[str]]",
-})
-
-ServerEventConnectionDescriptor = TypedDict("ServerEventConnectionDescriptor", {
-    "transport": "Required[str]",
-    "url": "Required[str]",
-    "token": "Required[str]",
-    "expires_at": "Required[str]",
-    "session_id": "NotRequired[str]",
-})
-
 CreateServerInstanceInput = TypedDict("CreateServerInstanceInput", {
     "name": "Required[str]",
     "variant_id": "NotRequired[str]",
@@ -1326,38 +1166,6 @@ ServerUsageSummary = TypedDict("ServerUsageSummary", {
 RuntimeInstanceStatusResult = TypedDict("RuntimeInstanceStatusResult", {
     "data": "Required[RuntimeInstanceStatusResultData]",
     "operation": "Required[RuntimeOperationSummary]",
-})
-
-NonNegativeAmount: TypeAlias = "str"
-
-LimitSet = TypedDict("LimitSet", {
-    "values": "Required[dict[str, int]]",
-    "entitlements": "Required[dict[str, bool]]",
-})
-
-UsageRecord = TypedDict("UsageRecord", {
-    "id": "Required[str]",
-    "developer_id": "NotRequired[str]",
-    "organization_id": "Required[str]",
-    "app_id": "Required[str]",
-    "external_user_id": "NotRequired[str]",
-    "api_key_id": "NotRequired[str]",
-    "instance_id": "NotRequired[str]",
-    "agent_id": "NotRequired[str]",
-    "task_id": "NotRequired[str]",
-    "method": "NotRequired[str]",
-    "path": "NotRequired[str]",
-    "http_status": "NotRequired[int]",
-    "latency_ms": "NotRequired[int]",
-    "request_id": "Required[str]",
-    "meter": "Required[str]",
-    "unit": "Required[str]",
-    "amount": "Required[NonNegativeAmount]",
-    "amount_bc": "Required[NonNegativeAmount]",
-    "rate_card_revision": "Required[str]",
-    "reference": "Required[str]",
-    "metadata": "Required[dict[str, str]]",
-    "created_at": "Required[str]",
 })
 
 UpdateServerInstanceInput = TypedDict("UpdateServerInstanceInput", {
@@ -1915,20 +1723,6 @@ StopInstanceOptions = TypedDict("StopInstanceOptions", {
     "If-Match": "Required[str]",
 })
 
-RestartInstanceOptions = TypedDict("RestartInstanceOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-GetInstanceLogsOptions = TypedDict("GetInstanceLogsOptions", {
-    "since": "NotRequired[str]",
-    "tail": "NotRequired[int]",
-    "follow": "NotRequired[bool]",
-})
-
-UpdateInstanceConfigOptions = TypedDict("UpdateInstanceConfigOptions", {
-    "If-Match": "Required[str]",
-})
-
 UpgradeInstanceRequest = TypedDict("UpgradeInstanceRequest", {
     "image_id": "NotRequired[str]",
     "image_ref": "NotRequired[str]",
@@ -1967,10 +1761,6 @@ UpdateConversationOptions = TypedDict("UpdateConversationOptions", {
 })
 
 DeleteConversationOptions = TypedDict("DeleteConversationOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-SendConversationMessageOptions = TypedDict("SendConversationMessageOptions", {
     "Idempotency-Key": "Required[str]",
 })
 
@@ -2026,22 +1816,6 @@ GetUsageSummaryOptions = TypedDict("GetUsageSummaryOptions", {
     "category": "NotRequired[str]",
 })
 
-GetUsageHistoryOptions = TypedDict("GetUsageHistoryOptions", {
-    "external_user_id": "NotRequired[str]",
-    "category": "NotRequired[str]",
-    "limit": "NotRequired[int]",
-    "offset": "NotRequired[int]",
-})
-
-ListWebhookDeliveriesOptions = TypedDict("ListWebhookDeliveriesOptions", {
-    "limit": "NotRequired[int]",
-})
-
-RedeliverWebhookResponse = TypedDict("RedeliverWebhookResponse", {
-    "success": "Required[Literal[True]]",
-    "data": "Required[WebhookDeliveryResponse]",
-})
-
 InvokeRuntimeMethodRequest = TypedDict("InvokeRuntimeMethodRequest", {
     "jsonrpc": "Required[Literal[\"2.0\"]]",
     "id": "Required[str]",
@@ -2059,10 +1833,6 @@ ListRuntimeOperationsOptions = TypedDict("ListRuntimeOperationsOptions", {
     "cursor": "NotRequired[str]",
     "limit": "NotRequired[int]",
     "method": "NotRequired[str]",
-})
-
-StreamRuntimeOperationEventsOptions = TypedDict("StreamRuntimeOperationEventsOptions", {
-    "Last-Event-ID": "NotRequired[str]",
 })
 
 CancelRuntimeOperationResponse = TypedDict("CancelRuntimeOperationResponse", {
@@ -2085,25 +1855,6 @@ CreateCanvasSessionRequest = TypedDict("CreateCanvasSessionRequest", {
     "platformAgentId": "Required[str]",
     "conversationId": "Required[str]",
     "canvasId": "NotRequired[str]",
-})
-
-ListHarnessesResponse = TypedDict("ListHarnessesResponse", {
-    "harnesses": "Required[list[UHPHarness]]",
-})
-
-CreateResponseOptions = TypedDict("CreateResponseOptions", {
-    "Idempotency-Key": "NotRequired[str]",
-    "UHP-Version": "NotRequired[str]",
-})
-
-DeleteResponseResponse = TypedDict("DeleteResponseResponse", {
-    "id": "NotRequired[str]",
-    "deleted": "NotRequired[bool]",
-})
-
-GetResponseInputItemsResponse = TypedDict("GetResponseInputItemsResponse", {
-    "object": "NotRequired[Literal[\"list\"]]",
-    "data": "NotRequired[list[dict[str, JSONValue]]]",
 })
 
 ExecInstanceRequest = TypedDict("ExecInstanceRequest", {
@@ -2140,10 +1891,6 @@ RenameFileRequest = TypedDict("RenameFileRequest", {
 })
 
 DeleteFileOptions = TypedDict("DeleteFileOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-CreateEventSessionOptions = TypedDict("CreateEventSessionOptions", {
     "Idempotency-Key": "Required[str]",
 })
 
@@ -2217,30 +1964,6 @@ GetFeaturedSkillsOptions = TypedDict("GetFeaturedSkillsOptions", {
     "scope": "NotRequired[str]",
     "scope_value": "NotRequired[str]",
     "limit": "NotRequired[int]",
-})
-
-CreateImageOptions = TypedDict("CreateImageOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-UpdateImageOptions = TypedDict("UpdateImageOptions", {
-    "If-Match": "Required[str]",
-})
-
-DeleteImageOptions = TypedDict("DeleteImageOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-CreateImageVersionOptions = TypedDict("CreateImageVersionOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-UpdateImageVersionOptions = TypedDict("UpdateImageVersionOptions", {
-    "If-Match": "Required[str]",
-})
-
-DeleteImageVersionOptions = TypedDict("DeleteImageVersionOptions", {
-    "Idempotency-Key": "Required[str]",
 })
 
 ListSkillSetsResponse = TypedDict("ListSkillSetsResponse", {
@@ -2410,11 +2133,6 @@ ResolveInstallConnectorResponse = TypedDict("ResolveInstallConnectorResponse", {
     "data": "Required[ProtoResolveInstallResponse]",
 })
 
-GetResponseEventsOptions = TypedDict("GetResponseEventsOptions", {
-    "Last-Event-ID": "NotRequired[str]",
-    "UHP-Version": "NotRequired[str]",
-})
-
 TranscribeAudioRequest = TypedDict("TranscribeAudioRequest", {
     "file": "Required[bytes]",
 })
@@ -2555,44 +2273,32 @@ GetA2ATaskOptions = TypedDict("GetA2ATaskOptions", {
     "history_length": "NotRequired[int]",
 })
 
+ListHarnessesResponse = TypedDict("ListHarnessesResponse", {
+    "harnesses": "Required[list[UHPHarness]]",
+})
+
+CreateResponseOptions = TypedDict("CreateResponseOptions", {
+    "Idempotency-Key": "NotRequired[str]",
+    "UHP-Version": "NotRequired[str]",
+})
+
+DeleteResponseResponse = TypedDict("DeleteResponseResponse", {
+    "id": "NotRequired[str]",
+    "deleted": "NotRequired[bool]",
+})
+
+GetResponseInputItemsResponse = TypedDict("GetResponseInputItemsResponse", {
+    "object": "NotRequired[Literal[\"list\"]]",
+    "data": "NotRequired[list[dict[str, JSONValue]]]",
+})
+
+GetResponseEventsOptions = TypedDict("GetResponseEventsOptions", {
+    "Last-Event-ID": "NotRequired[str]",
+    "UHP-Version": "NotRequired[str]",
+})
+
 ClientSessionInputDeviceAttestation = TypedDict("ClientSessionInputDeviceAttestation", {
     "jkt": "Required[str]",
-})
-
-RuntimeOperationErrorContext = TypedDict("RuntimeOperationErrorContext", {
-    "activeRuntimeEpoch": "NotRequired[str]",
-    "projectionRevision": "NotRequired[str]",
-    "retryAfterMs": "NotRequired[int]",
-    "expectedContractRevision": "NotRequired[str]",
-    "resourceId": "NotRequired[str]",
-    "deliveryFailure": "NotRequired[RuntimeDeliveryFailure]",
-})
-
-RuntimeOperationEventEnvelopeEvent = TypedDict("RuntimeOperationEventEnvelopeEvent", {
-    "type": "Required[Literal[\"runtime_operation_started\", \"runtime_operation_progress\", \"runtime_effect_committed\", \"runtime_projection_pending\", \"runtime_projection_synced\", \"runtime_projection_blocked\", \"runtime_operation_cancel_requested\", \"runtime_rpc_response\"]]",
-    "sequence": "Required[str]",
-    "recordedAt": "Required[str]",
-    "payload": "NotRequired[RuntimeOperationEventEnvelopeEventPayload]",
-    "outcome": "NotRequired[Literal[\"succeeded\", \"failed\", \"cancelled\", \"expired\", \"outcome_unknown\", \"projection_blocked\"]]",
-    "result": "NotRequired[JSONValue]",
-    "revision": "NotRequired[str]",
-    "error": "NotRequired[RuntimeOperationError]",
-})
-
-TaskWebhookResponseData = TypedDict("TaskWebhookResponseData", {
-    "webhook_id": "Required[str]",
-    "task_id": "Required[str]",
-    "url": "Required[str]",
-    "has_secret": "Required[bool]",
-    "created_at": "NotRequired[str]",
-})
-
-ListTaskWebhooksResponseData = TypedDict("ListTaskWebhooksResponseData", {
-    "webhooks": "Required[list[ListTaskWebhooksResponseDataWebhooksItem]]",
-})
-
-ListWebhookDeliveriesResponseData = TypedDict("ListWebhookDeliveriesResponseData", {
-    "deliveries": "Required[list[WebhookDeliveryResponse]]",
 })
 
 UHPDiscoveryImplementation = TypedDict("UHPDiscoveryImplementation", {
@@ -2729,30 +2435,6 @@ GetCanvasSessionResponseDataVariant1 = TypedDict("GetCanvasSessionResponseDataVa
     "role": "Required[str]",
 })
 
-RuntimeOperationEventEnvelopeEventPayload = TypedDict("RuntimeOperationEventEnvelopeEventPayload", {
-    "claimedAt": "NotRequired[str]",
-    "executionMode": "NotRequired[Literal[\"start\"]]",
-    "phase": "NotRequired[str]",
-    "current": "NotRequired[float]",
-    "total": "NotRequired[float]",
-    "committedAt": "NotRequired[str]",
-    "projectionRevision": "NotRequired[str]",
-    "revision": "NotRequired[str]",
-    "platformAgentId": "NotRequired[str]",
-    "errorCode": "NotRequired[Literal[\"PROJECTION_BLOCKED\"]]",
-    "causeCode": "NotRequired[Literal[\"AGENT_DEFAULT_MODEL_NOT_CONFIGURED\", \"COMMAND_EXPIRED\", \"CONTRACT_VERSION_MISMATCH\", \"CONVERSATION_CLEARING\", \"HISTORY_GENERATION_MISMATCH\", \"IDEMPOTENCY_CONFLICT\", \"INSTANCE_EPOCH_MISMATCH\", \"INSTANCE_OFFLINE\", \"INVALID_EXECUTION_GRANT\", \"INVALID_INVOCATION\", \"METHOD_NOT_SUPPORTED\", \"OPERATION_CANCELLED\", \"OPERATION_NOT_CANCELLABLE\", \"OPERATION_NOT_FOUND\", \"OUTCOME_UNKNOWN\", \"PROJECTION_BLOCKED\", \"PROJECTION_PENDING\", \"RUNTIME_EXECUTION_FAILED\", \"UNAUTHORIZED_PUBLISHER\", \"UNAUTHORIZED_TARGET\", \"USE_AGENTS_API\"]]",
-    "requestedBy": "NotRequired[str]",
-    "reason": "NotRequired[str]",
-})
-
-ListTaskWebhooksResponseDataWebhooksItem = TypedDict("ListTaskWebhooksResponseDataWebhooksItem", {
-    "webhook_id": "Required[str]",
-    "task_id": "Required[str]",
-    "url": "Required[str]",
-    "has_secret": "Required[bool]",
-    "created_at": "NotRequired[str]",
-})
-
 ReplyShareResponseDataAgent = TypedDict("ReplyShareResponseDataAgent", {
     "name": "Required[str]",
     "avatar_url": "Required[str]",
@@ -2797,41 +2479,50 @@ class UHPCreateResponseJSONRequestMetadataOpen(dict[str, JSONValue]):
             self["environment"] = environment
 
 
-class HTTPErrorBody(TypedDict):
+class InvalidResponseBody(TypedDict):
+    code: Literal["invalid_response"]
     content_type: str
     body: str
+    raw_body: bytes
+    reason: str
+
+_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"createAgentTask":{"default":"ErrorResponse"},"listAgentTasks":{"default":"ErrorResponse"},"getAgentTask":{"default":"ErrorResponse"},"listAgentTaskMessages":{"default":"ErrorResponse"},"cancelAgentTask":{"default":"ErrorResponse"},"continueAgentTask":{"default":"ErrorResponse"},"invokeAgent":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"getRuntimeCapabilities":{"401":"ErrorResponse","404":"ErrorResponse","default":"ErrorResponse"},"invokeRuntimeMethod":{"default":"ErrorResponse"},"listRuntimeOperations":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","default":"ErrorResponse"},"getRuntimeOperation":{"404":"ErrorResponse","default":"ErrorResponse"},"cancelRuntimeOperation":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"listMCPServers":{"default":"ErrorResponse"},"getMCPServer":{"default":"ErrorResponse"},"resolveMCPServer":{"default":"ErrorResponse"},"listSkills":{"default":"ErrorResponse"},"createSkill":{"default":"ErrorResponse"},"searchSkills":{"default":"ErrorResponse"},"getSkill":{"default":"ErrorResponse"},"getSkillBySlug":{"default":"ErrorResponse"},"listSkillCategories":{"default":"ErrorResponse"},"getFeaturedSkills":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"listSkillSets":{"default":"ErrorResponse"},"getSkillSet":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"PutConnectorCredentialConnector":{"default":"ErrorResponse"},"DeleteConnectorCredentialConnector":{"default":"ErrorResponse"},"ListInstanceConnectorsConnector":{"default":"ErrorResponse"},"InstallManagedConnectorConnector":{"default":"ErrorResponse"},"UpdateManagedConnectorConnector":{"default":"ErrorResponse"},"UninstallManagedConnectorConnector":{"default":"ErrorResponse"},"ListMcpServersConnector":{"default":"ErrorResponse"},"GetMcpServerConnector":{"default":"ErrorResponse"},"ListCategoriesConnector":{"default":"ErrorResponse"},"ResolvePreparationConnector":{"default":"ErrorResponse"},"ResolveInstallConnector":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
+
+def _matches_error_body(schema: str | None, value: JSONValue) -> bool:
+    if not isinstance(value, dict):
+        return False
+    if schema == "UHPErrorEnvelope":
+        nested = value.get("error")
+        return isinstance(nested, dict) and isinstance(nested.get("code"), str) and nested.get("code") != "" and isinstance(nested.get("message"), str)
+    if schema == "DeviceBindingErrorResponse":
+        return isinstance(value.get("error"), str) and value.get("error") != "" and isinstance(value.get("message"), str)
+    return schema == "ErrorResponse" and isinstance(value.get("code"), str) and value.get("code") != "" and isinstance(value.get("message"), str)
 
 class APIError(Exception):
-    def __init__(self, status: int, body: ErrorResponse | AgentAPIError | UHPErrorEnvelope | ServiceOperationCursorConflict | DeviceBindingErrorResponse | HTTPErrorBody) -> None:
+    def __init__(self, status: int, body: ErrorResponse | DeviceBindingErrorResponse | UHPErrorEnvelope | InvalidResponseBody) -> None:
         self.status = status
         self.body = body
         super().__init__(f"BeeOS API returned HTTP {status}")
 
 class BeeOSClient:
-    def __init__(self, base_url: str, api_key: str | Callable[[], str], *, external_user_id: str | None = None) -> None:
+    def __init__(self, base_url: str, api_key: str | Callable[[], str], *, external_user_id: str | None = None, timeout: float = 30.0) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.external_user_id = external_user_id
+        self.timeout = timeout
         self.identity = IdentityResource(self)
         self.catalog = CatalogResource(self)
         self.instances = InstancesResource(self)
-        self.runtime = RuntimeResource(self)
         self.agents = AgentsResource(self)
         self.conversations = ConversationsResource(self)
         self.messages = MessagesResource(self)
         self.tasks = TasksResource(self)
         self.usage = UsageResource(self)
-        self.task_webhooks = TaskWebhooksResource(self)
         self.methods = MethodsResource(self)
         self.operations = OperationsResource(self)
-        self.harnesses = HarnessesResource(self)
-        self.responses = ResponsesResource(self)
         self.files = FilesResource(self)
-        self.event_sessions = EventSessionsResource(self)
         self.mcp = McpResource(self)
         self.skills = SkillsResource(self)
-        self.images = ImagesResource(self)
-        self.image_versions = ImageVersionsResource(self)
         self.skill_sets = SkillSetsResource(self)
         self.automations = AutomationsResource(self)
         self.connectors = ConnectorsResource(self)
@@ -2839,11 +2530,13 @@ class BeeOSClient:
         self.canvases = CanvasesResource(self)
         self.device_bindings = DeviceBindingsResource(self)
         self.a2a = A2aResource(self)
+        self.harnesses = HarnessesResource(self)
+        self.responses = ResponsesResource(self)
 
     def with_external_user(self, external_user_id: str) -> BeeOSClient:
-        return BeeOSClient(self.base_url, self.api_key, external_user_id=external_user_id)
+        return BeeOSClient(self.base_url, self.api_key, external_user_id=external_user_id, timeout=self.timeout)
 
-    def _request(self, method: str, path: str, base_path: str, query: dict[str, str], headers: dict[str, str], body: bytes | None, content_type: str) -> bytes:
+    def _request(self, operation: str, method: str, path: str, base_path: str, query: dict[str, str], headers: dict[str, str], body: bytes | None, content_type: str) -> bytes:
         base = self.base_url
         if base_path:
             parts = urlsplit(base)
@@ -2858,21 +2551,31 @@ class BeeOSClient:
         if content_type:
             headers["Content-Type"] = content_type
         request = URLRequest(target, data=body, headers=headers, method=method)
-        with self._open(request) as response:
+        with self._open(request, operation) as response:
             return response.read()
 
-    def _open(self, request: URLRequest) -> HTTPResponse:
+    def _open(self, request: URLRequest, operation: str) -> HTTPResponse:
         try:
-            return cast(HTTPResponse, urlopen(request))
+            return cast(HTTPResponse, urlopen(request, timeout=self.timeout))
         except HTTPError as error:
             with error:
                 payload = error.read()
                 content_type = error.headers.get("Content-Type", "")
                 media_type = content_type.split(";", 1)[0].strip().lower()
+                invalid = InvalidResponseBody(code="invalid_response", content_type=content_type, body=payload.decode("utf-8", errors="replace"), raw_body=payload, reason="non_json_error")
+                body: ErrorResponse | DeviceBindingErrorResponse | UHPErrorEnvelope | InvalidResponseBody = invalid
                 if media_type == "application/json" or media_type.endswith("+json"):
-                    body = cast("ErrorResponse | AgentAPIError | UHPErrorEnvelope | ServiceOperationCursorConflict | DeviceBindingErrorResponse | HTTPErrorBody", json.loads(payload))
-                else:
-                    body = HTTPErrorBody(content_type=content_type, body=payload.decode())
+                    try:
+                        candidate = cast(JSONValue, json.loads(payload))
+                    except (json.JSONDecodeError, UnicodeDecodeError):
+                        invalid["reason"] = "invalid_json_error"
+                    else:
+                        schemas = _ERROR_SCHEMAS[operation]
+                        schema = schemas.get(str(error.code), schemas.get(f"{error.code // 100}XX", schemas.get("default")))
+                        if _matches_error_body(schema, candidate):
+                            body = cast("ErrorResponse | DeviceBindingErrorResponse | UHPErrorEnvelope | InvalidResponseBody", candidate)
+                        else:
+                            invalid["reason"] = "invalid_error_shape"
             raise APIError(error.code, body) from error
 
     @staticmethod
@@ -2882,7 +2585,7 @@ class BeeOSClient:
         suffix = f"\r\n--{boundary}--\r\n".encode()
         return prefix + file + suffix, f"multipart/form-data; boundary={boundary}"
 
-    def _stream(self, method: str, path: str, base_path: str, query: dict[str, str], headers: dict[str, str], body: bytes | None, content_type: str) -> Iterator[JSONValue]:
+    def _stream(self, operation: str, method: str, path: str, base_path: str, query: dict[str, str], headers: dict[str, str], body: bytes | None, content_type: str) -> Iterator[JSONValue]:
         parts = urlsplit(self.base_url)
         target = urlunsplit((parts.scheme, parts.netloc, (base_path or parts.path.rstrip("/")) + path, urlencode(query), ""))
         key = self.api_key() if callable(self.api_key) else self.api_key
@@ -2892,7 +2595,7 @@ class BeeOSClient:
         if self.external_user_id is not None:
             headers["X-BeeOS-External-User-ID"] = self.external_user_id
         request = URLRequest(target, data=body, headers=headers, method=method)
-        with self._open(request) as response:
+        with self._open(request, operation) as response:
             data: list[str] = []
             for raw in response:
                 line = raw.decode().rstrip("\r\n")
@@ -2916,7 +2619,7 @@ class IdentityResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createClientSession", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ClientSessionResponse", json.loads(payload))
 
     def refresh_client_session(self, session_id: str, input: RefreshClientSessionRequest | None = None, *, options: RefreshClientSessionOptions) -> ClientSessionResponse:
@@ -2926,7 +2629,7 @@ class IdentityResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode() if input is not None else None, "application/json")
+        payload = self._client._request("refreshClientSession", "POST", path, "", query, headers, json.dumps(input).encode() if input is not None else None, "application/json")
         return cast("ClientSessionResponse", json.loads(payload))
 
     def revoke_client_session(self, session_id: str, options: RevokeClientSessionOptions) -> None:
@@ -2936,7 +2639,7 @@ class IdentityResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("revokeClientSession", "DELETE", path, "", query, headers, None, "")
         return None
 
     def delete_external_user(self, external_user_id: ExternalUserID, options: DeleteExternalUserOptions) -> DeletionAccepted:
@@ -2946,14 +2649,14 @@ class IdentityResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("deleteExternalUser", "DELETE", path, "", query, headers, None, "")
         return cast("DeletionAccepted", json.loads(payload))
 
     def get_external_user_deletion(self, external_user_id: ExternalUserID, deletion_id: str) -> Deletion:
         path = f"/external-users/{quote(str(external_user_id), safe='')}/deletions/{quote(str(deletion_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getExternalUserDeletion", "GET", path, "", query, headers, None, "")
         return cast("Deletion", json.loads(payload))
 
 
@@ -2968,7 +2671,7 @@ class CatalogResource:
         opts = options if options is not None else {}
         if "capability" in opts:
             query["capability"] = str(opts["capability"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listProviders", "GET", path, "", query, headers, None, "")
         return cast("ProviderPage", json.loads(payload))
 
     def list_regions(self, options: ListDeployRegionsOptions | None = None) -> RegionPage:
@@ -2980,7 +2683,7 @@ class CatalogResource:
             query["provider_id"] = str(opts["provider_id"])
         if "available" in opts:
             query["available"] = str(opts["available"]).lower()
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listDeployRegions", "GET", path, "", query, headers, None, "")
         return cast("RegionPage", json.loads(payload))
 
     def list_models(self, options: ListDeployModelsOptions | None = None) -> ModelPage:
@@ -2992,7 +2695,7 @@ class CatalogResource:
             query["agent_framework"] = str(opts["agent_framework"])
         if "search" in opts:
             query["search"] = str(opts["search"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listDeployModels", "GET", path, "", query, headers, None, "")
         return cast("ModelPage", json.loads(payload))
 
     def list_instance_templates(self, options: ListInstanceTemplatesOptions | None = None) -> InstanceTemplatePage:
@@ -3010,14 +2713,14 @@ class CatalogResource:
             query["provider_id"] = str(opts["provider_id"])
         if "search" in opts:
             query["search"] = str(opts["search"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listInstanceTemplates", "GET", path, "", query, headers, None, "")
         return cast("InstanceTemplatePage", json.loads(payload))
 
     def get_instance_template(self, template_id: str) -> InstanceTemplate:
         path = f"/instance-templates/{quote(str(template_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getInstanceTemplate", "GET", path, "", query, headers, None, "")
         return cast("InstanceTemplate", json.loads(payload))
 
     def list_agent_templates(self, options: ListAgentTemplatesOptions | None = None) -> ListAgentTemplatesResponse:
@@ -3033,22 +2736,22 @@ class CatalogResource:
             query["page"] = str(opts["page"])
         if "page_size" in opts:
             query["page_size"] = str(opts["page_size"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listAgentTemplates", "GET", path, "", query, headers, None, "")
         return cast("ListAgentTemplatesResponse", json.loads(payload))
-
-    def get_discovery(self) -> UHPDiscovery:
-        path = f"/uhp"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "/uhp/v1", query, headers, None, "")
-        return cast("UHPDiscovery", json.loads(payload))
 
     def get_agent_template(self, id: str) -> agentTemplateCatalogView:
         path = f"/agent-templates/{quote(str(id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getAgentTemplate", "GET", path, "", query, headers, None, "")
         return cast("agentTemplateCatalogView", json.loads(payload))
+
+    def get_discovery(self) -> UHPDiscovery:
+        path = f"/uhp"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("getDiscovery", "GET", path, "/uhp/v1", query, headers, None, "")
+        return cast("UHPDiscovery", json.loads(payload))
 
 
 class InstancesResource:
@@ -3074,7 +2777,7 @@ class InstancesResource:
             query["cluster_id"] = str(opts["cluster_id"])
         if "search" in opts:
             query["search"] = str(opts["search"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listInstances", "GET", path, "", query, headers, None, "")
         return cast("InstancePage", json.loads(payload))
 
     def create(self, input: CreateServerInstanceInput, options: InstanceCreateOptions) -> RuntimeInstanceResult:
@@ -3084,14 +2787,14 @@ class InstancesResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("instanceCreate", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("RuntimeInstanceResult", json.loads(payload))
 
     def get(self, instance_id: str) -> RuntimeInstanceResult:
         path = f"/instances/{quote(str(instance_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getInstance", "GET", path, "", query, headers, None, "")
         return cast("RuntimeInstanceResult", json.loads(payload))
 
     def update(self, instance_id: str, input: UpdateServerInstanceInput, options: UpdateInstanceMetadataOptions) -> UpdateInstanceMetadataResponse:
@@ -3101,7 +2804,7 @@ class InstancesResource:
         opts = options
         if "If-Match" in opts:
             headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("updateInstanceMetadata", "PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("UpdateInstanceMetadataResponse", json.loads(payload))
 
     def delete(self, instance_id: str, options: DeleteInstanceOptions) -> RuntimeInstanceResult:
@@ -3113,14 +2816,14 @@ class InstancesResource:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
         if "If-Match" in opts:
             headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("deleteInstance", "DELETE", path, "", query, headers, None, "")
         return cast("RuntimeInstanceResult", json.loads(payload))
 
     def get_status(self, instance_id: str) -> RuntimeInstanceStatusResult:
         path = f"/instances/{quote(str(instance_id), safe='')}/status"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getInstanceStatus", "GET", path, "", query, headers, None, "")
         return cast("RuntimeInstanceStatusResult", json.loads(payload))
 
     def start(self, instance_id: str, options: StartInstanceOptions) -> RuntimeInstanceResult:
@@ -3132,7 +2835,7 @@ class InstancesResource:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
         if "If-Match" in opts:
             headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("startInstance", "POST", path, "", query, headers, None, "")
         return cast("RuntimeInstanceResult", json.loads(payload))
 
     def stop(self, instance_id: str, options: StopInstanceOptions) -> RuntimeInstanceResult:
@@ -3144,7 +2847,7 @@ class InstancesResource:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
         if "If-Match" in opts:
             headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("stopInstance", "POST", path, "", query, headers, None, "")
         return cast("RuntimeInstanceResult", json.loads(payload))
 
     def upgrade(self, instance_id: str, input: UpgradeInstanceRequest, options: UpgradeInstanceOptions) -> RuntimeUpgradeJob:
@@ -3154,35 +2857,35 @@ class InstancesResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("upgradeInstance", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("RuntimeUpgradeJob", json.loads(payload))
 
     def get_upgrade(self, instance_id: str, job_id: str) -> RuntimeUpgradeJob:
         path = f"/instances/{quote(str(instance_id), safe='')}/upgrades/{quote(str(job_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getInstanceUpgrade", "GET", path, "", query, headers, None, "")
         return cast("RuntimeUpgradeJob", json.loads(payload))
 
     def create_terminal_session(self, instance_id: str, input: CreateTerminalSessionRequest) -> TerminalSessionDocument:
         path = f"/instances/{quote(str(instance_id), safe='')}/terminal-sessions"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createTerminalSession", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("TerminalSessionDocument", json.loads(payload))
 
     def create_canvas_session(self, instance_id: str, input: CreateCanvasSessionRequest) -> CanvasSessionDocument:
         path = f"/instances/{quote(str(instance_id), safe='')}/canvas-sessions"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createCanvasSession", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CanvasSessionDocument", json.loads(payload))
 
     def exec(self, instance_id: str, input: ExecInstanceRequest) -> RuntimeExecResult:
         path = f"/instances/{quote(str(instance_id), safe='')}/exec"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("execInstance", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("RuntimeExecResult", json.loads(payload))
 
     def get_connect_url(self, instance_id: str, options: GetInstanceConnectURLOptions | None = None) -> ConnectURLResponse:
@@ -3198,7 +2901,7 @@ class InstancesResource:
             query["role"] = str(opts["role"])
         if "generation" in opts:
             query["generation"] = str(opts["generation"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getInstanceConnectURL", "GET", path, "", query, headers, None, "")
         return cast("ConnectURLResponse", json.loads(payload))
 
     def get_stream_url(self, instance_id: str, options: GetInstanceStreamURLOptions | None = None) -> GetInstanceStreamURLResponse:
@@ -3212,54 +2915,8 @@ class InstancesResource:
             query["viewportHeight"] = str(opts["viewportHeight"])
         if "dpr" in opts:
             query["dpr"] = str(opts["dpr"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getInstanceStreamURL", "GET", path, "", query, headers, None, "")
         return cast("GetInstanceStreamURLResponse", json.loads(payload))
-
-
-class RuntimeResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def restart_instance(self, instance_id: str, options: RestartInstanceOptions) -> InstanceResult:
-        path = f"/instances/{quote(str(instance_id), safe='')}/restart"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, None, "")
-        return cast("InstanceResult", json.loads(payload))
-
-    def get_instance_logs(self, instance_id: str, options: GetInstanceLogsOptions | None = None) -> InstanceLogPage:
-        path = f"/instances/{quote(str(instance_id), safe='')}/logs"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "since" in opts:
-            query["since"] = str(opts["since"])
-        if "tail" in opts:
-            query["tail"] = str(opts["tail"])
-        if "follow" in opts:
-            query["follow"] = str(opts["follow"]).lower()
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("InstanceLogPage", json.loads(payload))
-
-    def update_instance_config(self, instance_id: str, input: InstanceConfigPatch, options: UpdateInstanceConfigOptions) -> InstanceSummary:
-        path = f"/instances/{quote(str(instance_id), safe='')}/config"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "If-Match" in opts:
-            headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("InstanceSummary", json.loads(payload))
-
-    def create_realtime_session(self, input: CreateRealtimeSessionInput) -> RealtimeSession:
-        path = f"/realtime/sessions"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("RealtimeSession", json.loads(payload))
 
 
 class AgentsResource:
@@ -3283,14 +2940,14 @@ class AgentsResource:
             query["page"] = str(opts["page"])
         if "page_size" in opts:
             query["page_size"] = str(opts["page_size"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listAgents", "GET", path, "", query, headers, None, "")
         return cast("AgentPage", json.loads(payload))
 
     def get(self, agent_id: str) -> AgentResponse:
         path = f"/agents/{quote(str(agent_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getAgent", "GET", path, "", query, headers, None, "")
         return cast("AgentResponse", json.loads(payload))
 
     def update(self, agent_id: str, input: AgentPatch, options: UpdateAgentOptions) -> AgentResponse:
@@ -3300,7 +2957,7 @@ class AgentsResource:
         opts = options
         if "If-Match" in opts:
             headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("updateAgent", "PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("AgentResponse", json.loads(payload))
 
     def invoke(self, agent_id: str, input: AgentInvokeInput, options: InvokeAgentOptions) -> AgentInvokeResult:
@@ -3310,7 +2967,7 @@ class AgentsResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("invokeAgent", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("AgentInvokeResult", json.loads(payload))
 
 
@@ -3325,7 +2982,7 @@ class ConversationsResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createAgentConversation", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ConversationResponse", json.loads(payload))
 
     def list(self, agent_id: str, options: ListAgentConversationsOptions | None = None) -> ConversationPage:
@@ -3339,14 +2996,14 @@ class ConversationsResource:
             query["limit"] = str(opts["limit"])
         if "state" in opts:
             query["state"] = str(opts["state"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listAgentConversations", "GET", path, "", query, headers, None, "")
         return cast("ConversationPage", json.loads(payload))
 
     def get(self, agent_id: str, conversation_id: str) -> ConversationResponse:
         path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getConversation", "GET", path, "", query, headers, None, "")
         return cast("ConversationResponse", json.loads(payload))
 
     def update(self, agent_id: str, conversation_id: str, input: UpdateConversationInput, options: UpdateConversationOptions) -> ConversationResponse:
@@ -3356,7 +3013,7 @@ class ConversationsResource:
         opts = options
         if "If-Match" in opts:
             headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("updateConversation", "PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ConversationResponse", json.loads(payload))
 
     def delete(self, agent_id: str, conversation_id: str, options: DeleteConversationOptions) -> None:
@@ -3366,7 +3023,7 @@ class ConversationsResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("deleteConversation", "DELETE", path, "", query, headers, None, "")
         return None
 
     def cancel(self, agent_id: str, conversation_id: str, input: CancelConversationInput, options: CancelConversationOptions) -> CommandReceiptResponse:
@@ -3376,7 +3033,7 @@ class ConversationsResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("cancelConversation", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CommandReceiptResponse", json.loads(payload))
 
     def clear(self, agent_id: str, conversation_id: str, options: ClearConversationOptions) -> ClearConversationReceiptResponse:
@@ -3386,7 +3043,7 @@ class ConversationsResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("clearConversation", "POST", path, "", query, headers, None, "")
         return cast("ClearConversationReceiptResponse", json.loads(payload))
 
     def set_model(self, agent_id: str, conversation_id: str, input: SetConversationModelInput, options: SetConversationModelOptions) -> CommandReceiptResponse:
@@ -3396,7 +3053,7 @@ class ConversationsResource:
         opts = options
         if "If-Match" in opts:
             headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("PUT", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("setConversationModel", "PUT", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CommandReceiptResponse", json.loads(payload))
 
     def resume(self, agent_id: str, conversation_id: str, options: ResumeConversationOptions) -> ResumeConversationResponse:
@@ -3406,23 +3063,13 @@ class ConversationsResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("resumeConversation", "POST", path, "", query, headers, None, "")
         return cast("ResumeConversationResponse", json.loads(payload))
 
 
 class MessagesResource:
     def __init__(self, client: BeeOSClient) -> None:
         self._client = client
-
-    def send(self, agent_id: str, conversation_id: str, input: SendMessageInput, options: SendConversationMessageOptions) -> MessageResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/messages"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("MessageResponse", json.loads(payload))
 
     def list(self, agent_id: str, conversation_id: str, options: ListConversationMessagesOptions | None = None) -> MessagePage:
         path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/messages"
@@ -3433,42 +3080,42 @@ class MessagesResource:
             query["cursor"] = str(opts["cursor"])
         if "limit" in opts:
             query["limit"] = str(opts["limit"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listConversationMessages", "GET", path, "", query, headers, None, "")
         return cast("MessagePage", json.loads(payload))
 
     def get(self, agent_id: str, conversation_id: str, message_id: str) -> MessageEnvelopeResponse:
         path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/messages/{quote(str(message_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getConversationMessage", "GET", path, "", query, headers, None, "")
         return cast("MessageEnvelopeResponse", json.loads(payload))
 
     def create_share(self, agent_id: str, conversation_id: str, message_id: str) -> CreateShareReplyResponse:
         path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/messages/{quote(str(message_id), safe='')}/share"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("createShareReply", "POST", path, "", query, headers, None, "")
         return cast("CreateShareReplyResponse", json.loads(payload))
 
     def get_share(self, agent_id: str, conversation_id: str, message_id: str) -> GetShareReplyResponse:
         path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/messages/{quote(str(message_id), safe='')}/share"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getShareReply", "GET", path, "", query, headers, None, "")
         return cast("GetShareReplyResponse", json.loads(payload))
 
     def revoke_share(self, agent_id: str, conversation_id: str, message_id: str) -> None:
         path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/messages/{quote(str(message_id), safe='')}/share"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("revokeShareReply", "DELETE", path, "", query, headers, None, "")
         return None
 
     def resolve_share(self, slug: str) -> ReplyShareResponse:
         path = f"/reply-shares/{quote(str(slug), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("resolveReplyShare", "GET", path, "", query, headers, None, "")
         return cast("ReplyShareResponse", json.loads(payload))
 
 
@@ -3483,7 +3130,7 @@ class TasksResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createAgentTask", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CreateTaskResponse", json.loads(payload))
 
     def list(self, agent_id: str, options: ListAgentTasksOptions | None = None) -> TaskPage:
@@ -3499,14 +3146,14 @@ class TasksResource:
             query["limit"] = str(opts["limit"])
         if "state" in opts:
             query["state"] = str(opts["state"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listAgentTasks", "GET", path, "", query, headers, None, "")
         return cast("TaskPage", json.loads(payload))
 
     def get(self, agent_id: str, task_id: str) -> TaskResponse:
         path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getAgentTask", "GET", path, "", query, headers, None, "")
         return cast("TaskResponse", json.loads(payload))
 
     def list_messages(self, agent_id: str, task_id: str, options: ListAgentTaskMessagesOptions | None = None) -> MessagePage:
@@ -3520,7 +3167,7 @@ class TasksResource:
             query["since"] = str(opts["since"])
         if "limit" in opts:
             query["limit"] = str(opts["limit"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listAgentTaskMessages", "GET", path, "", query, headers, None, "")
         return cast("MessagePage", json.loads(payload))
 
     def cancel(self, agent_id: str, task_id: str, input: CancelTaskInput | None = None, *, options: CancelAgentTaskOptions) -> CommandReceiptResponse:
@@ -3530,7 +3177,7 @@ class TasksResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode() if input is not None else None, "application/json")
+        payload = self._client._request("cancelAgentTask", "POST", path, "", query, headers, json.dumps(input).encode() if input is not None else None, "application/json")
         return cast("CommandReceiptResponse", json.loads(payload))
 
     def continue_task(self, agent_id: str, task_id: str, input: ContinueTaskInput | None = None, *, options: ContinueAgentTaskOptions) -> CommandReceiptResponse:
@@ -3540,7 +3187,7 @@ class TasksResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode() if input is not None else None, "application/json")
+        payload = self._client._request("continueAgentTask", "POST", path, "", query, headers, json.dumps(input).encode() if input is not None else None, "application/json")
         return cast("CommandReceiptResponse", json.loads(payload))
 
 
@@ -3559,74 +3206,8 @@ class UsageResource:
             query["external_user_id"] = str(opts["external_user_id"])
         if "category" in opts:
             query["category"] = str(opts["category"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getUsageSummary", "GET", path, "", query, headers, None, "")
         return cast("ServerUsageSummary", json.loads(payload))
-
-    def get_history(self, options: GetUsageHistoryOptions | None = None) -> UsagePage:
-        path = f"/usage/history"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "external_user_id" in opts:
-            query["external_user_id"] = str(opts["external_user_id"])
-        if "category" in opts:
-            query["category"] = str(opts["category"])
-        if "limit" in opts:
-            query["limit"] = str(opts["limit"])
-        if "offset" in opts:
-            query["offset"] = str(opts["offset"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("UsagePage", json.loads(payload))
-
-    def get_limits(self) -> EffectiveLimits:
-        path = f"/usage/limits"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("EffectiveLimits", json.loads(payload))
-
-
-class TaskWebhooksResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def create(self, task_id: str, agent_id: str, input: RegisterTaskWebhookRequest) -> TaskWebhookResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/webhooks"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("TaskWebhookResponse", json.loads(payload))
-
-    def list(self, task_id: str, agent_id: str) -> ListTaskWebhooksResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/webhooks"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("ListTaskWebhooksResponse", json.loads(payload))
-
-    def delete(self, webhook_id: str, task_id: str, agent_id: str) -> None:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/webhooks/{quote(str(webhook_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
-        return None
-
-    def list_deliveries(self, webhook_id: str, task_id: str, agent_id: str, options: ListWebhookDeliveriesOptions | None = None) -> ListWebhookDeliveriesResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/webhooks/{quote(str(webhook_id), safe='')}/deliveries"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "limit" in opts:
-            query["limit"] = str(opts["limit"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("ListWebhookDeliveriesResponse", json.loads(payload))
-
-    def redeliver(self, delivery_id: str, webhook_id: str, task_id: str, agent_id: str) -> RedeliverWebhookResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/webhooks/{quote(str(webhook_id), safe='')}/deliveries/{quote(str(delivery_id), safe='')}/redeliver"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, None, "")
-        return cast("RedeliverWebhookResponse", json.loads(payload))
 
 
 class MethodsResource:
@@ -3637,7 +3218,7 @@ class MethodsResource:
         path = f"/instances/{quote(str(instance_id), safe='')}/runtime-capabilities"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getRuntimeCapabilities", "GET", path, "", query, headers, None, "")
         return cast("RuntimeCapabilityDocument", json.loads(payload))
 
     def invoke(self, instance_id: str, input: InvokeRuntimeMethodRequest, options: InvokeRuntimeMethodOptions) -> RuntimeMethodResponse:
@@ -3649,7 +3230,7 @@ class MethodsResource:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
         if "X-BeeOS-Operation-Id" in opts:
             headers["X-BeeOS-Operation-Id"] = str(opts["X-BeeOS-Operation-Id"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("invokeRuntimeMethod", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("RuntimeMethodResponse", json.loads(payload))
 
 
@@ -3670,24 +3251,15 @@ class OperationsResource:
             query["limit"] = str(opts["limit"])
         if "method" in opts:
             query["method"] = str(opts["method"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listRuntimeOperations", "GET", path, "", query, headers, None, "")
         return cast("CloudSkillOperationPage", json.loads(payload))
 
     def get(self, operation_id: str, instance_id: str) -> CloudSkillOperationDetail:
         path = f"/instances/{quote(str(instance_id), safe='')}/operations/{quote(str(operation_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getRuntimeOperation", "GET", path, "", query, headers, None, "")
         return cast("CloudSkillOperationDetail", json.loads(payload))
-
-    def get_events(self, operation_id: str, instance_id: str, options: StreamRuntimeOperationEventsOptions | None = None) -> Iterator[RuntimeOperationEventEnvelope]:
-        path = f"/instances/{quote(str(instance_id), safe='')}/operations/{quote(str(operation_id), safe='')}/events"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "Last-Event-ID" in opts:
-            headers["Last-Event-ID"] = str(opts["Last-Event-ID"])
-        return cast("Iterator[RuntimeOperationEventEnvelope]", self._client._stream("GET", path, "", query, headers, None, ""))
 
     def cancel(self, operation_id: str, instance_id: str, options: CancelRuntimeOperationOptions) -> CancelRuntimeOperationResponse:
         path = f"/instances/{quote(str(instance_id), safe='')}/operations/{quote(str(operation_id), safe='')}/cancel"
@@ -3698,104 +3270,8 @@ class OperationsResource:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
         if "X-BeeOS-Operation-Id" in opts:
             headers["X-BeeOS-Operation-Id"] = str(opts["X-BeeOS-Operation-Id"])
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("cancelRuntimeOperation", "POST", path, "", query, headers, None, "")
         return cast("CancelRuntimeOperationResponse", json.loads(payload))
-
-
-class HarnessesResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def list(self) -> ListHarnessesResponse:
-        path = f"/harnesses"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "/uhp/v1", query, headers, None, "")
-        return cast("ListHarnessesResponse", json.loads(payload))
-
-    def get(self, harness_id: str) -> UHPHarness:
-        path = f"/harnesses/{quote(str(harness_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "/uhp/v1", query, headers, None, "")
-        return cast("UHPHarness", json.loads(payload))
-
-    def list_all_models(self) -> UHPModelCatalog:
-        path = f"/models"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "/uhp/v1", query, headers, None, "")
-        return cast("UHPModelCatalog", json.loads(payload))
-
-    def list_models(self, harness_id: str) -> UHPHarnessModels:
-        path = f"/harnesses/{quote(str(harness_id), safe='')}/models"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "/uhp/v1", query, headers, None, "")
-        return cast("UHPHarnessModels", json.loads(payload))
-
-
-class ResponsesResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def create(self, input: UHPCreateResponseJSONRequest, options: CreateResponseOptions | None = None) -> UHPResponse:
-        path = f"/responses"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        if "UHP-Version" in opts:
-            headers["UHP-Version"] = str(opts["UHP-Version"])
-        payload = self._client._request("POST", path, "/uhp/v1", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("UHPResponse", json.loads(payload))
-
-    def get(self, response_id: str) -> UHPResponse:
-        path = f"/responses/{quote(str(response_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "/uhp/v1", query, headers, None, "")
-        return cast("UHPResponse", json.loads(payload))
-
-    def delete(self, response_id: str) -> DeleteResponseResponse:
-        path = f"/responses/{quote(str(response_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("DELETE", path, "/uhp/v1", query, headers, None, "")
-        return cast("DeleteResponseResponse", json.loads(payload))
-
-    def get_input_items(self, response_id: str) -> GetResponseInputItemsResponse:
-        path = f"/responses/{quote(str(response_id), safe='')}/input_items"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "/uhp/v1", query, headers, None, "")
-        return cast("GetResponseInputItemsResponse", json.loads(payload))
-
-    def cancel(self, response_id: str) -> UHPResponse:
-        path = f"/responses/{quote(str(response_id), safe='')}/cancel"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "/uhp/v1", query, headers, None, "")
-        return cast("UHPResponse", json.loads(payload))
-
-    def get_events(self, response_id: str, options: GetResponseEventsOptions | None = None) -> Iterator[UHPEvent]:
-        path = f"/responses/{quote(str(response_id), safe='')}/events"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "Last-Event-ID" in opts:
-            headers["Last-Event-ID"] = str(opts["Last-Event-ID"])
-        if "UHP-Version" in opts:
-            headers["UHP-Version"] = str(opts["UHP-Version"])
-        return cast("Iterator[UHPEvent]", self._client._stream("GET", path, "/uhp/v1", query, headers, None, ""))
-
-    def create_stream(self, input: UHPCreateResponseRequest, options: CreateResponseOptions | None = None) -> Iterator[UHPEvent]:
-        body: UHPCreateResponseRequest = {**input, "stream": True}
-        headers: dict[str, str] = {}
-        if options is not None:
-            headers.update({key: str(value) for key, value in options.items()})
-        return cast(Iterator[UHPEvent], self._client._stream("POST", "/responses", "/uhp/v1", {}, headers, json.dumps(body).encode(), "application/json"))
 
 
 class FilesResource:
@@ -3809,7 +3285,7 @@ class FilesResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("presignFileUpload", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("FileTransferDescriptor", json.loads(payload))
 
     def confirm_upload(self, file_id: str, input: FileConfirmInput, options: ConfirmFileUploadOptions) -> FileFile:
@@ -3819,7 +3295,7 @@ class FilesResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("confirmFileUpload", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("FileFile", json.loads(payload))
 
     def list(self, options: ListFilesOptions | None = None) -> FilePage:
@@ -3853,21 +3329,21 @@ class FilesResource:
             query["limit"] = str(opts["limit"])
         if "offset" in opts:
             query["offset"] = str(opts["offset"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listFiles", "GET", path, "", query, headers, None, "")
         return cast("FilePage", json.loads(payload))
 
     def get(self, file_id: str) -> FileResolution:
         path = f"/files/{quote(str(file_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getFile", "GET", path, "", query, headers, None, "")
         return cast("FileResolution", json.loads(payload))
 
     def rename(self, file_id: str, input: RenameFileRequest) -> FileFile:
         path = f"/files/{quote(str(file_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("renameFile", "PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("FileFile", json.loads(payload))
 
     def delete(self, file_id: str, options: DeleteFileOptions) -> None:
@@ -3877,7 +3353,7 @@ class FilesResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("deleteFile", "DELETE", path, "", query, headers, None, "")
         return None
 
     def create_share(self, file_id: str, options: CreateShareFileShareOptions) -> FileShareResponse:
@@ -3887,51 +3363,36 @@ class FilesResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("createShareFileShare", "POST", path, "", query, headers, None, "")
         return cast("FileShareResponse", json.loads(payload))
 
     def get_share(self, file_id: str) -> FileShareResponse:
         path = f"/files/{quote(str(file_id), safe='')}/share"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getShareFileShare", "GET", path, "", query, headers, None, "")
         return cast("FileShareResponse", json.loads(payload))
 
     def revoke_share(self, file_id: str) -> None:
         path = f"/files/{quote(str(file_id), safe='')}/share"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("revokeShareFileShare", "DELETE", path, "", query, headers, None, "")
         return None
 
     def resolve_share(self, slug: str) -> ResolveFileShareResponse:
         path = f"/file-shares/{quote(str(slug), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("resolveFileShare", "GET", path, "", query, headers, None, "")
         return cast("ResolveFileShareResponse", json.loads(payload))
 
     def get_summary(self) -> FileSummary:
         path = f"/files/summary"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getFilesSummary", "GET", path, "", query, headers, None, "")
         return cast("FileSummary", json.loads(payload))
-
-
-class EventSessionsResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def create(self, input: ServerEventSessionInput, options: CreateEventSessionOptions) -> ServerEventConnectionDescriptor:
-        path = f"/events/session"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("ServerEventConnectionDescriptor", json.loads(payload))
 
 
 class McpResource:
@@ -3942,21 +3403,21 @@ class McpResource:
         path = f"/mcp/servers"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listMCPServers", "GET", path, "", query, headers, None, "")
         return cast("ListMCPServersResponse", json.loads(payload))
 
     def get(self, server_id: str) -> GetMCPServerResponse:
         path = f"/mcp/servers/{quote(str(server_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getMCPServer", "GET", path, "", query, headers, None, "")
         return cast("GetMCPServerResponse", json.loads(payload))
 
     def resolve(self, server_id: str) -> ResolveMCPServerResponse:
         path = f"/mcp/servers/{quote(str(server_id), safe='')}/resolve"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("resolveMCPServer", "POST", path, "", query, headers, None, "")
         return cast("ResolveMCPServerResponse", json.loads(payload))
 
 
@@ -3983,14 +3444,14 @@ class SkillsResource:
             query["limit"] = str(opts["limit"])
         if "offset" in opts:
             query["offset"] = str(opts["offset"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listSkills", "GET", path, "", query, headers, None, "")
         return cast("SkillPage", json.loads(payload))
 
     def create(self, input: CreateSkillRequest) -> CreateSkillResponse:
         path = f"/skills"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createSkill", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CreateSkillResponse", json.loads(payload))
 
     def search(self, options: SearchSkillsOptions | None = None) -> SkillPage:
@@ -4012,28 +3473,28 @@ class SkillsResource:
             query["limit"] = str(opts["limit"])
         if "offset" in opts:
             query["offset"] = str(opts["offset"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("searchSkills", "GET", path, "", query, headers, None, "")
         return cast("SkillPage", json.loads(payload))
 
     def get(self, id: str) -> GetSkillResponse:
         path = f"/skills/{quote(str(id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getSkill", "GET", path, "", query, headers, None, "")
         return cast("GetSkillResponse", json.loads(payload))
 
     def get_by_slug(self, slug: str) -> GetSkillBySlugResponse:
         path = f"/skills/by-slug/{quote(str(slug), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getSkillBySlug", "GET", path, "", query, headers, None, "")
         return cast("GetSkillBySlugResponse", json.loads(payload))
 
     def categories(self) -> ListSkillCategoriesResponse:
         path = f"/skills/categories"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listSkillCategories", "GET", path, "", query, headers, None, "")
         return cast("ListSkillCategoriesResponse", json.loads(payload))
 
     def featured(self, options: GetFeaturedSkillsOptions | None = None) -> GetFeaturedSkillsResponse:
@@ -4047,106 +3508,8 @@ class SkillsResource:
             query["scope_value"] = str(opts["scope_value"])
         if "limit" in opts:
             query["limit"] = str(opts["limit"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getFeaturedSkills", "GET", path, "", query, headers, None, "")
         return cast("GetFeaturedSkillsResponse", json.loads(payload))
-
-
-class ImagesResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def list(self) -> JSONValue:
-        path = f"/images"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("JSONValue", json.loads(payload))
-
-    def create(self, input: JSONValue, options: CreateImageOptions) -> JSONValue:
-        path = f"/images"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("JSONValue", json.loads(payload))
-
-    def get(self, image_id: str) -> JSONValue:
-        path = f"/images/{quote(str(image_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("JSONValue", json.loads(payload))
-
-    def update(self, image_id: str, input: JSONValue, options: UpdateImageOptions) -> JSONValue:
-        path = f"/images/{quote(str(image_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "If-Match" in opts:
-            headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("PUT", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("JSONValue", json.loads(payload))
-
-    def delete(self, image_id: str, options: DeleteImageOptions) -> JSONValue:
-        path = f"/images/{quote(str(image_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
-        return cast("JSONValue", json.loads(payload))
-
-    def list_versions(self, image_id: str) -> JSONValue:
-        path = f"/images/{quote(str(image_id), safe='')}/versions"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("JSONValue", json.loads(payload))
-
-    def create_version(self, image_id: str, input: JSONValue, options: CreateImageVersionOptions) -> JSONValue:
-        path = f"/images/{quote(str(image_id), safe='')}/versions"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("JSONValue", json.loads(payload))
-
-
-class ImageVersionsResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def get(self, version_id: str) -> JSONValue:
-        path = f"/image-versions/{quote(str(version_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
-        return cast("JSONValue", json.loads(payload))
-
-    def update(self, version_id: str, input: JSONValue, options: UpdateImageVersionOptions) -> JSONValue:
-        path = f"/image-versions/{quote(str(version_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "If-Match" in opts:
-            headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("PUT", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("JSONValue", json.loads(payload))
-
-    def delete(self, version_id: str, options: DeleteImageVersionOptions) -> JSONValue:
-        path = f"/image-versions/{quote(str(version_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
-        return cast("JSONValue", json.loads(payload))
 
 
 class SkillSetsResource:
@@ -4164,14 +3527,14 @@ class SkillSetsResource:
             query["page"] = str(opts["page"])
         if "page_size" in opts:
             query["page_size"] = str(opts["page_size"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listSkillSets", "GET", path, "", query, headers, None, "")
         return cast("ListSkillSetsResponse", json.loads(payload))
 
     def get(self, slug: str) -> skillSetDetailView:
         path = f"/skillhub/skill-sets/{quote(str(slug), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getSkillSet", "GET", path, "", query, headers, None, "")
         return cast("skillSetDetailView", json.loads(payload))
 
 
@@ -4183,7 +3546,7 @@ class AutomationsResource:
         path = f"/automations"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createAutomation", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CreateAutomationResponse", json.loads(payload))
 
     def list(self, options: ListAutomationsOptions | None = None) -> ListAutomationsResponse:
@@ -4197,42 +3560,42 @@ class AutomationsResource:
             query["cursor"] = str(opts["cursor"])
         if "limit" in opts:
             query["limit"] = str(opts["limit"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listAutomations", "GET", path, "", query, headers, None, "")
         return cast("ListAutomationsResponse", json.loads(payload))
 
     def get(self, automation_id: str) -> GetAutomationResponse:
         path = f"/automations/{quote(str(automation_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getAutomation", "GET", path, "", query, headers, None, "")
         return cast("GetAutomationResponse", json.loads(payload))
 
     def update(self, automation_id: str, input: ProtoAutomationPatch) -> UpdateAutomationResponse:
         path = f"/automations/{quote(str(automation_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("updateAutomation", "PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("UpdateAutomationResponse", json.loads(payload))
 
     def delete(self, automation_id: str) -> None:
         path = f"/automations/{quote(str(automation_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("deleteAutomation", "DELETE", path, "", query, headers, None, "")
         return None
 
     def pause(self, automation_id: str) -> PauseAutomationResponse:
         path = f"/automations/{quote(str(automation_id), safe='')}/pause"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("pauseAutomation", "POST", path, "", query, headers, None, "")
         return cast("PauseAutomationResponse", json.loads(payload))
 
     def resume(self, automation_id: str) -> ResumeAutomationResponse:
         path = f"/automations/{quote(str(automation_id), safe='')}/resume"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("resumeAutomation", "POST", path, "", query, headers, None, "")
         return cast("ResumeAutomationResponse", json.loads(payload))
 
     def create_run(self, automation_id: str, input: ProtoAutomationRunInput, options: CreateAutomationRunOptions) -> CreateAutomationRunResponse:
@@ -4242,7 +3605,7 @@ class AutomationsResource:
         opts = options
         if "Idempotency-Key" in opts:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createAutomationRun", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CreateAutomationRunResponse", json.loads(payload))
 
     def list_runs(self, automation_id: str, options: ListAutomationRunsOptions | None = None) -> ListAutomationRunsResponse:
@@ -4256,21 +3619,21 @@ class AutomationsResource:
             query["cursor"] = str(opts["cursor"])
         if "limit" in opts:
             query["limit"] = str(opts["limit"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listAutomationRuns", "GET", path, "", query, headers, None, "")
         return cast("ListAutomationRunsResponse", json.loads(payload))
 
     def get_run(self, automation_id: str, run_id: str) -> GetAutomationRunResponse:
         path = f"/automations/{quote(str(automation_id), safe='')}/runs/{quote(str(run_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getAutomationRun", "GET", path, "", query, headers, None, "")
         return cast("GetAutomationRunResponse", json.loads(payload))
 
     def create_webhook(self, input: ProtoAutomationWebhookInput) -> CreateWebhookAutomationResponse:
         path = f"/automations/webhooks"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createWebhookAutomation", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CreateWebhookAutomationResponse", json.loads(payload))
 
 
@@ -4282,77 +3645,77 @@ class ConnectorsResource:
         path = f"/connectors/credential-put"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("PutConnectorCredentialConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("PutConnectorCredentialConnectorResponse", json.loads(payload))
 
     def credential_delete(self, input: ProtoDeleteConnectorCredentialRequest) -> DeleteConnectorCredentialConnectorResponse:
         path = f"/connectors/credential-delete"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("DeleteConnectorCredentialConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("DeleteConnectorCredentialConnectorResponse", json.loads(payload))
 
     def list(self, input: ProtoListInstanceConnectorsRequest) -> ListInstanceConnectorsConnectorResponse:
         path = f"/connectors/list"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("ListInstanceConnectorsConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ListInstanceConnectorsConnectorResponse", json.loads(payload))
 
     def install(self, input: ProtoInstallManagedConnectorRequest) -> InstallManagedConnectorConnectorResponse:
         path = f"/connectors/install"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("InstallManagedConnectorConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("InstallManagedConnectorConnectorResponse", json.loads(payload))
 
     def update(self, input: ProtoUpdateManagedConnectorRequest) -> UpdateManagedConnectorConnectorResponse:
         path = f"/connectors/update"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("UpdateManagedConnectorConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("UpdateManagedConnectorConnectorResponse", json.loads(payload))
 
     def uninstall(self, input: ProtoUninstallManagedConnectorRequest) -> UninstallManagedConnectorConnectorResponse:
         path = f"/connectors/uninstall"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("UninstallManagedConnectorConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("UninstallManagedConnectorConnectorResponse", json.loads(payload))
 
     def catalog_list(self, input: ProtoListMcpServersRequest) -> ListMcpServersConnectorResponse:
         path = f"/connectors/catalog-list"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("ListMcpServersConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ListMcpServersConnectorResponse", json.loads(payload))
 
     def catalog_get(self, input: ProtoGetMcpServerRequest) -> GetMcpServerConnectorResponse:
         path = f"/connectors/catalog-get"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("GetMcpServerConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("GetMcpServerConnectorResponse", json.loads(payload))
 
     def catalog_categories(self, input: ProtoMcpListCategoriesRequest) -> ListCategoriesConnectorResponse:
         path = f"/connectors/catalog-categories"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("ListCategoriesConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ListCategoriesConnectorResponse", json.loads(payload))
 
     def catalog_prepare(self, input: ProtoResolveMcpPreparationRequest) -> ResolvePreparationConnectorResponse:
         path = f"/connectors/catalog-prepare"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("ResolvePreparationConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ResolvePreparationConnectorResponse", json.loads(payload))
 
     def catalog_resolve(self, input: ProtoResolveInstallRequest) -> ResolveInstallConnectorResponse:
         path = f"/connectors/catalog-resolve"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("ResolveInstallConnector", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ResolveInstallConnectorResponse", json.loads(payload))
 
 
@@ -4365,7 +3728,7 @@ class AudioResource:
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
         multipart_body, content_type = self._client._multipart(input["file"])
-        payload = self._client._request("POST", path, "", query, headers, multipart_body, content_type)
+        payload = self._client._request("transcribeAudio", "POST", path, "", query, headers, multipart_body, content_type)
         return cast("TranscribeAudioResponse", json.loads(payload))
 
 
@@ -4382,7 +3745,7 @@ class CanvasesResource:
             headers["X-BeeOS-Conversation-ID"] = str(opts["X-BeeOS-Conversation-ID"])
         if "X-BeeOS-Platform-Agent-ID" in opts:
             headers["X-BeeOS-Platform-Agent-ID"] = str(opts["X-BeeOS-Platform-Agent-ID"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getShareCanvas", "GET", path, "", query, headers, None, "")
         return cast("GetShareCanvasResponse", json.loads(payload))
 
     def create_share(self, instance_id: str, canvas_id: str, input: CreateShareCanvasRequest, options: CreateShareCanvasOptions) -> CreateShareCanvasResponse:
@@ -4394,7 +3757,7 @@ class CanvasesResource:
             headers["X-BeeOS-Conversation-ID"] = str(opts["X-BeeOS-Conversation-ID"])
         if "X-BeeOS-Platform-Agent-ID" in opts:
             headers["X-BeeOS-Platform-Agent-ID"] = str(opts["X-BeeOS-Platform-Agent-ID"])
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createShareCanvas", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CreateShareCanvasResponse", json.loads(payload))
 
     def delete_share(self, instance_id: str, canvas_id: str, options: DeleteShareCanvasOptions) -> None:
@@ -4406,7 +3769,7 @@ class CanvasesResource:
             headers["X-BeeOS-Conversation-ID"] = str(opts["X-BeeOS-Conversation-ID"])
         if "X-BeeOS-Platform-Agent-ID" in opts:
             headers["X-BeeOS-Platform-Agent-ID"] = str(opts["X-BeeOS-Platform-Agent-ID"])
-        payload = self._client._request("DELETE", path, "", query, headers, None, "")
+        payload = self._client._request("deleteShareCanvas", "DELETE", path, "", query, headers, None, "")
         return None
 
     def list_snapshots(self, instance_id: str, canvas_id: str, options: ListCanvasSnapshotsOptions) -> ListCanvasSnapshotsResponse:
@@ -4418,7 +3781,7 @@ class CanvasesResource:
             headers["X-BeeOS-Conversation-ID"] = str(opts["X-BeeOS-Conversation-ID"])
         if "X-BeeOS-Platform-Agent-ID" in opts:
             headers["X-BeeOS-Platform-Agent-ID"] = str(opts["X-BeeOS-Platform-Agent-ID"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listCanvasSnapshots", "GET", path, "", query, headers, None, "")
         return cast("ListCanvasSnapshotsResponse", json.loads(payload))
 
     def restore_snapshot(self, instance_id: str, canvas_id: str, snapshot_id: str, options: RestoreCanvasSnapshotOptions) -> RestoreCanvasSnapshotResponse:
@@ -4430,7 +3793,7 @@ class CanvasesResource:
             headers["X-BeeOS-Conversation-ID"] = str(opts["X-BeeOS-Conversation-ID"])
         if "X-BeeOS-Platform-Agent-ID" in opts:
             headers["X-BeeOS-Platform-Agent-ID"] = str(opts["X-BeeOS-Platform-Agent-ID"])
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("restoreCanvasSnapshot", "POST", path, "", query, headers, None, "")
         return cast("RestoreCanvasSnapshotResponse", json.loads(payload))
 
     def get_session(self, instance_id: str, conversation_id: str, options: GetCanvasSessionOptions) -> GetCanvasSessionResponse:
@@ -4442,7 +3805,7 @@ class CanvasesResource:
             headers["X-BeeOS-Conversation-ID"] = str(opts["X-BeeOS-Conversation-ID"])
         if "X-BeeOS-Platform-Agent-ID" in opts:
             headers["X-BeeOS-Platform-Agent-ID"] = str(opts["X-BeeOS-Platform-Agent-ID"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getCanvasSession", "GET", path, "", query, headers, None, "")
         return cast("GetCanvasSessionResponse", json.loads(payload))
 
 
@@ -4454,42 +3817,42 @@ class DeviceBindingsResource:
         path = f"/agent/bind/{quote(str(id), safe='')}/details"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getAgentBindDetails", "GET", path, "", query, headers, None, "")
         return cast("GetAgentBindDetailsResponse", json.loads(payload))
 
     def confirm(self, id: str, input: ConfirmAgentBindRequest) -> ConfirmAgentBindResponse:
         path = f"/agent/bind/{quote(str(id), safe='')}/confirm"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("confirmAgentBind", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ConfirmAgentBindResponse", json.loads(payload))
 
     def create_portal(self, input: CreatePortalBindRequest) -> CreatePortalBindResponse:
         path = f"/agent/portal/bind-sessions"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("createPortalBind", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("CreatePortalBindResponse", json.loads(payload))
 
     def get_portal(self, id: str) -> GetPortalBindResponse:
         path = f"/agent/portal/bind-sessions/{quote(str(id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getPortalBind", "GET", path, "", query, headers, None, "")
         return cast("GetPortalBindResponse", json.loads(payload))
 
     def revoke_portal(self, id: str) -> RevokePortalBindResponse:
         path = f"/agent/portal/bind-sessions/{quote(str(id), safe='')}/revoke"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("revokePortalBind", "POST", path, "", query, headers, None, "")
         return cast("RevokePortalBindResponse", json.loads(payload))
 
     def resolve_portal(self, id: str, input: ResolvePortalBindRequest) -> ResolvePortalBindResponse:
         path = f"/agent/portal/bind-sessions/{quote(str(id), safe='')}/resolve"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("resolvePortalBind", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("ResolvePortalBindResponse", json.loads(payload))
 
 
@@ -4501,21 +3864,21 @@ class A2aResource:
         path = f"/a2a/{quote(str(agent_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        payload = self._client._request("invokeA2A", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("RuntimeMethodResponse", json.loads(payload))
 
     def get_agent_card(self, agent_id: str) -> A2AAgentCard:
         path = f"/a2a/{quote(str(agent_id), safe='')}/.well-known/agent-card.json"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getA2AAgentCard", "GET", path, "", query, headers, None, "")
         return cast("A2AAgentCard", json.loads(payload))
 
     def get_agent_card_legacy(self, agent_id: str) -> A2AAgentCard:
         path = f"/a2a/{quote(str(agent_id), safe='')}/.well-known/agent.json"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getA2AAgentCardLegacy", "GET", path, "", query, headers, None, "")
         return cast("A2AAgentCard", json.loads(payload))
 
     def list_tasks(self, agent_id: str, options: ListA2ATasksOptions | None = None) -> ListA2ATasksResponse:
@@ -4531,7 +3894,7 @@ class A2aResource:
             query["cursor"] = str(opts["cursor"])
         if "limit" in opts:
             query["limit"] = str(opts["limit"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("listA2ATasks", "GET", path, "", query, headers, None, "")
         return cast("ListA2ATasksResponse", json.loads(payload))
 
     def get_task(self, agent_id: str, task_id: str, options: GetA2ATaskOptions | None = None) -> a2aTaskView:
@@ -4541,13 +3904,109 @@ class A2aResource:
         opts = options if options is not None else {}
         if "history_length" in opts:
             query["history_length"] = str(opts["history_length"])
-        payload = self._client._request("GET", path, "", query, headers, None, "")
+        payload = self._client._request("getA2ATask", "GET", path, "", query, headers, None, "")
         return cast("a2aTaskView", json.loads(payload))
 
     def cancel_task(self, agent_id: str, task_id: str) -> a2aTaskView:
         path = f"/a2a/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/cancel"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
-        payload = self._client._request("POST", path, "", query, headers, None, "")
+        payload = self._client._request("cancelA2ATask", "POST", path, "", query, headers, None, "")
         return cast("a2aTaskView", json.loads(payload))
+
+
+class HarnessesResource:
+    def __init__(self, client: BeeOSClient) -> None:
+        self._client = client
+
+    def list(self) -> ListHarnessesResponse:
+        path = f"/harnesses"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("listHarnesses", "GET", path, "/uhp/v1", query, headers, None, "")
+        return cast("ListHarnessesResponse", json.loads(payload))
+
+    def get(self, harness_id: str) -> UHPHarness:
+        path = f"/harnesses/{quote(str(harness_id), safe='')}"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("getHarness", "GET", path, "/uhp/v1", query, headers, None, "")
+        return cast("UHPHarness", json.loads(payload))
+
+    def list_all_models(self) -> UHPModelCatalog:
+        path = f"/models"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("listModels", "GET", path, "/uhp/v1", query, headers, None, "")
+        return cast("UHPModelCatalog", json.loads(payload))
+
+    def list_models(self, harness_id: str) -> UHPHarnessModels:
+        path = f"/harnesses/{quote(str(harness_id), safe='')}/models"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("listHarnessModels", "GET", path, "/uhp/v1", query, headers, None, "")
+        return cast("UHPHarnessModels", json.loads(payload))
+
+
+class ResponsesResource:
+    def __init__(self, client: BeeOSClient) -> None:
+        self._client = client
+
+    def create(self, input: UHPCreateResponseJSONRequest, options: CreateResponseOptions | None = None) -> UHPResponse:
+        path = f"/responses"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options if options is not None else {}
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
+        if "UHP-Version" in opts:
+            headers["UHP-Version"] = str(opts["UHP-Version"])
+        payload = self._client._request("createResponse", "POST", path, "/uhp/v1", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("UHPResponse", json.loads(payload))
+
+    def get(self, response_id: str) -> UHPResponse:
+        path = f"/responses/{quote(str(response_id), safe='')}"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("getResponse", "GET", path, "/uhp/v1", query, headers, None, "")
+        return cast("UHPResponse", json.loads(payload))
+
+    def delete(self, response_id: str) -> DeleteResponseResponse:
+        path = f"/responses/{quote(str(response_id), safe='')}"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("deleteResponse", "DELETE", path, "/uhp/v1", query, headers, None, "")
+        return cast("DeleteResponseResponse", json.loads(payload))
+
+    def get_input_items(self, response_id: str) -> GetResponseInputItemsResponse:
+        path = f"/responses/{quote(str(response_id), safe='')}/input_items"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("getResponseInputItems", "GET", path, "/uhp/v1", query, headers, None, "")
+        return cast("GetResponseInputItemsResponse", json.loads(payload))
+
+    def cancel(self, response_id: str) -> UHPResponse:
+        path = f"/responses/{quote(str(response_id), safe='')}/cancel"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("cancelResponse", "POST", path, "/uhp/v1", query, headers, None, "")
+        return cast("UHPResponse", json.loads(payload))
+
+    def get_events(self, response_id: str, options: GetResponseEventsOptions | None = None) -> Iterator[UHPEvent]:
+        path = f"/responses/{quote(str(response_id), safe='')}/events"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options if options is not None else {}
+        if "Last-Event-ID" in opts:
+            headers["Last-Event-ID"] = str(opts["Last-Event-ID"])
+        if "UHP-Version" in opts:
+            headers["UHP-Version"] = str(opts["UHP-Version"])
+        return cast("Iterator[UHPEvent]", self._client._stream("getResponseEvents", "GET", path, "/uhp/v1", query, headers, None, ""))
+
+    def create_stream(self, input: UHPCreateResponseRequest, options: CreateResponseOptions | None = None) -> Iterator[UHPEvent]:
+        body: UHPCreateResponseRequest = {**input, "stream": True}
+        headers: dict[str, str] = {}
+        if options is not None:
+            headers.update({key: str(value) for key, value in options.items()})
+        return cast(Iterator[UHPEvent], self._client._stream("createResponse", "POST", "/responses", "/uhp/v1", {}, headers, json.dumps(body).encode(), "application/json"))
 

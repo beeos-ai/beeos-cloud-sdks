@@ -46,3 +46,20 @@ it('preserves schema string literals when replacing open schema types', async ()
   const files = await generate(spec);
   expect(files['src/models.ts']).toContain('ExampleStatus: "unknown" | "ready"');
 });
+
+it('generates only the live v2 operation set with correct UHP servers and errors', async () => {
+  const spec = JSON.parse(await fs.readFile('spec/server.openapi.json', 'utf8'));
+  const ops = Object.entries(spec.paths).flatMap(([route, item]) => Object.values(item as Record<string, {operationId?: string; [key: string]: unknown}>).filter(op => op.operationId).map(op => ({route, op})));
+  expect(spec.info.version).toBe('2.0.0');
+  expect(ops).toHaveLength(133);
+  expect(ops.every(({op}) => op['x-sdk-activation'] === 'live')).toBe(true);
+  for (const {route, op} of ops.filter(({op}) => op.servers)) {
+    expect(route.startsWith('/uhp/v1')).toBe(false);
+    expect(op.servers).toEqual([{url: 'https://api.cloud.beeos.ai/uhp/v1'}]);
+    const responses = op.responses as Record<string, {content?: Record<string, {schema: {$ref: string}}>} >;
+    expect(responses.default.content?.['application/json'].schema.$ref).toBe('#/components/schemas/UHPErrorEnvelope');
+    if (op.operationId === 'createResponse') {
+      for (const status of ['400', '503']) expect(responses[status].content?.['application/json'].schema.$ref).toBe('#/components/schemas/UHPErrorEnvelope');
+    }
+  }
+});

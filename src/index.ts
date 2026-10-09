@@ -8,7 +8,7 @@ export * from "./models.js";
 import type * as Models from "./models.js";
 import type { JSONValue } from "./models.js";
 
-export interface HTTPErrorBody { contentType: string; text: string; }
+export interface HTTPErrorBody { contentType: string; text: string; json?: JSONValue; reason?: string; }
 
 export class BeeOSAPIError extends Error {
   constructor(
@@ -33,10 +33,7 @@ export interface BeeOSClientOptions {
 type Query = Record<string, string | number | boolean | undefined>;
 
 export class BeeOSClient {
-  readonly runtime: RuntimeModule;
   readonly operations: OperationsModule;
-  readonly harnesses: HarnessesModule;
-  readonly responses: ResponsesModule;
   readonly mcp: McpModule;
   readonly skills: SkillsModule;
   readonly skillSets: SkillSetsModule;
@@ -46,28 +43,23 @@ export class BeeOSClient {
   readonly canvases: CanvasesModule;
   readonly deviceBindings: DeviceBindingsModule;
   readonly a2a: A2aModule;
+  readonly harnesses: HarnessesModule;
+  readonly responses: ResponsesModule;
   readonly identity: IdentityModule;
   readonly usage: UsageModule;
   readonly catalog: CatalogModule;
   readonly instances: InstancesModule;
-  readonly images: ImagesModule;
-  readonly imageVersions: ImageVersionsModule;
   readonly agents: AgentsModule;
   readonly conversations: ConversationsModule;
   readonly messages: MessagesModule;
   readonly tasks: TasksModule;
   readonly files: FilesModule;
-  readonly eventSessions: EventSessionsModule;
-  readonly taskWebhooks: TaskWebhooksModule;
   readonly appWebhooks: AppWebhooksModule;
   readonly methods: MethodsModule;
 
   constructor(private readonly options: BeeOSClientOptions) {
     if (!options.baseURL || !options.apiKey) throw new Error("Server baseURL and bsk_ apiKey are required");
-    this.runtime = new RuntimeModule(this);
     this.operations = new OperationsModule(this);
-    this.harnesses = new HarnessesModule(this);
-    this.responses = new ResponsesModule(this);
     this.mcp = new McpModule(this);
     this.skills = new SkillsModule(this);
     this.skillSets = new SkillSetsModule(this);
@@ -77,19 +69,17 @@ export class BeeOSClient {
     this.canvases = new CanvasesModule(this);
     this.deviceBindings = new DeviceBindingsModule(this);
     this.a2a = new A2aModule(this);
+    this.harnesses = new HarnessesModule(this);
+    this.responses = new ResponsesModule(this);
     this.identity = new IdentityModule(this);
     this.usage = new UsageModule(this);
     this.catalog = new CatalogModule(this);
     this.instances = new InstancesModule(this);
-    this.images = new ImagesModule(this);
-    this.imageVersions = new ImageVersionsModule(this);
     this.agents = new AgentsModule(this);
     this.conversations = new ConversationsModule(this);
     this.messages = new MessagesModule(this);
     this.tasks = new TasksModule(this);
     this.files = new FilesModule(this);
-    this.eventSessions = new EventSessionsModule(this);
-    this.taskWebhooks = new TaskWebhooksModule(this);
     this.appWebhooks = new AppWebhooksModule(this);
     this.methods = new MethodsModule(this);
   }
@@ -99,7 +89,7 @@ export class BeeOSClient {
     return new BeeOSClient({ ...this.options, externalUserId: id });
   }
 
-  async request<T = JSONValue>(method: string, path: string, init: { query?: Query; json?: JSONValue; idempotencyKey?: string; headers?: Record<string, string>; basePath?: string; responseType?: "sse" | "bytes"; form?: FormData; conflictBody?: true; errorCodeField?: "error" } = {}): Promise<T> {
+  async request<T = JSONValue>(method: string, path: string, init: { query?: Query; json?: JSONValue; idempotencyKey?: string; headers?: Record<string, string>; basePath?: string; responseType?: "sse" | "bytes"; form?: FormData; errorCodeField?: "error" } = {}): Promise<T> {
     const baseURL = init.basePath ? new URL(init.basePath.replace(/\/$/, "") + "/", this.options.baseURL).href : this.options.baseURL;
     const url = new URL(path.replace(/^\//, ""), baseURL.endsWith("/") ? baseURL : baseURL + "/");
     for (const [key, value] of Object.entries(init.query ?? {})) {
@@ -122,24 +112,32 @@ export class BeeOSClient {
     const requestId = response.headers.get("X-Request-ID") ?? undefined;
     if (!response.ok) {
       const contentType = response.headers.get("Content-Type") ?? "";
-      if (!contentType.includes("application/json")) {
-        const body = { contentType, text: await response.text() };
-        throw new BeeOSAPIError(response.status, "invalid_response", response.statusText, requestId, body);
+      const text = await response.text();
+      let payload: JSONValue;
+      try {
+        payload = JSON.parse(text) as JSONValue;
+      } catch (error) {
+        if (!(error instanceof SyntaxError)) throw error;
+        throw new BeeOSAPIError(response.status, "invalid_response", response.statusText, requestId, { contentType, text, reason: "invalid_json" });
       }
-      if (init.basePath === "/uhp/v1") {
-        const body = await response.json() as Models.UHPErrorEnvelope;
-        throw new BeeOSAPIError(response.status, body.error.code, body.error.message, requestId, body);
+      let code = "invalid_response";
+      let message = response.statusText;
+      let body: Models.APIErrorBody | HTTPErrorBody = { contentType, text, json: payload, reason: "invalid_envelope" };
+      if (payload !== null && typeof payload === "object" && !Array.isArray(payload)) {
+        if (typeof payload.message === "string") message = payload.message;
+        const envelope = init.basePath === "/uhp/v1" ? payload.error : payload;
+        if (envelope !== null && typeof envelope === "object" && !Array.isArray(envelope)) {
+          const candidate = envelope[init.errorCodeField === "error" ? "error" : "code"];
+          if (typeof candidate === "string" && candidate.length > 0) {
+            code = candidate;
+            if (typeof envelope.message === "string") {
+              message = envelope.message;
+              body = payload as Models.APIErrorBody;
+            }
+          }
+        }
       }
-      if (response.status === 409 && init.conflictBody) {
-        const body = await response.json() as Models.ServiceOperationCursorConflict;
-        throw new BeeOSAPIError(response.status, body.code, response.statusText, requestId, body);
-      }
-      if (init.errorCodeField === "error") {
-        const body = await response.json() as Models.DeviceBindingErrorResponse;
-        throw new BeeOSAPIError(response.status, body.error, body.message, requestId, body);
-      }
-      const body = await response.json() as Models.ErrorResponse;
-      throw new BeeOSAPIError(response.status, body.code, body.message, requestId, body);
+      throw new BeeOSAPIError(response.status, code, message, requestId, body);
     }
     if (response.status === 204) return undefined as T;
     if (init.responseType === "sse") return readEvents(response) as T;
@@ -171,12 +169,6 @@ class UsageModule {
   constructor(private readonly client: BeeOSClient) {}
   getSummary(query: Models.GetUsageSummaryQuery): Promise<Models.GetUsageSummaryResponse> {
     return this.client.request<Models.GetUsageSummaryResponse>("GET", "usage/summary", { query });
-  }
-  getHistory(query: Models.GetUsageHistoryQuery): Promise<Models.GetUsageHistoryResponse> {
-    return this.client.request<Models.GetUsageHistoryResponse>("GET", "usage/history", { query });
-  }
-  getLimits(): Promise<Models.GetUsageLimitsResponse> {
-    return this.client.request<Models.GetUsageLimitsResponse>("GET", "usage/limits");
   }
 }
 
@@ -262,82 +254,6 @@ class InstancesModule {
   }
 }
 
-class ImagesModule {
-  constructor(private readonly client: BeeOSClient) {}
-  list(query?: Query): Promise<Models.ListImagesResponse> {
-    return this.client.request<Models.ListImagesResponse>("GET", "images", { query });
-  }
-  create(input: Models.CreateImageInput, idempotencyKey: string): Promise<Models.CreateImageResponse> {
-    return this.client.request<Models.CreateImageResponse>("POST", "images", { json: input, idempotencyKey });
-  }
-  get(imageId: string): Promise<Models.GetImageResponse> {
-    return this.client.request<Models.GetImageResponse>("GET", `images/${imageId}`);
-  }
-  update(imageId: string, patch: Models.UpdateImageInput, version: number): Promise<Models.UpdateImageResponse> {
-    return this.client.request<Models.UpdateImageResponse>("PUT", `images/${imageId}`, { json: patch, headers: { "If-Match": `"${version}"` } });
-  }
-  delete(imageId: string, idempotencyKey: string): Promise<Models.DeleteImageResponse> {
-    return this.client.request<Models.DeleteImageResponse>("DELETE", `images/${imageId}`, { idempotencyKey });
-  }
-  listVersions(imageId: string, query?: Query): Promise<Models.ListImageVersionsResponse> {
-    return this.client.request<Models.ListImageVersionsResponse>("GET", `images/${imageId}/versions`, { query });
-  }
-  createVersion(imageId: string, input: Models.CreateImageVersionInput, idempotencyKey: string): Promise<Models.CreateImageVersionResponse> {
-    return this.client.request<Models.CreateImageVersionResponse>("POST", `images/${imageId}/versions`, { json: input, idempotencyKey });
-  }
-  open(imageId: string) {
-    return new Image(this.client, imageId);
-  }
-}
-
-class ImageVersionsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  get(versionId: string): Promise<Models.GetImageVersionResponse> {
-    return this.client.request<Models.GetImageVersionResponse>("GET", `image-versions/${versionId}`);
-  }
-  update(versionId: string, patch: Models.UpdateImageVersionInput, version: number): Promise<Models.UpdateImageVersionResponse> {
-    return this.client.request<Models.UpdateImageVersionResponse>("PUT", `image-versions/${versionId}`, { json: patch, headers: { "If-Match": `"${version}"` } });
-  }
-  delete(versionId: string, idempotencyKey: string): Promise<Models.DeleteImageVersionResponse> {
-    return this.client.request<Models.DeleteImageVersionResponse>("DELETE", `image-versions/${versionId}`, { idempotencyKey });
-  }
-  open(versionId: string) {
-    return new ImageVersion(this.client, versionId);
-  }
-}
-
-export class Image {
-  constructor(private readonly client: BeeOSClient, readonly id: string) {}
-  refresh() {
-    return this.client.images.get(this.id);
-  }
-  update(patch: JSONValue, version: number) {
-    return this.client.images.update(this.id, patch, version);
-  }
-  delete(idempotencyKey: string) {
-    return this.client.images.delete(this.id, idempotencyKey);
-  }
-  listVersions(query?: Query) {
-    return this.client.images.listVersions(this.id, query);
-  }
-  createVersion(input: JSONValue, idempotencyKey: string) {
-    return this.client.images.createVersion(this.id, input, idempotencyKey);
-  }
-}
-
-export class ImageVersion {
-  constructor(private readonly client: BeeOSClient, readonly id: string) {}
-  refresh() {
-    return this.client.imageVersions.get(this.id);
-  }
-  update(patch: JSONValue, version: number) {
-    return this.client.imageVersions.update(this.id, patch, version);
-  }
-  delete(idempotencyKey: string) {
-    return this.client.imageVersions.delete(this.id, idempotencyKey);
-  }
-}
-
 class AgentsModule {
   invoke(agentId: string, input: Models.InvokeAgentInput, idempotencyKey: string): Promise<Models.InvokeAgentResponse> {
     return this.client.request<Models.InvokeAgentResponse>("POST", `agents/${encodeURIComponent(agentId)}/invoke`, { json: input, idempotencyKey });
@@ -405,9 +321,6 @@ class MessagesModule {
   }
 
   constructor(private readonly client: BeeOSClient) {}
-  send(agentId: string, conversationId: string, input: Models.SendConversationMessageInput, idempotencyKey: string): Promise<Models.SendConversationMessageResponse> {
-    return this.client.request<Models.SendConversationMessageResponse>("POST", `agents/${agentId}/conversations/${conversationId}/messages`, { json: input, idempotencyKey });
-  }
   list(agentId: string, conversationId: string, query?: Models.ListConversationMessagesQuery): Promise<Models.ListConversationMessagesResponse> {
     return this.client.request<Models.ListConversationMessagesResponse>("GET", `agents/${agentId}/conversations/${conversationId}/messages`, { query });
   }
@@ -482,35 +395,6 @@ class FilesModule {
   }
   delete(fileId: string, idempotencyKey: string): Promise<Models.DeleteFileResponse> {
     return this.client.request<Models.DeleteFileResponse>("DELETE", `files/${fileId}`, { idempotencyKey });
-  }
-}
-
-class EventSessionsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  create(input: Models.CreateEventSessionInput, idempotencyKey: string): Promise<Models.CreateEventSessionResponse> {
-    return this.client.request<Models.CreateEventSessionResponse>("POST", "events/session", { json: input, idempotencyKey });
-  }
-}
-
-class TaskWebhooksModule {
-  constructor(private readonly client: BeeOSClient) {}
-  create(agentId: string, taskId: string, input: Models.RegisterTaskWebhookInput, idempotencyKey: string): Promise<Models.RegisterTaskWebhookResponse> {
-    return this.client.request<Models.RegisterTaskWebhookResponse>("POST", `agents/${agentId}/tasks/${taskId}/webhooks`, { json: input, idempotencyKey });
-  }
-  list(agentId: string, taskId: string): Promise<Models.ListTaskWebhooksResponse> {
-    return this.client.request<Models.ListTaskWebhooksResponse>("GET", `agents/${agentId}/tasks/${taskId}/webhooks`);
-  }
-  delete(agentId: string, taskId: string, webhookId: string, idempotencyKey: string): Promise<Models.DeleteTaskWebhookResponse> {
-    return this.client.request<Models.DeleteTaskWebhookResponse>("DELETE", `agents/${agentId}/tasks/${taskId}/webhooks/${webhookId}`, { idempotencyKey });
-  }
-  listDeliveries(agentId: string, taskId: string, webhookId: string, limit?: number): Promise<Models.ListWebhookDeliveriesResponse> {
-    return this.client.request<Models.ListWebhookDeliveriesResponse>("GET", `agents/${agentId}/tasks/${taskId}/webhooks/${webhookId}/deliveries`, { query: { limit } });
-  }
-  redeliver(agentId: string, taskId: string, webhookId: string, deliveryId: string, idempotencyKey: string): Promise<Models.RedeliverWebhookResponse> {
-    return this.client.request<Models.RedeliverWebhookResponse>("POST", `agents/${agentId}/tasks/${taskId}/webhooks/${webhookId}/deliveries/${deliveryId}/redeliver`, { idempotencyKey });
-  }
-  verifySignature(rawBody: Uint8Array, headers: Record<string, string>, secret: string, now = Date.now()) {
-    return verifyTaskWebhookSignature(rawBody, headers, secret, now);
   }
 }
 
@@ -669,22 +553,6 @@ export class Instance {
   }
 }
 
-class RuntimeModule {
-  constructor(private readonly client: BeeOSClient) {}
-  restartInstance(instanceId: string, idempotencyKey: string): Promise<Models.RestartInstanceResponse> {
-    return this.client.request<Models.RestartInstanceResponse>("POST", `instances/${encodeURIComponent(instanceId)}/restart`, { idempotencyKey });
-  }
-  getInstanceLogs(instanceId: string, query?: Models.GetInstanceLogsQuery): Promise<Models.GetInstanceLogsResponse> {
-    return this.client.request<Models.GetInstanceLogsResponse>("GET", `instances/${encodeURIComponent(instanceId)}/logs`, { query });
-  }
-  updateInstanceConfig(instanceId: string, input: Models.UpdateInstanceConfigInput, version: number): Promise<Models.UpdateInstanceConfigResponse> {
-    return this.client.request<Models.UpdateInstanceConfigResponse>("PATCH", `instances/${encodeURIComponent(instanceId)}/config`, { json: input, headers: { "If-Match": `"${version}"` } });
-  }
-  createRealtimeSession(input: Models.CreateRealtimeSessionInput): Promise<Models.CreateRealtimeSessionResponse> {
-    return this.client.request<Models.CreateRealtimeSessionResponse>("POST", `realtime/sessions`, { json: input });
-  }
-}
-
 class OperationsModule {
   constructor(private readonly client: BeeOSClient) {}
   list(instanceId: string, query?: Models.ListRuntimeOperationsQuery): Promise<Models.ListRuntimeOperationsResponse> {
@@ -693,53 +561,8 @@ class OperationsModule {
   get(operationId: string, instanceId: string): Promise<Models.GetRuntimeOperationResponse> {
     return this.client.request<Models.GetRuntimeOperationResponse>("GET", `instances/${encodeURIComponent(instanceId)}/operations/${encodeURIComponent(operationId)}`, {  });
   }
-  getEvents(operationId: string, instanceId: string, LastEventID?: string): Promise<Models.StreamRuntimeOperationEventsResponse> {
-    return this.client.request<Models.StreamRuntimeOperationEventsResponse>("GET", `instances/${encodeURIComponent(instanceId)}/operations/${encodeURIComponent(operationId)}/events`, { conflictBody: true, headers: { ...(LastEventID === undefined ? {} : { "Last-Event-ID": LastEventID }) }, responseType: 'sse' });
-  }
   cancel(operationId: string, instanceId: string, idempotencyKey: string, XBeeOSOperationId?: string): Promise<Models.CancelRuntimeOperationResponse> {
     return this.client.request<Models.CancelRuntimeOperationResponse>("POST", `instances/${encodeURIComponent(instanceId)}/operations/${encodeURIComponent(operationId)}/cancel`, { idempotencyKey, headers: { ...(XBeeOSOperationId === undefined ? {} : { "X-BeeOS-Operation-Id": XBeeOSOperationId }) } });
-  }
-}
-
-class HarnessesModule {
-  constructor(private readonly client: BeeOSClient) {}
-  list(): Promise<Models.ListHarnessesResponse> {
-    return this.client.request<Models.ListHarnessesResponse>("GET", `harnesses`, { basePath: "/uhp/v1" });
-  }
-  get(harness_id: string): Promise<Models.GetHarnessResponse> {
-    return this.client.request<Models.GetHarnessResponse>("GET", `harnesses/${encodeURIComponent(harness_id)}`, { basePath: "/uhp/v1" });
-  }
-  listAllModels(): Promise<Models.ListModelsResponse> {
-    return this.client.request<Models.ListModelsResponse>("GET", `models`, { basePath: "/uhp/v1" });
-  }
-  listModels(harness_id: string): Promise<Models.ListHarnessModelsResponse> {
-    return this.client.request<Models.ListHarnessModelsResponse>("GET", `harnesses/${encodeURIComponent(harness_id)}/models`, { basePath: "/uhp/v1" });
-  }
-}
-
-class ResponsesModule {
-  createStream(input: Models.UHPCreateResponseStreamRequest, idempotencyKey?: string): Promise<AsyncIterable<Models.UHPEvent>> {
-    return this.client.request<AsyncIterable<Models.UHPEvent>>("POST", "responses", { json: { ...input, stream: true }, idempotencyKey, basePath: "/uhp/v1", responseType: "sse" });
-  }
-
-  constructor(private readonly client: BeeOSClient) {}
-  create(input: Models.CreateResponseInput, idempotencyKey?: string, UHPVersion?: string): Promise<Models.CreateResponseResponse> {
-    return this.client.request<Models.CreateResponseResponse>("POST", `responses`, { json: input, idempotencyKey, headers: { ...(UHPVersion === undefined ? {} : { "UHP-Version": UHPVersion }) }, basePath: "/uhp/v1" });
-  }
-  get(response_id: string): Promise<Models.GetResponseResponse> {
-    return this.client.request<Models.GetResponseResponse>("GET", `responses/${encodeURIComponent(response_id)}`, { basePath: "/uhp/v1" });
-  }
-  delete(response_id: string): Promise<Models.DeleteResponseResponse> {
-    return this.client.request<Models.DeleteResponseResponse>("DELETE", `responses/${encodeURIComponent(response_id)}`, { basePath: "/uhp/v1" });
-  }
-  getInputItems(response_id: string): Promise<Models.GetResponseInputItemsResponse> {
-    return this.client.request<Models.GetResponseInputItemsResponse>("GET", `responses/${encodeURIComponent(response_id)}/input_items`, { basePath: "/uhp/v1" });
-  }
-  cancel(response_id: string): Promise<Models.CancelResponseResponse> {
-    return this.client.request<Models.CancelResponseResponse>("POST", `responses/${encodeURIComponent(response_id)}/cancel`, { basePath: "/uhp/v1" });
-  }
-  getEvents(response_id: string, LastEventID?: string, UHPVersion?: string): Promise<Models.GetResponseEventsResponse> {
-    return this.client.request<Models.GetResponseEventsResponse>("GET", `responses/${encodeURIComponent(response_id)}/events`, { headers: { ...(LastEventID === undefined ? {} : { "Last-Event-ID": LastEventID }), ...(UHPVersion === undefined ? {} : { "UHP-Version": UHPVersion }) }, responseType: 'sse', basePath: "/uhp/v1" });
   }
 }
 
@@ -935,6 +758,48 @@ class A2aModule {
   }
   cancelTask(agentId: string, taskId: string): Promise<Models.CancelA2ATaskResponse> {
     return this.client.request<Models.CancelA2ATaskResponse>("POST", `a2a/${encodeURIComponent(agentId)}/tasks/${encodeURIComponent(taskId)}/cancel`, {  });
+  }
+}
+
+class HarnessesModule {
+  constructor(private readonly client: BeeOSClient) {}
+  list(): Promise<Models.ListHarnessesResponse> {
+    return this.client.request<Models.ListHarnessesResponse>("GET", `harnesses`, { basePath: "/uhp/v1" });
+  }
+  get(harness_id: string): Promise<Models.GetHarnessResponse> {
+    return this.client.request<Models.GetHarnessResponse>("GET", `harnesses/${encodeURIComponent(harness_id)}`, { basePath: "/uhp/v1" });
+  }
+  listAllModels(): Promise<Models.ListModelsResponse> {
+    return this.client.request<Models.ListModelsResponse>("GET", `models`, { basePath: "/uhp/v1" });
+  }
+  listModels(harness_id: string): Promise<Models.ListHarnessModelsResponse> {
+    return this.client.request<Models.ListHarnessModelsResponse>("GET", `harnesses/${encodeURIComponent(harness_id)}/models`, { basePath: "/uhp/v1" });
+  }
+}
+
+class ResponsesModule {
+  createStream(input: Models.UHPCreateResponseStreamRequest, idempotencyKey?: string): Promise<AsyncIterable<Models.UHPEvent>> {
+    return this.client.request<AsyncIterable<Models.UHPEvent>>("POST", "responses", { json: { ...input, stream: true }, idempotencyKey, basePath: "/uhp/v1", responseType: "sse" });
+  }
+
+  constructor(private readonly client: BeeOSClient) {}
+  create(input: Models.CreateResponseInput, idempotencyKey?: string, UHPVersion?: string): Promise<Models.CreateResponseResponse> {
+    return this.client.request<Models.CreateResponseResponse>("POST", `responses`, { json: input, idempotencyKey, headers: { ...(UHPVersion === undefined ? {} : { "UHP-Version": UHPVersion }) }, basePath: "/uhp/v1" });
+  }
+  get(response_id: string): Promise<Models.GetResponseResponse> {
+    return this.client.request<Models.GetResponseResponse>("GET", `responses/${encodeURIComponent(response_id)}`, { basePath: "/uhp/v1" });
+  }
+  delete(response_id: string): Promise<Models.DeleteResponseResponse> {
+    return this.client.request<Models.DeleteResponseResponse>("DELETE", `responses/${encodeURIComponent(response_id)}`, { basePath: "/uhp/v1" });
+  }
+  getInputItems(response_id: string): Promise<Models.GetResponseInputItemsResponse> {
+    return this.client.request<Models.GetResponseInputItemsResponse>("GET", `responses/${encodeURIComponent(response_id)}/input_items`, { basePath: "/uhp/v1" });
+  }
+  cancel(response_id: string): Promise<Models.CancelResponseResponse> {
+    return this.client.request<Models.CancelResponseResponse>("POST", `responses/${encodeURIComponent(response_id)}/cancel`, { basePath: "/uhp/v1" });
+  }
+  getEvents(response_id: string, LastEventID?: string, UHPVersion?: string): Promise<Models.GetResponseEventsResponse> {
+    return this.client.request<Models.GetResponseEventsResponse>("GET", `responses/${encodeURIComponent(response_id)}/events`, { headers: { ...(LastEventID === undefined ? {} : { "Last-Event-ID": LastEventID }), ...(UHPVersion === undefined ? {} : { "UHP-Version": UHPVersion }) }, responseType: 'sse', basePath: "/uhp/v1" });
   }
 }
 

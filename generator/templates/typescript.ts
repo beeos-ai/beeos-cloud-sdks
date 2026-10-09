@@ -4,7 +4,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 export type JSONValue = null | boolean | number | string | JSONValue[] | { [key: string]: JSONValue };
 
-export interface HTTPErrorBody { contentType: string; text: string; }
+export interface HTTPErrorBody { contentType: string; text: string; json?: JSONValue; reason?: string; }
 
 export class BeeOSAPIError extends Error {
   constructor(
@@ -33,15 +33,11 @@ export class BeeOSClient {
   readonly usage: UsageModule;
   readonly catalog: CatalogModule;
   readonly instances: InstancesModule;
-  readonly images: ImagesModule;
-  readonly imageVersions: ImageVersionsModule;
   readonly agents: AgentsModule;
   readonly conversations: ConversationsModule;
   readonly messages: MessagesModule;
   readonly tasks: TasksModule;
   readonly files: FilesModule;
-  readonly eventSessions: EventSessionsModule;
-  readonly taskWebhooks: TaskWebhooksModule;
   readonly appWebhooks: AppWebhooksModule;
   readonly methods: MethodsModule;
 
@@ -51,15 +47,11 @@ export class BeeOSClient {
     this.usage = new UsageModule(this);
     this.catalog = new CatalogModule(this);
     this.instances = new InstancesModule(this);
-    this.images = new ImagesModule(this);
-    this.imageVersions = new ImageVersionsModule(this);
     this.agents = new AgentsModule(this);
     this.conversations = new ConversationsModule(this);
     this.messages = new MessagesModule(this);
     this.tasks = new TasksModule(this);
     this.files = new FilesModule(this);
-    this.eventSessions = new EventSessionsModule(this);
-    this.taskWebhooks = new TaskWebhooksModule(this);
     this.appWebhooks = new AppWebhooksModule(this);
     this.methods = new MethodsModule(this);
   }
@@ -90,16 +82,33 @@ export class BeeOSClient {
     const response = await fetchImpl(url, { method, headers, body });
     const requestId = response.headers.get("X-Request-ID") ?? undefined;
     if (!response.ok) {
+      const contentType = response.headers.get("Content-Type") ?? "";
+      const text = await response.text();
+      let payload: JSONValue;
+      try {
+        payload = JSON.parse(text) as JSONValue;
+      } catch (error) {
+        if (!(error instanceof SyntaxError)) throw error;
+        throw new BeeOSAPIError(response.status, "invalid_response", response.statusText, requestId, { contentType, text, reason: "invalid_json" });
+      }
       let code = "invalid_response";
       let message = response.statusText;
-      try {
-        const err = (await response.json()) as { code?: string; message?: string };
-        code = err.code ?? code;
-        message = err.message ?? message;
-      } catch {
-        /* envelope optional */
+      let body: Models.APIErrorBody | HTTPErrorBody = { contentType, text, json: payload, reason: "invalid_envelope" };
+      if (payload !== null && typeof payload === "object" && !Array.isArray(payload)) {
+        if (typeof payload.message === "string") message = payload.message;
+        const envelope = init.basePath === "/uhp/v1" ? payload.error : payload;
+        if (envelope !== null && typeof envelope === "object" && !Array.isArray(envelope)) {
+          const candidate = envelope[init.errorCodeField === "error" ? "error" : "code"];
+          if (typeof candidate === "string" && candidate.length > 0) {
+            code = candidate;
+            if (typeof envelope.message === "string") {
+              message = envelope.message;
+              body = payload as Models.APIErrorBody;
+            }
+          }
+        }
       }
-      throw new BeeOSAPIError(response.status, code, message, requestId);
+      throw new BeeOSAPIError(response.status, code, message, requestId, body);
     }
     if (response.status === 204) return undefined;
     return response.json();
@@ -129,12 +138,6 @@ class UsageModule {
   constructor(private readonly client: BeeOSClient) {}
   getSummary(query: Query) {
     return this.client.request("GET", "usage/summary", { query });
-  }
-  getHistory(query: Query) {
-    return this.client.request("GET", "usage/history", { query });
-  }
-  getLimits() {
-    return this.client.request("GET", "usage/limits");
   }
 }
 
@@ -188,82 +191,6 @@ class InstancesModule {
   }
 }
 
-class ImagesModule {
-  constructor(private readonly client: BeeOSClient) {}
-  list(query?: Query) {
-    return this.client.request("GET", "images", { query });
-  }
-  create(input: unknown, idempotencyKey: string) {
-    return this.client.request("POST", "images", { json: input, idempotencyKey });
-  }
-  get(imageId: string) {
-    return this.client.request("GET", `images/${imageId}`);
-  }
-  update(imageId: string, patch: unknown, version: number) {
-    return this.client.request("PUT", `images/${imageId}`, { json: patch, headers: { "If-Match": `"${version}"` } });
-  }
-  delete(imageId: string, idempotencyKey: string) {
-    return this.client.request("DELETE", `images/${imageId}`, { idempotencyKey });
-  }
-  listVersions(imageId: string, query?: Query) {
-    return this.client.request("GET", `images/${imageId}/versions`, { query });
-  }
-  createVersion(imageId: string, input: unknown, idempotencyKey: string) {
-    return this.client.request("POST", `images/${imageId}/versions`, { json: input, idempotencyKey });
-  }
-  open(imageId: string) {
-    return new Image(this.client, imageId);
-  }
-}
-
-class ImageVersionsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  get(versionId: string) {
-    return this.client.request("GET", `image-versions/${versionId}`);
-  }
-  update(versionId: string, patch: unknown, version: number) {
-    return this.client.request("PUT", `image-versions/${versionId}`, { json: patch, headers: { "If-Match": `"${version}"` } });
-  }
-  delete(versionId: string, idempotencyKey: string) {
-    return this.client.request("DELETE", `image-versions/${versionId}`, { idempotencyKey });
-  }
-  open(versionId: string) {
-    return new ImageVersion(this.client, versionId);
-  }
-}
-
-export class Image {
-  constructor(private readonly client: BeeOSClient, readonly id: string) {}
-  refresh() {
-    return this.client.images.get(this.id);
-  }
-  update(patch: unknown, version: number) {
-    return this.client.images.update(this.id, patch, version);
-  }
-  delete(idempotencyKey: string) {
-    return this.client.images.delete(this.id, idempotencyKey);
-  }
-  listVersions(query?: Query) {
-    return this.client.images.listVersions(this.id, query);
-  }
-  createVersion(input: unknown, idempotencyKey: string) {
-    return this.client.images.createVersion(this.id, input, idempotencyKey);
-  }
-}
-
-export class ImageVersion {
-  constructor(private readonly client: BeeOSClient, readonly id: string) {}
-  refresh() {
-    return this.client.imageVersions.get(this.id);
-  }
-  update(patch: unknown, version: number) {
-    return this.client.imageVersions.update(this.id, patch, version);
-  }
-  delete(idempotencyKey: string) {
-    return this.client.imageVersions.delete(this.id, idempotencyKey);
-  }
-}
-
 class AgentsModule {
   constructor(private readonly client: BeeOSClient) {}
   list(query?: Query) {
@@ -310,9 +237,6 @@ class ConversationsModule {
 
 class MessagesModule {
   constructor(private readonly client: BeeOSClient) {}
-  send(agentId: string, conversationId: string, input: unknown, idempotencyKey: string) {
-    return this.client.request("POST", `agents/${agentId}/conversations/${conversationId}/messages`, { json: input, idempotencyKey });
-  }
   list(agentId: string, conversationId: string, query?: Query) {
     return this.client.request("GET", `agents/${agentId}/conversations/${conversationId}/messages`, { query });
   }
@@ -368,35 +292,6 @@ class FilesModule {
   }
   delete(fileId: string, idempotencyKey: string) {
     return this.client.request("DELETE", `files/${fileId}`, { idempotencyKey });
-  }
-}
-
-class EventSessionsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  create(input: unknown, idempotencyKey: string) {
-    return this.client.request("POST", "events/session", { json: input, idempotencyKey });
-  }
-}
-
-class TaskWebhooksModule {
-  constructor(private readonly client: BeeOSClient) {}
-  create(agentId: string, taskId: string, input: unknown, idempotencyKey: string) {
-    return this.client.request("POST", `agents/${agentId}/tasks/${taskId}/webhooks`, { json: input, idempotencyKey });
-  }
-  list(agentId: string, taskId: string) {
-    return this.client.request("GET", `agents/${agentId}/tasks/${taskId}/webhooks`);
-  }
-  delete(agentId: string, taskId: string, webhookId: string, idempotencyKey: string) {
-    return this.client.request("DELETE", `agents/${agentId}/tasks/${taskId}/webhooks/${webhookId}`, { idempotencyKey });
-  }
-  listDeliveries(agentId: string, taskId: string, webhookId: string, limit?: number) {
-    return this.client.request("GET", `agents/${agentId}/tasks/${taskId}/webhooks/${webhookId}/deliveries`, { query: { limit } });
-  }
-  redeliver(agentId: string, taskId: string, webhookId: string, deliveryId: string, idempotencyKey: string) {
-    return this.client.request("POST", `agents/${agentId}/tasks/${taskId}/webhooks/${webhookId}/deliveries/${deliveryId}/redeliver`, { idempotencyKey });
-  }
-  verifySignature(rawBody: Uint8Array, headers: Record<string, string>, secret: string, now = Date.now()) {
-    return verifyTaskWebhookSignature(rawBody, headers, secret, now);
   }
 }
 
