@@ -1,0 +1,65 @@
+name: Publish @beeos-ai/cloud-agent-sdk
+
+on:
+  push:
+    tags:
+      - "cloud-agent-sdk-v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-cloud-agent-sdk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Test and publish
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agent
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+
+      - name: Verify tag matches package version
+        run: |
+          package_version=$(node -p "require('./package.json').version")
+          expected_tag="cloud-agent-sdk-v${package_version}"
+          if [ "$expected_tag" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match ${expected_tag}"
+            exit 1
+          fi
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish when this version is not on npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          test -n "$NODE_AUTH_TOKEN"
+          local_version=$(node -p "require('./package.json').version")
+          package_name=$(node -p "require('./package.json').name")
+          if [ "$package_name" != "@beeos-ai/cloud-agent-sdk" ]; then
+            echo "::error::Refusing to publish ${package_name}"
+            exit 1
+          fi
+          version_url="https://registry.npmjs.org/@beeos-ai/cloud-agent-sdk/${local_version}"
+          status=$(curl -s -o /dev/null -w '%{http_code}' "$version_url")
+          if [ "$status" = "200" ]; then
+            echo "${package_name}@${local_version} is already published"
+            exit 0
+          fi
+          npm publish --access public
