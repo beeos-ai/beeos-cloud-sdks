@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "BeeOS Cloud Server API",
-    "version": "2.0.0"
+    "version": "3.0.0"
   },
   "servers": [
     {
@@ -451,7 +451,7 @@
         ],
         "parameters": [
           {
-            "name": "agent_framework",
+            "name": "harness",
             "in": "query",
             "schema": {
               "type": "string"
@@ -523,7 +523,7 @@
             }
           },
           {
-            "name": "agent_framework",
+            "name": "harness",
             "in": "query",
             "schema": {
               "type": "string"
@@ -747,7 +747,7 @@
             }
           },
           {
-            "name": "agent_framework",
+            "name": "harness",
             "in": "query",
             "schema": {
               "type": "string"
@@ -8986,7 +8986,7 @@
           "sort_order": {
             "type": "integer"
           },
-          "agent_framework": {
+          "harness": {
             "type": "string"
           },
           "provider_id": {
@@ -9069,7 +9069,7 @@
           "app_id",
           "developer_id",
           "name",
-          "agent_framework",
+          "harness",
           "provider_id",
           "region",
           "os_type",
@@ -9097,7 +9097,7 @@
           "name": {
             "type": "string"
           },
-          "agent_framework": {
+          "harness": {
             "type": "string"
           },
           "provider_id": {
@@ -11363,7 +11363,7 @@
           "name": {
             "type": "string"
           },
-          "agent_framework": {
+          "harness": {
             "type": "string"
           },
           "provider_id": {
@@ -11462,7 +11462,7 @@
           "app_id",
           "developer_id",
           "name",
-          "agent_framework",
+          "harness",
           "provider_id",
           "region",
           "os_type",
@@ -11801,7 +11801,7 @@
           "avatar_url": {
             "type": "string"
           },
-          "agent_framework": {
+          "harness": {
             "type": "string"
           },
           "destroyed": {
@@ -12003,7 +12003,7 @@
                 "avatar_url": {
                   "type": "string"
                 },
-                "agent_framework": {
+                "harness": {
                   "type": "string"
                 },
                 "destroyed": {
@@ -12739,7 +12739,7 @@
           "fingerprint_short": {
             "type": "string"
           },
-          "agent_framework": {
+          "harness": {
             "type": "string"
           },
           "os_type": {
@@ -12759,7 +12759,7 @@
           "bind_id",
           "hostname",
           "fingerprint_short",
-          "agent_framework",
+          "harness",
           "expires_at",
           "status",
           "server_time"
@@ -12854,7 +12854,7 @@
               "type": "string"
             }
           },
-          "agent_framework": {
+          "harness": {
             "type": "string"
           },
           "template_version": {
@@ -12872,7 +12872,7 @@
           "banner_url",
           "default_model",
           "tags",
-          "agent_framework",
+          "harness",
           "template_version"
         ],
         "additionalProperties": false
@@ -13414,7 +13414,7 @@
           "variant_id": {
             "type": "string"
           },
-          "agent_framework": {
+          "harness": {
             "type": "string",
             "enum": [
               "openclaw"

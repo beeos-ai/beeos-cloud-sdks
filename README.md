@@ -1,9 +1,9 @@
 # BeeOS Cloud Server SDKs
 
 The TypeScript package `@beeos-ai/cloud-sdk`, Python distribution
-`beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v2` share
+`beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v3` share
 one contract: [`spec/server.openapi.json`](spec/server.openapi.json). Version
-2.0.0 generates typed request, response, query, and error models for the 133
+3.0.0 generates typed request, response, query, and error models for the 133
 registered Server operations. Inactive API methods and their models are removed.
 
 ```ts
@@ -27,8 +27,10 @@ Both expose the same spec operations through typed resources. Compile-only
 examples are in `examples/typescript.ts`, `python/examples/typed_smoke.py`, and
 `go/examples/typed_smoke/main.go`.
 
-Instance creation preserves the complete variant and LLM/BYOK request. Responses,
-harnesses, and discovery use the producer's `/uhp/v1` surface on the same host;
+Instance creation preserves the complete variant and LLM/BYOK request. The
+`harness` field and query parameter on instances, templates, and the catalog
+carry the product harness name (for example `openclaw`), not a UHP harness id
+(`chrn_*`). Responses, harnesses, and discovery use the producer's `/uhp/v1` surface on the same host;
 other server operations use the configured `/v1` base. Non-streaming Responses
 use `responses.create` / `Responses.Create`; streaming uses `createStream`,
 `create_stream`, or `CreateStream`, with typed SSE events. Audio transcription
@@ -78,10 +80,11 @@ resource interfaces. Generation requires Node and Go (`gofmt`). The Python devel
 
 No package is published by regeneration. The existing **Publish
 @beeos-ai/cloud-sdk** workflow (`.github/workflows/publish.yml`) publishes the root
-npm package only when a matching `v2.0.0` tag is pushed; it uses GitHub secret
-`NPM_TOKEN`. The Python package has no publishing workflow in this repository.
-Its wheel must be built and published separately after coordinator approval. The
-Go module resides in `go/`, so its module release tag is `go/v2.0.0`. The import path is `github.com/beeos-ai/beeos-cloud-sdks/go/v2`. Go discovery
+npm package only when a matching `v3.0.0` tag is pushed; it uses GitHub secret
+`NPM_TOKEN`. The Python package is published by
+`.github/workflows/publish-python.yml` when a matching `python/v3.0.0` tag is
+pushed. The Go module resides in `go/`, so its module release tag is
+`go/v3.0.0`. The import path is `github.com/beeos-ai/beeos-cloud-sdks/go/v3`. Go discovery
 needs no package-registry secret. These tags and registry writes require the
 separate release authorization.
 
