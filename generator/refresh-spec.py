@@ -23,7 +23,7 @@ def read(path):
 import json,yaml,re,copy
 from pathlib import Path
 B=Path(args.producer_root).resolve(); V=Path(args.app_sdk_root).resolve(); OUT=Path(args.output).resolve()
-spec={'openapi':'3.1.0','info':{'title':'BeeOS Cloud Server API','version':'2.0.0'},'servers':[{'url':'https://api.cloud.beeos.ai/v1'}],'security':[{'ServerAPIKey':[]}],'paths':{},'components':{'schemas':{},'parameters':{},'responses':{},'securitySchemes':{'ServerAPIKey':{'type':'http','scheme':'bearer','description':'BeeOS Server API key (bsk_).'}}},'x-producer-repository':'beeos-ai/beeos-cloud-backend','x-producer-revision':args.producer_ref}
+spec={'openapi':'3.1.0','info':{'title':'BeeOS Cloud Server API','version':'3.0.0'},'servers':[{'url':'https://api.cloud.beeos.ai/v1'}],'security':[{'ServerAPIKey':[]}],'paths':{},'components':{'schemas':{},'parameters':{},'responses':{},'securitySchemes':{'ServerAPIKey':{'type':'http','scheme':'bearer','description':'BeeOS Server API key (bsk_).'}}},'x-producer-repository':'beeos-ai/beeos-cloud-backend','x-producer-revision':args.producer_ref}
 S=spec['components']['schemas']
 def load(p): return yaml.safe_load(read(p))
 def ref(n):return {'$ref':'#/components/schemas/'+n}
@@ -111,7 +111,7 @@ for n,(fields,prefix,body) in models.items():
 # Embedded File request base (untagged embed is flattened on JSON wire).
 S['FilePrepareUploadInput']['properties'].update(S['FilePrepareInput']['properties']);S['FilePrepareUploadInput']['required']+=S['FilePrepareInput']['required']
 S['MCPServerResolution']['properties'].update(S['MCPServer']['properties']);S['MCPServerResolution']['required']+=S['MCPServer']['required']
-S['CreateServerInstanceInput']=obj({'name':strs,'variant_id':strs,'agent_framework':{'type':'string','enum':['openclaw']},'llm':{'anyOf':[ref('RuntimeLLM'),{'type':'null'}]}},['name'])
+S['CreateServerInstanceInput']=obj({'name':strs,'variant_id':strs,'harness':{'type':'string','enum':['openclaw']},'llm':{'anyOf':[ref('RuntimeLLM'),{'type':'null'}]}},['name'])
 S['RuntimeInstanceSummary']['properties']['capabilities']=obj({'computer':{'type':'boolean'},'mobile':{'type':'boolean'},'device':{'type':'boolean'},'terminal':{'type':'boolean'}},[])
 S['RuntimeLLMProvider']['properties']['api_key']['writeOnly']=True
 S['RuntimeLLMProvider']['properties']['protocol']={'type':'string','enum':['openai','anthropic']}
@@ -396,7 +396,7 @@ manifest={
  'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':subprocess.check_output(['git','-C',str(V),'rev-parse','HEAD'],text=True).strip(),'directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'reference wire types for live Server operations; producer implementations override the public shapes'},
  'canvas':{'repository':'beeos-ai/beeos-cloud-canvas','revision':'55a9822c96958bb1b70b04751cef3c39e1abb6ce','files':['pkg/infrastructure/server/http/handler.go','pkg/domain/canvas.go','pkg/domain/share.go'],'role':'persisted Canvas public response projections forwarded verbatim by backend runtime_canvas_rest.go'},
  'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go','dependency':'PyYAML==6.0.3','procedure':'Fetch the split producer remote, review changes in public route registrations and schema producers, update --producer-ref to the reviewed full commit SHA; refresh; npm run generate; run all language strict checks and tests. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes.'},
- 'version':'2.0.0',
+ 'version':'3.0.0',
  'activation':{'live':'Registered Server-key producer route; all non-live operations are excluded'},
  'input_sha256':dict(sorted(inputs.items()))}
 OUT.with_name('sources.json').write_text(json.dumps(manifest,indent=2)+'\n')

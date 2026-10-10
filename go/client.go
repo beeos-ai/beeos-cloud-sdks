@@ -75,15 +75,15 @@ type DeployModel struct {
 }
 
 type InstanceTemplate struct {
-	ID             string           `json:"id"`
-	Name           string           `json:"name"`
-	Description    *string          `json:"description,omitempty"`
-	LogoURL        *string          `json:"logo_url,omitempty"`
-	SortOrder      *int64           `json:"sort_order,omitempty"`
-	AgentFramework *string          `json:"agent_framework,omitempty"`
-	ProviderID     *string          `json:"provider_id,omitempty"`
-	Specs          []CatalogSpec    `json:"specs,omitempty"`
-	Variants       []CatalogVariant `json:"variants,omitempty"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Description *string          `json:"description,omitempty"`
+	LogoURL     *string          `json:"logo_url,omitempty"`
+	SortOrder   *int64           `json:"sort_order,omitempty"`
+	Harness     *string          `json:"harness,omitempty"`
+	ProviderID  *string          `json:"provider_id,omitempty"`
+	Specs       []CatalogSpec    `json:"specs,omitempty"`
+	Variants    []CatalogVariant `json:"variants,omitempty"`
 }
 
 type ProviderPage struct {
@@ -107,7 +107,7 @@ type InstanceSummary struct {
 	AppID              string `json:"app_id"`
 	DeveloperID        string `json:"developer_id"`
 	Name               string `json:"name"`
-	AgentFramework     string `json:"agent_framework"`
+	Harness            string `json:"harness"`
 	ProviderID         string `json:"provider_id"`
 	Region             string `json:"region"`
 	OsType             string `json:"os_type"`
@@ -1754,7 +1754,7 @@ type RuntimeInstanceSummary struct {
 	AppID              string                             `json:"app_id"`
 	DeveloperID        string                             `json:"developer_id"`
 	Name               string                             `json:"name"`
-	AgentFramework     string                             `json:"agent_framework"`
+	Harness            string                             `json:"harness"`
 	ProviderID         string                             `json:"provider_id"`
 	Region             string                             `json:"region"`
 	OsType             string                             `json:"os_type"`
@@ -1854,15 +1854,15 @@ type FileFile struct {
 }
 
 type FileOrigin struct {
-	Source         string  `json:"source"`
-	InstanceID     *string `json:"instance_id,omitempty"`
-	AgentID        *string `json:"agent_id,omitempty"`
-	OperationID    *string `json:"operation_id,omitempty"`
-	InstanceName   *string `json:"instance_name,omitempty"`
-	AgentName      *string `json:"agent_name,omitempty"`
-	AvatarURL      *string `json:"avatar_url,omitempty"`
-	AgentFramework *string `json:"agent_framework,omitempty"`
-	Destroyed      *bool   `json:"destroyed,omitempty"`
+	Source       string  `json:"source"`
+	InstanceID   *string `json:"instance_id,omitempty"`
+	AgentID      *string `json:"agent_id,omitempty"`
+	OperationID  *string `json:"operation_id,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	AgentName    *string `json:"agent_name,omitempty"`
+	AvatarURL    *string `json:"avatar_url,omitempty"`
+	Harness      *string `json:"harness,omitempty"`
+	Destroyed    *bool   `json:"destroyed,omitempty"`
 }
 
 type FileTransferDescriptor struct {
@@ -2104,7 +2104,7 @@ type agentBindDetailsWire struct {
 	BindID           string  `json:"bind_id"`
 	Hostname         string  `json:"hostname"`
 	FingerprintShort string  `json:"fingerprint_short"`
-	AgentFramework   string  `json:"agent_framework"`
+	Harness          string  `json:"harness"`
 	OsType           *string `json:"os_type,omitempty"`
 	ExpiresAt        int64   `json:"expires_at"`
 	Status           string  `json:"status"`
@@ -2138,7 +2138,7 @@ type agentTemplateCatalogView struct {
 	BannerURL       string   `json:"banner_url"`
 	DefaultModel    string   `json:"default_model"`
 	Tags            []string `json:"tags"`
-	AgentFramework  string   `json:"agent_framework"`
+	Harness         string   `json:"harness"`
 	TemplateVersion string   `json:"template_version"`
 }
 
@@ -2286,10 +2286,10 @@ type a2aTaskView struct {
 }
 
 type CreateServerInstanceInput struct {
-	Name           string                                   `json:"name"`
-	VariantID      *string                                  `json:"variant_id,omitempty"`
-	AgentFramework *CreateServerInstanceInputAgentFramework `json:"agent_framework,omitempty"`
-	LLM            *RuntimeLLM                              `json:"llm,omitempty"`
+	Name      string                            `json:"name"`
+	VariantID *string                           `json:"variant_id,omitempty"`
+	Harness   *CreateServerInstanceInputHarness `json:"harness,omitempty"`
+	LLM       *RuntimeLLM                       `json:"llm,omitempty"`
 }
 
 type ServerUsageSummary struct {
@@ -2906,16 +2906,16 @@ type ListDeployRegionsOptions struct {
 }
 
 type ListDeployModelsOptions struct {
-	AgentFramework *string `json:"agent_framework,omitempty"`
-	Search         *string `json:"search,omitempty"`
+	Harness *string `json:"harness,omitempty"`
+	Search  *string `json:"search,omitempty"`
 }
 
 type ListInstanceTemplatesOptions struct {
-	Page           *int64  `json:"page,omitempty"`
-	PageSize       *int64  `json:"page_size,omitempty"`
-	AgentFramework *string `json:"agent_framework,omitempty"`
-	ProviderID     *string `json:"provider_id,omitempty"`
-	Search         *string `json:"search,omitempty"`
+	Page       *int64  `json:"page,omitempty"`
+	PageSize   *int64  `json:"page_size,omitempty"`
+	Harness    *string `json:"harness,omitempty"`
+	ProviderID *string `json:"provider_id,omitempty"`
+	Search     *string `json:"search,omitempty"`
 }
 
 type ListAgentTemplatesResponse struct {
@@ -2931,13 +2931,13 @@ type ListAgentTemplatesOptions struct {
 }
 
 type ListInstancesOptions struct {
-	Page           *int64  `json:"page,omitempty"`
-	PageSize       *int64  `json:"page_size,omitempty"`
-	Status         *string `json:"status,omitempty"`
-	ProviderID     *string `json:"provider_id,omitempty"`
-	AgentFramework *string `json:"agent_framework,omitempty"`
-	ClusterID      *string `json:"cluster_id,omitempty"`
-	Search         *string `json:"search,omitempty"`
+	Page       *int64  `json:"page,omitempty"`
+	PageSize   *int64  `json:"page_size,omitempty"`
+	Status     *string `json:"status,omitempty"`
+	ProviderID *string `json:"provider_id,omitempty"`
+	Harness    *string `json:"harness,omitempty"`
+	ClusterID  *string `json:"cluster_id,omitempty"`
+	Search     *string `json:"search,omitempty"`
 }
 
 type InstanceCreateOptions struct {
@@ -3939,22 +3939,22 @@ const (
 )
 
 type FileSummaryInstancesItem struct {
-	Source         string  `json:"source"`
-	InstanceID     *string `json:"instance_id,omitempty"`
-	AgentID        *string `json:"agent_id,omitempty"`
-	OperationID    *string `json:"operation_id,omitempty"`
-	InstanceName   *string `json:"instance_name,omitempty"`
-	AgentName      *string `json:"agent_name,omitempty"`
-	AvatarURL      *string `json:"avatar_url,omitempty"`
-	AgentFramework *string `json:"agent_framework,omitempty"`
-	Destroyed      *bool   `json:"destroyed,omitempty"`
-	Count          int64   `json:"count"`
+	Source       string  `json:"source"`
+	InstanceID   *string `json:"instance_id,omitempty"`
+	AgentID      *string `json:"agent_id,omitempty"`
+	OperationID  *string `json:"operation_id,omitempty"`
+	InstanceName *string `json:"instance_name,omitempty"`
+	AgentName    *string `json:"agent_name,omitempty"`
+	AvatarURL    *string `json:"avatar_url,omitempty"`
+	Harness      *string `json:"harness,omitempty"`
+	Destroyed    *bool   `json:"destroyed,omitempty"`
+	Count        int64   `json:"count"`
 }
 
-type CreateServerInstanceInputAgentFramework string
+type CreateServerInstanceInputHarness string
 
 const (
-	CreateServerInstanceInputAgentFrameworkOpenclaw CreateServerInstanceInputAgentFramework = "openclaw"
+	CreateServerInstanceInputHarnessOpenclaw CreateServerInstanceInputHarness = "openclaw"
 )
 
 type RuntimeInstanceStatusResultData struct {
@@ -4715,8 +4715,8 @@ func (r *CatalogResource) ListModels(ctx context.Context, options ListDeployMode
 	query := url.Values{}
 	headers := http.Header{}
 	var output ModelPage
-	if options.AgentFramework != nil {
-		query.Set("agent_framework", fmt.Sprint(*options.AgentFramework))
+	if options.Harness != nil {
+		query.Set("harness", fmt.Sprint(*options.Harness))
 	}
 	if options.Search != nil {
 		query.Set("search", fmt.Sprint(*options.Search))
@@ -4741,8 +4741,8 @@ func (r *CatalogResource) ListInstanceTemplates(ctx context.Context, options Lis
 	if options.PageSize != nil {
 		query.Set("page_size", fmt.Sprint(*options.PageSize))
 	}
-	if options.AgentFramework != nil {
-		query.Set("agent_framework", fmt.Sprint(*options.AgentFramework))
+	if options.Harness != nil {
+		query.Set("harness", fmt.Sprint(*options.Harness))
 	}
 	if options.ProviderID != nil {
 		query.Set("provider_id", fmt.Sprint(*options.ProviderID))
@@ -4846,8 +4846,8 @@ func (r *InstancesResource) List(ctx context.Context, options ListInstancesOptio
 	if options.ProviderID != nil {
 		query.Set("provider_id", fmt.Sprint(*options.ProviderID))
 	}
-	if options.AgentFramework != nil {
-		query.Set("agent_framework", fmt.Sprint(*options.AgentFramework))
+	if options.Harness != nil {
+		query.Set("harness", fmt.Sprint(*options.Harness))
 	}
 	if options.ClusterID != nil {
 		query.Set("cluster_id", fmt.Sprint(*options.ClusterID))
