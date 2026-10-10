@@ -601,6 +601,7 @@ type UHPMcpServer struct {
 	Enabled              *bool                  `json:"enabled,omitempty"`
 	Headers              map[string]string      `json:"headers,omitempty"`
 	Auth                 *string                `json:"auth,omitempty"`
+	ExpiresAt            *string                `json:"expires_at,omitempty"`
 	AdditionalProperties map[string]JSONValue   `json:"-"`
 }
 
@@ -643,6 +644,7 @@ func (v *UHPMcpServer) UnmarshalJSON(data []byte) error {
 	delete(fields, "enabled")
 	delete(fields, "headers")
 	delete(fields, "auth")
+	delete(fields, "expires_at")
 	decoded.AdditionalProperties = map[string]JSONValue{}
 	for key, raw := range fields {
 		var value JSONValue
@@ -728,6 +730,8 @@ type UHPSkill struct {
 	Files                []UHPSkillFile       `json:"files,omitempty"`
 	Content              *string              `json:"content,omitempty"`
 	Blob                 *string              `json:"blob,omitempty"`
+	Sha256               *string              `json:"sha256,omitempty"`
+	SizeBytes            *string              `json:"size_bytes,omitempty"`
 	AdditionalProperties map[string]JSONValue `json:"-"`
 }
 
@@ -769,6 +773,8 @@ func (v *UHPSkill) UnmarshalJSON(data []byte) error {
 	delete(fields, "files")
 	delete(fields, "content")
 	delete(fields, "blob")
+	delete(fields, "sha256")
+	delete(fields, "size_bytes")
 	decoded.AdditionalProperties = map[string]JSONValue{}
 	for key, raw := range fields {
 		var value JSONValue
@@ -1995,95 +2001,6 @@ type A2ADataPartOut struct {
 	Metadata map[string]JSONValue `json:"metadata,omitempty"`
 }
 
-type Skill struct {
-	ID                string            `json:"id"`
-	Slug              string            `json:"slug"`
-	Name              string            `json:"name"`
-	Description       string            `json:"description"`
-	Category          string            `json:"category"`
-	Tags              []string          `json:"tags"`
-	License           string            `json:"license"`
-	Status            string            `json:"status"`
-	LatestVersion     string            `json:"latest_version"`
-	IconURL           string            `json:"icon_url"`
-	AuthorDisplayName string            `json:"author_display_name"`
-	SourceRepoURL     *string           `json:"source_repo_url,omitempty"`
-	LatestVersionInfo *SkillVersionInfo `json:"latest_version_info,omitempty"`
-	Files             []SkillDetailFile `json:"files,omitempty"`
-	Downloads         int64             `json:"downloads"`
-	Stars             int64             `json:"stars"`
-	CreatedAt         string            `json:"created_at"`
-	UpdatedAt         string            `json:"updated_at"`
-}
-
-type SkillVersionInfo struct {
-	ID          string  `json:"id"`
-	SkillID     string  `json:"skill_id"`
-	Version     string  `json:"version"`
-	Changelog   string  `json:"changelog"`
-	Fingerprint string  `json:"fingerprint"`
-	License     string  `json:"license"`
-	CreatedAt   string  `json:"created_at"`
-	ContentURL  *string `json:"content_url,omitempty"`
-}
-
-type SkillDetailFile struct {
-	Path        string `json:"path"`
-	DownloadURL string `json:"download_url"`
-	Sha256      string `json:"sha256"`
-	Size        int64  `json:"size"`
-}
-
-type SkillPage struct {
-	Data       []Skill `json:"data"`
-	Total      int64   `json:"total"`
-	NextCursor *string `json:"next_cursor,omitempty"`
-}
-
-type SkillCategory struct {
-	Category string `json:"category"`
-	Count    int64  `json:"count"`
-}
-
-type skillSetListView struct {
-	ID          string `json:"id"`
-	Slug        string `json:"slug"`
-	DisplayName string `json:"display_name"`
-	Summary     string `json:"summary"`
-	Scene       string `json:"scene"`
-	IconURL     string `json:"icon_url"`
-	SkillCount  int64  `json:"skill_count"`
-	UpdatedAt   string `json:"updated_at"`
-}
-
-type skillSetMemberView struct {
-	ID          string `json:"id"`
-	Slug        string `json:"slug"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	IconURL     string `json:"icon_url"`
-	Downloads   int64  `json:"downloads"`
-	Stars       int64  `json:"stars"`
-	Status      string `json:"status"`
-}
-
-type skillSetItemView struct {
-	StepNote string             `json:"step_note"`
-	Skill    skillSetMemberView `json:"skill"`
-}
-
-type skillSetDetailView struct {
-	ID               string             `json:"id"`
-	Slug             string             `json:"slug"`
-	DisplayName      string             `json:"display_name"`
-	Summary          string             `json:"summary"`
-	Content          string             `json:"content"`
-	Scene            string             `json:"scene"`
-	IconURL          string             `json:"icon_url"`
-	Items            []skillSetItemView `json:"items"`
-	UnavailableCount int64              `json:"unavailable_count"`
-}
-
 type agentBindWire struct {
 	Status         string           `json:"status"`
 	BindID         *string          `json:"bind_id,omitempty"`
@@ -2140,130 +2057,6 @@ type agentTemplateCatalogView struct {
 	Tags            []string `json:"tags"`
 	Harness         string   `json:"harness"`
 	TemplateVersion string   `json:"template_version"`
-}
-
-type CloudSkillOperationDetail struct {
-	ID                 string                      `json:"id"`
-	InstanceID         string                      `json:"instanceId"`
-	Target             CloudRuntimeOperationTarget `json:"target"`
-	Capability         string                      `json:"capability"`
-	Transport          string                      `json:"transport"`
-	Sequence           string                      `json:"sequence"`
-	Cursor             string                      `json:"cursor"`
-	CreatedAt          string                      `json:"createdAt"`
-	EffectState        string                      `json:"effectState"`
-	OperationID        string                      `json:"operationId"`
-	RequestOperationID *string                     `json:"requestOperationId,omitempty"`
-	ReplayDefaultKey   *bool                       `json:"replayDefaultKey,omitempty"`
-	Method             string                      `json:"method"`
-	Status             string                      `json:"status"`
-	Terminal           bool                        `json:"terminal"`
-	ContractRevision   string                      `json:"contractRevision"`
-	CatalogIntent      *CloudSkillInstallIntent    `json:"catalogIntent,omitempty"`
-	SkillIntent        *JSONValue                  `json:"skillIntent,omitempty"`
-	TemplateIntent     *CloudTemplateIntent        `json:"templateIntent,omitempty"`
-	UpdatedAt          string                      `json:"updatedAt"`
-	Result             *JSONValue                  `json:"result,omitempty"`
-	Error              *JSONValue                  `json:"error,omitempty"`
-	ObservationCode    *string                     `json:"observationCode,omitempty"`
-}
-
-type CloudRuntimeOperationTarget struct {
-	Scope           string  `json:"scope"`
-	PlatformAgentID *string `json:"platformAgentId,omitempty"`
-	ConversationID  *string `json:"conversationId,omitempty"`
-}
-
-type CloudSkillInstallIntent struct {
-	PlatformAgentID string  `json:"platformAgentId"`
-	Slug            string  `json:"slug"`
-	Version         *string `json:"version,omitempty"`
-}
-
-type CloudTemplateIntent struct {
-	Name            string  `json:"name"`
-	TemplateID      string  `json:"templateId"`
-	TemplateVersion *string `json:"templateVersion,omitempty"`
-}
-
-type MCPServer struct {
-	ID                   string                          `json:"id"`
-	Slug                 *string                         `json:"slug,omitempty"`
-	Status               string                          `json:"status"`
-	Installs             int64                           `json:"installs"`
-	Install              *JSONValue                      `json:"install,omitempty"`
-	Auth                 *JSONValue                      `json:"auth,omitempty"`
-	Inputs               *JSONValue                      `json:"inputs,omitempty"`
-	Category             *string                         `json:"category,omitempty"`
-	Tags                 []string                        `json:"tags"`
-	Display              *JSONValue                      `json:"display,omitempty"`
-	IconURL              *string                         `json:"iconUrl,omitempty"`
-	Info                 *JSONValue                      `json:"info,omitempty"`
-	CreatedAt            *string                         `json:"createdAt,omitempty"`
-	UpdatedAt            *string                         `json:"updatedAt,omitempty"`
-	Kind                 *string                         `json:"kind,omitempty"`
-	ConnectorID          *string                         `json:"connectorId,omitempty"`
-	AuthorizationOptions []catalogAuthorizationOptionDTO `json:"authorizationOptions,omitempty"`
-	ActionCount          *int64                          `json:"actionCount,omitempty"`
-	Actions              []catalogActionDTO              `json:"actions,omitempty"`
-	AuthMode             *string                         `json:"auth_mode,omitempty"`
-	Connected            bool                            `json:"connected"`
-}
-
-type catalogCredentialFieldDTO struct {
-	Key      string `json:"key"`
-	Label    string `json:"label"`
-	Type     string `json:"type"`
-	Required bool   `json:"required"`
-}
-
-type catalogAuthorizationOptionDTO struct {
-	ConfigurationRequired   bool                        `json:"configurationRequired"`
-	Kind                    string                      `json:"kind"`
-	CredentialKey           *string                     `json:"credentialKey,omitempty"`
-	AuthorizationProfileKey *string                     `json:"authorizationProfileKey,omitempty"`
-	Fields                  []catalogCredentialFieldDTO `json:"fields,omitempty"`
-}
-
-type catalogActionDTO struct {
-	ID             string    `json:"id"`
-	ConnectorID    string    `json:"connectorId"`
-	Name           string    `json:"name"`
-	Description    string    `json:"description"`
-	InputSchema    JSONValue `json:"inputSchema"`
-	OutputSchema   JSONValue `json:"outputSchema"`
-	RequiredScopes []string  `json:"requiredScopes"`
-}
-
-type MCPServerResolution struct {
-	Name                 string                          `json:"name"`
-	Definition           map[string]JSONValue            `json:"definition"`
-	ID                   string                          `json:"id"`
-	Slug                 *string                         `json:"slug,omitempty"`
-	Status               string                          `json:"status"`
-	Installs             int64                           `json:"installs"`
-	Install              *JSONValue                      `json:"install,omitempty"`
-	Auth                 *JSONValue                      `json:"auth,omitempty"`
-	Inputs               *JSONValue                      `json:"inputs,omitempty"`
-	Category             *string                         `json:"category,omitempty"`
-	Tags                 []string                        `json:"tags"`
-	Display              *JSONValue                      `json:"display,omitempty"`
-	IconURL              *string                         `json:"iconUrl,omitempty"`
-	Info                 *JSONValue                      `json:"info,omitempty"`
-	CreatedAt            *string                         `json:"createdAt,omitempty"`
-	UpdatedAt            *string                         `json:"updatedAt,omitempty"`
-	Kind                 *string                         `json:"kind,omitempty"`
-	ConnectorID          *string                         `json:"connectorId,omitempty"`
-	AuthorizationOptions []catalogAuthorizationOptionDTO `json:"authorizationOptions,omitempty"`
-	ActionCount          *int64                          `json:"actionCount,omitempty"`
-	Actions              []catalogActionDTO              `json:"actions,omitempty"`
-	AuthMode             *string                         `json:"auth_mode,omitempty"`
-	Connected            bool                            `json:"connected"`
-}
-
-type CloudSkillOperationPage struct {
-	Operations []CloudSkillOperationDetail `json:"operations"`
-	NextCursor *string                     `json:"nextCursor,omitempty"`
 }
 
 type a2aTaskView struct {
@@ -2438,184 +2231,6 @@ type ProtoAutomationWebhookInput struct {
 	Mailbox                 *string                 `json:"mailbox,omitempty"`
 }
 
-type ProtoPutConnectorCredentialResponse struct {
-}
-
-type ProtoPutConnectorCredentialRequest struct {
-	OrganizationID *string `json:"organizationId,omitempty"`
-	AppID          *string `json:"appId,omitempty"`
-	CredentialRef  *string `json:"credentialRef,omitempty"`
-	CredentialKey  *string `json:"credentialKey,omitempty"`
-	AuthKind       *string `json:"authKind,omitempty"`
-}
-
-type ProtoDeleteConnectorCredentialResponse struct {
-}
-
-type ProtoDeleteConnectorCredentialRequest struct {
-	OrganizationID *string `json:"organizationId,omitempty"`
-	AppID          *string `json:"appId,omitempty"`
-	CredentialRef  *string `json:"credentialRef,omitempty"`
-}
-
-type ProtoListInstanceConnectorsResponse struct {
-	Connectors []ProtoInstanceConnector `json:"connectors,omitempty"`
-	Total      *int64                   `json:"total,omitempty"`
-}
-
-type ProtoInstanceConnector struct {
-	Catalog          *ProtoMcpServer        `json:"catalog,omitempty"`
-	Installed        *bool                  `json:"installed,omitempty"`
-	Binding          *ProtoConnectorBinding `json:"binding,omitempty"`
-	CredentialStatus *string                `json:"credentialStatus,omitempty"`
-}
-
-type ProtoMcpServer struct {
-	ID                   *string                           `json:"id,omitempty"`
-	Slug                 *string                           `json:"slug,omitempty"`
-	Status               *string                           `json:"status,omitempty"`
-	Installs             *string                           `json:"installs,omitempty"`
-	CreatedAt            *string                           `json:"createdAt,omitempty"`
-	UpdatedAt            *string                           `json:"updatedAt,omitempty"`
-	Install              *string                           `json:"install,omitempty"`
-	Auth                 *string                           `json:"auth,omitempty"`
-	Inputs               *string                           `json:"inputs,omitempty"`
-	Category             *string                           `json:"category,omitempty"`
-	Tags                 []string                          `json:"tags,omitempty"`
-	Display              *string                           `json:"display,omitempty"`
-	IconURL              *string                           `json:"iconUrl,omitempty"`
-	Info                 *string                           `json:"info,omitempty"`
-	ConnectorID          *string                           `json:"connectorId,omitempty"`
-	Kind                 *string                           `json:"kind,omitempty"`
-	AuthorizationOptions []ProtoCatalogAuthorizationOption `json:"authorizationOptions,omitempty"`
-	ActionCount          *int64                            `json:"actionCount,omitempty"`
-	Actions              []ProtoCatalogAction              `json:"actions,omitempty"`
-}
-
-type ProtoCatalogAuthorizationOption struct {
-	Kind                    *string                       `json:"kind,omitempty"`
-	CredentialKey           *string                       `json:"credentialKey,omitempty"`
-	AuthorizationProfileKey *string                       `json:"authorizationProfileKey,omitempty"`
-	Fields                  []ProtoCatalogCredentialField `json:"fields,omitempty"`
-	ConfigurationRequired   *bool                         `json:"configurationRequired,omitempty"`
-}
-
-type ProtoCatalogCredentialField struct {
-	Key      *string `json:"key,omitempty"`
-	Label    *string `json:"label,omitempty"`
-	Type     *string `json:"type,omitempty"`
-	Required *bool   `json:"required,omitempty"`
-}
-
-type ProtoCatalogAction struct {
-	ID             *string  `json:"id,omitempty"`
-	ConnectorID    *string  `json:"connectorId,omitempty"`
-	Name           *string  `json:"name,omitempty"`
-	Description    *string  `json:"description,omitempty"`
-	InputSchema    *string  `json:"inputSchema,omitempty"`
-	OutputSchema   *string  `json:"outputSchema,omitempty"`
-	RequiredScopes []string `json:"requiredScopes,omitempty"`
-}
-
-type ProtoConnectorBinding struct {
-	ID             *string `json:"id,omitempty"`
-	ConnectorID    *string `json:"connectorId,omitempty"`
-	CredentialRef  *string `json:"credentialRef,omitempty"`
-	Enabled        *bool   `json:"enabled,omitempty"`
-	CreatedAt      *string `json:"createdAt,omitempty"`
-	UpdatedAt      *string `json:"updatedAt,omitempty"`
-	OrganizationID *string `json:"organizationId,omitempty"`
-	AppID          *string `json:"appId,omitempty"`
-}
-
-type ProtoListInstanceConnectorsRequest struct {
-	AgentInstanceID *string  `json:"agentInstanceId,omitempty"`
-	InstalledOnly   *bool    `json:"installedOnly,omitempty"`
-	Category        *string  `json:"category,omitempty"`
-	Tags            []string `json:"tags,omitempty"`
-	Query           *string  `json:"query,omitempty"`
-	Limit           *int64   `json:"limit,omitempty"`
-	Offset          *int64   `json:"offset,omitempty"`
-	OrganizationID  *string  `json:"organizationId,omitempty"`
-	AppID           *string  `json:"appId,omitempty"`
-}
-
-type ProtoInstallManagedConnectorRequest struct {
-	AgentInstanceID *string `json:"agentInstanceId,omitempty"`
-	MarketEntryID   *string `json:"marketEntryId,omitempty"`
-	CredentialRef   *string `json:"credentialRef,omitempty"`
-	OrganizationID  *string `json:"organizationId,omitempty"`
-	AppID           *string `json:"appId,omitempty"`
-}
-
-type ProtoUpdateManagedConnectorRequest struct {
-	AgentInstanceID *string `json:"agentInstanceId,omitempty"`
-	ConnectorID     *string `json:"connectorId,omitempty"`
-	Enabled         *bool   `json:"enabled,omitempty"`
-	CredentialRef   *string `json:"credentialRef,omitempty"`
-	OrganizationID  *string `json:"organizationId,omitempty"`
-	AppID           *string `json:"appId,omitempty"`
-}
-
-type ProtoUninstallManagedConnectorResponse struct {
-}
-
-type ProtoUninstallManagedConnectorRequest struct {
-	AgentInstanceID *string `json:"agentInstanceId,omitempty"`
-	ConnectorID     *string `json:"connectorId,omitempty"`
-	OrganizationID  *string `json:"organizationId,omitempty"`
-	AppID           *string `json:"appId,omitempty"`
-}
-
-type ProtoListMcpServersResponse struct {
-	Servers []ProtoMcpServer `json:"servers,omitempty"`
-	Total   *int64           `json:"total,omitempty"`
-}
-
-type ProtoListMcpServersRequest struct {
-	Category *string  `json:"category,omitempty"`
-	Tags     []string `json:"tags,omitempty"`
-	Query    *string  `json:"query,omitempty"`
-	Limit    *int64   `json:"limit,omitempty"`
-	Offset   *int64   `json:"offset,omitempty"`
-}
-
-type ProtoGetMcpServerResponse struct {
-	Server *ProtoMcpServer `json:"server,omitempty"`
-}
-
-type ProtoGetMcpServerRequest struct {
-	ID *string `json:"id,omitempty"`
-}
-
-type ProtoListCategoriesResponse struct {
-	Categories []ProtoCategoryCount `json:"categories,omitempty"`
-}
-
-type ProtoCategoryCount struct {
-	Category *string `json:"category,omitempty"`
-	Count    *int64  `json:"count,omitempty"`
-}
-
-type ProtoMcpListCategoriesRequest struct {
-}
-
-type ProtoResolveMcpPreparationRequest struct {
-	ID *string `json:"id,omitempty"`
-}
-
-type ProtoResolveInstallResponse struct {
-	ServerName       *string  `json:"serverName,omitempty"`
-	ServerConfigJSON *string  `json:"serverConfigJson,omitempty"`
-	AuthMode         *string  `json:"authMode,omitempty"`
-	OneClickEligible *bool    `json:"oneClickEligible,omitempty"`
-	Warnings         []string `json:"warnings,omitempty"`
-}
-
-type ProtoResolveInstallRequest struct {
-	ID *string `json:"id,omitempty"`
-}
-
 type RuntimeMethodResponse struct {
 	JSONrpc RuntimeMethodResponseJSONrpc `json:"jsonrpc"`
 	ID      RuntimeMethodResponseID      `json:"id"`
@@ -2711,33 +2326,6 @@ func (v *A2AOutputPart) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type RuntimeMethodAvailability struct {
-	Enabled                          bool    `json:"enabled"`
-	MinimumRuntimeRpcProtocolVersion int64   `json:"minimumRuntimeRpcProtocolVersion"`
-	MinimumRuntimeContractRevision   *string `json:"minimumRuntimeContractRevision,omitempty"`
-}
-
-type RuntimeCapabilitySupport struct {
-	Service                          bool   `json:"service"`
-	MinimumRuntimeRpcProtocolVersion *int64 `json:"minimumRuntimeRpcProtocolVersion,omitempty"`
-}
-
-type RuntimeCapabilityDocument struct {
-	ManifestID                     string                               `json:"manifestId"`
-	ContractRevision               string                               `json:"contractRevision"`
-	RuntimeRpcProtocolVersion      int64                                `json:"runtimeRpcProtocolVersion"`
-	RuntimeEpoch                   string                               `json:"runtimeEpoch"`
-	ServiceMethods                 []string                             `json:"serviceMethods"`
-	ConversationMethods            []string                             `json:"conversationMethods"`
-	MethodAvailability             map[string]RuntimeMethodAvailability `json:"methodAvailability"`
-	ConversationMethodAvailability map[string]RuntimeMethodAvailability `json:"conversationMethodAvailability"`
-	Capabilities                   map[string]RuntimeCapabilitySupport  `json:"capabilities"`
-	GeneratedAt                    string                               `json:"generatedAt"`
-	ExpiresAt                      string                               `json:"expiresAt"`
-	TerminalTransport              *string                              `json:"terminalTransport,omitempty"`
-	CanvasTransport                *string                              `json:"canvasTransport,omitempty"`
-}
-
 type RealtimeTicketHeader struct {
 	Alg string `json:"alg"`
 	Typ string `json:"typ"`
@@ -2800,6 +2388,81 @@ type CanvasSessionDocument struct {
 type DeviceBindingErrorResponse struct {
 	Error   string `json:"error"`
 	Message string `json:"message"`
+}
+
+type UHPHarnessCreate struct {
+	Name                 *string              `json:"name,omitempty"`
+	Base                 string               `json:"base"`
+	DefaultModel         *string              `json:"default_model,omitempty"`
+	SystemPrompt         *string              `json:"system_prompt,omitempty"`
+	McpServers           []UHPMcpServer       `json:"mcp_servers,omitempty"`
+	Skills               []UHPSkill           `json:"skills,omitempty"`
+	Plugins              []UHPPlugin          `json:"plugins,omitempty"`
+	Environment          *string              `json:"environment,omitempty"`
+	DisabledTools        []string             `json:"disabled_tools,omitempty"`
+	MaxStep              *int64               `json:"max_step,omitempty"`
+	TimeoutSeconds       *int64               `json:"timeout_seconds,omitempty"`
+	InstanceID           *string              `json:"instance_id,omitempty"`
+	TemplateID           *string              `json:"template_id,omitempty"`
+	AdditionalProperties map[string]JSONValue `json:"-"`
+}
+
+func (v UHPHarnessCreate) MarshalJSON() ([]byte, error) {
+	type plain UHPHarnessCreate
+	encoded, err := json.Marshal(plain(v))
+	if err != nil {
+		return nil, err
+	}
+	values := map[string]json.RawMessage{}
+	for key, value := range v.AdditionalProperties {
+		raw, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		values[key] = raw
+	}
+	var known map[string]json.RawMessage
+	if err := json.Unmarshal(encoded, &known); err != nil {
+		return nil, err
+	}
+	for key, value := range known {
+		values[key] = value
+	}
+	return json.Marshal(values)
+}
+func (v *UHPHarnessCreate) UnmarshalJSON(data []byte) error {
+	type plain UHPHarnessCreate
+	var decoded plain
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		return err
+	}
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	delete(fields, "name")
+	delete(fields, "base")
+	delete(fields, "default_model")
+	delete(fields, "system_prompt")
+	delete(fields, "mcp_servers")
+	delete(fields, "skills")
+	delete(fields, "plugins")
+	delete(fields, "environment")
+	delete(fields, "disabled_tools")
+	delete(fields, "max_step")
+	delete(fields, "timeout_seconds")
+	delete(fields, "instance_id")
+	delete(fields, "template_id")
+	decoded.AdditionalProperties = map[string]JSONValue{}
+	for key, raw := range fields {
+		var value JSONValue
+		if err := json.Unmarshal(raw, &value); err != nil {
+			return err
+		}
+		decoded.AdditionalProperties[key] = value
+	}
+	*v = UHPHarnessCreate(decoded)
+	return nil
 }
 
 type UHPCreateResponseJSONRequest struct {
@@ -3060,35 +2723,6 @@ type GetUsageSummaryOptions struct {
 	Category       *string                       `json:"category,omitempty"`
 }
 
-type InvokeRuntimeMethodRequest struct {
-	JSONrpc InvokeRuntimeMethodRequestJSONrpc `json:"jsonrpc"`
-	ID      string                            `json:"id"`
-	Method  string                            `json:"method"`
-	Params  JSONValue                         `json:"params"`
-}
-
-type InvokeRuntimeMethodOptions struct {
-	IdempotencyKey    string  `json:"Idempotency-Key"`
-	XBeeOSOperationID *string `json:"X-BeeOS-Operation-Id,omitempty"`
-}
-
-type ListRuntimeOperationsOptions struct {
-	Status *ListRuntimeOperationsOptionsStatus `json:"status,omitempty"`
-	Cursor *string                             `json:"cursor,omitempty"`
-	Limit  *int64                              `json:"limit,omitempty"`
-	Method *string                             `json:"method,omitempty"`
-}
-
-type CancelRuntimeOperationResponse struct {
-	Status      string `json:"status"`
-	OperationID string `json:"operationId"`
-}
-
-type CancelRuntimeOperationOptions struct {
-	IdempotencyKey    string  `json:"Idempotency-Key"`
-	XBeeOSOperationID *string `json:"X-BeeOS-Operation-Id,omitempty"`
-}
-
 type CreateTerminalSessionRequest struct {
 	PlatformAgentID  string  `json:"platformAgentId"`
 	ConversationID   *string `json:"conversationId,omitempty"`
@@ -3136,89 +2770,6 @@ type RenameFileRequest struct {
 
 type DeleteFileOptions struct {
 	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type ListMCPServersResponse struct {
-	Data  []MCPServer `json:"data"`
-	Total int64       `json:"total"`
-}
-
-type GetMCPServerResponse struct {
-	Data MCPServer `json:"data"`
-}
-
-type ResolveMCPServerResponse struct {
-	Data MCPServerResolution `json:"data"`
-}
-
-type ListSkillsOptions struct {
-	Ids      *string `json:"ids,omitempty"`
-	Category *string `json:"category,omitempty"`
-	Cursor   *string `json:"cursor,omitempty"`
-	Q        *string `json:"q,omitempty"`
-	OrderBy  *string `json:"order_by,omitempty"`
-	Limit    *int64  `json:"limit,omitempty"`
-	Offset   *int64  `json:"offset,omitempty"`
-}
-
-type CreateSkillRequest struct {
-	Slug        string                        `json:"slug"`
-	Name        string                        `json:"name"`
-	Description *string                       `json:"description,omitempty"`
-	Category    *string                       `json:"category,omitempty"`
-	License     *string                       `json:"license,omitempty"`
-	Version     string                        `json:"version"`
-	Changelog   *string                       `json:"changelog,omitempty"`
-	Tags        []string                      `json:"tags,omitempty"`
-	Files       []CreateSkillRequestFilesItem `json:"files"`
-}
-
-type CreateSkillResponse struct {
-	Data Skill `json:"data"`
-}
-
-type SearchSkillsOptions struct {
-	Ids      *string `json:"ids,omitempty"`
-	Category *string `json:"category,omitempty"`
-	Cursor   *string `json:"cursor,omitempty"`
-	Q        *string `json:"q,omitempty"`
-	OrderBy  *string `json:"order_by,omitempty"`
-	Limit    *int64  `json:"limit,omitempty"`
-	Offset   *int64  `json:"offset,omitempty"`
-}
-
-type GetSkillResponse struct {
-	Data Skill `json:"data"`
-}
-
-type GetSkillBySlugResponse struct {
-	Data Skill `json:"data"`
-}
-
-type ListSkillCategoriesResponse struct {
-	Data []SkillCategory `json:"data"`
-}
-
-type GetFeaturedSkillsResponse struct {
-	Data  []Skill `json:"data"`
-	Total int64   `json:"total"`
-}
-
-type GetFeaturedSkillsOptions struct {
-	Scope      *string `json:"scope,omitempty"`
-	ScopeValue *string `json:"scope_value,omitempty"`
-	Limit      *int64  `json:"limit,omitempty"`
-}
-
-type ListSkillSetsResponse struct {
-	Data  []skillSetListView `json:"data"`
-	Total int64              `json:"total"`
-}
-
-type ListSkillSetsOptions struct {
-	Category *string `json:"category,omitempty"`
-	Page     *int64  `json:"page,omitempty"`
-	PageSize *int64  `json:"page_size,omitempty"`
 }
 
 type CreateShareFileShareOptions struct {
@@ -3331,50 +2882,6 @@ type GetAutomationRunResponse struct {
 type CreateWebhookAutomationResponse struct {
 	Success bool                `json:"success"`
 	Data    ProtoAutomationRule `json:"data"`
-}
-
-type PutConnectorCredentialConnectorResponse struct {
-	Data ProtoPutConnectorCredentialResponse `json:"data"`
-}
-
-type DeleteConnectorCredentialConnectorResponse struct {
-	Data ProtoDeleteConnectorCredentialResponse `json:"data"`
-}
-
-type ListInstanceConnectorsConnectorResponse struct {
-	Data ProtoListInstanceConnectorsResponse `json:"data"`
-}
-
-type InstallManagedConnectorConnectorResponse struct {
-	Data JSONValue `json:"data"`
-}
-
-type UpdateManagedConnectorConnectorResponse struct {
-	Data JSONValue `json:"data"`
-}
-
-type UninstallManagedConnectorConnectorResponse struct {
-	Data ProtoUninstallManagedConnectorResponse `json:"data"`
-}
-
-type ListMcpServersConnectorResponse struct {
-	Data ProtoListMcpServersResponse `json:"data"`
-}
-
-type GetMcpServerConnectorResponse struct {
-	Data ProtoGetMcpServerResponse `json:"data"`
-}
-
-type ListCategoriesConnectorResponse struct {
-	Data ProtoListCategoriesResponse `json:"data"`
-}
-
-type ResolvePreparationConnectorResponse struct {
-	Data JSONValue `json:"data"`
-}
-
-type ResolveInstallConnectorResponse struct {
-	Data ProtoResolveInstallResponse `json:"data"`
 }
 
 type TranscribeAudioRequest struct {
@@ -3519,6 +3026,11 @@ type GetA2ATaskOptions struct {
 
 type ListHarnessesResponse struct {
 	Harnesses []UHPHarness `json:"harnesses"`
+}
+
+type DeleteHarnessResponse struct {
+	ID      string `json:"id"`
+	Deleted bool   `json:"deleted"`
 }
 
 type CreateResponseOptions struct {
@@ -4165,23 +3677,6 @@ const (
 	GetUsageSummaryOptionsPeriodMonth GetUsageSummaryOptionsPeriod = "month"
 )
 
-type InvokeRuntimeMethodRequestJSONrpc string
-
-const (
-	InvokeRuntimeMethodRequestJSONrpc20 InvokeRuntimeMethodRequestJSONrpc = "2.0"
-)
-
-type ListRuntimeOperationsOptionsStatus string
-
-const (
-	ListRuntimeOperationsOptionsStatusActive ListRuntimeOperationsOptionsStatus = "active"
-)
-
-type CreateSkillRequestFilesItem struct {
-	Path    string `json:"path"`
-	Content string `json:"content"`
-}
-
 type CreateShareReplyResponseData struct {
 	Slug      string `json:"slug"`
 	CreatedAt string `json:"created_at"`
@@ -4320,32 +3815,8 @@ func decodeErrorBody[T APIErrorBody](schema string, payload []byte) (APIErrorBod
 }
 func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody, error) {
 	switch operation {
-	case "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "invokeRuntimeMethod", "cancelRuntimeOperation", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "listMCPServers", "getMCPServer", "resolveMCPServer", "listSkills", "createSkill", "searchSkills", "getSkill", "getSkillBySlug", "listSkillCategories", "getFeaturedSkills", "getAgentTemplate", "listSkillSets", "getSkillSet", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "PutConnectorCredentialConnector", "DeleteConnectorCredentialConnector", "ListInstanceConnectorsConnector", "InstallManagedConnectorConnector", "UpdateManagedConnectorConnector", "UninstallManagedConnectorConnector", "ListMcpServersConnector", "GetMcpServerConnector", "ListCategoriesConnector", "ResolvePreparationConnector", "ResolveInstallConnector", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
+	case "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
 
-		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-	case "getRuntimeCapabilities":
-		if status == 401 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		if status == 404 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-	case "listRuntimeOperations":
-		if status == 400 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		if status == 401 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		if status == 404 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-	case "getRuntimeOperation":
-		if status == 404 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
 		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "createTerminalSession", "createCanvasSession":
 		if status == 400 {
@@ -4372,8 +3843,53 @@ func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody,
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "createHarness":
+		if status == 409 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 422 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 502 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 503 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 504 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 	case "getHarness", "listHarnessModels", "getResponse", "deleteResponse", "getResponseInputItems", "cancelResponse":
 		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "updateHarness":
+		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 409 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 422 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 502 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 503 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 504 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "deleteHarness":
+		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 422 {
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
@@ -4424,14 +3940,8 @@ type BeeOSClient struct {
 	Messages       *MessagesResource
 	Tasks          *TasksResource
 	Usage          *UsageResource
-	Methods        *MethodsResource
-	Operations     *OperationsResource
 	Files          *FilesResource
-	Mcp            *McpResource
-	Skills         *SkillsResource
-	SkillSets      *SkillSetsResource
 	Automations    *AutomationsResource
-	Connectors     *ConnectorsResource
 	Audio          *AudioResource
 	Canvases       *CanvasesResource
 	DeviceBindings *DeviceBindingsResource
@@ -4457,14 +3967,8 @@ func (c *BeeOSClient) initResources() {
 	c.Messages = &MessagesResource{client: c}
 	c.Tasks = &TasksResource{client: c}
 	c.Usage = &UsageResource{client: c}
-	c.Methods = &MethodsResource{client: c}
-	c.Operations = &OperationsResource{client: c}
 	c.Files = &FilesResource{client: c}
-	c.Mcp = &McpResource{client: c}
-	c.Skills = &SkillsResource{client: c}
-	c.SkillSets = &SkillSetsResource{client: c}
 	c.Automations = &AutomationsResource{client: c}
-	c.Connectors = &ConnectorsResource{client: c}
 	c.Audio = &AudioResource{client: c}
 	c.Canvases = &CanvasesResource{client: c}
 	c.DeviceBindings = &DeviceBindingsResource{client: c}
@@ -5608,105 +5112,6 @@ func (r *UsageResource) GetSummary(ctx context.Context, options GetUsageSummaryO
 	return output, err
 }
 
-type MethodsResource struct{ client *BeeOSClient }
-
-func (r *MethodsResource) GetCapabilities(ctx context.Context, instanceId string) (RuntimeCapabilityDocument, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/runtime-capabilities"
-	query := url.Values{}
-	headers := http.Header{}
-	var output RuntimeCapabilityDocument
-	var body []byte
-	payload, err := r.client.request(ctx, "getRuntimeCapabilities", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *MethodsResource) Invoke(ctx context.Context, instanceId string, input InvokeRuntimeMethodRequest, options InvokeRuntimeMethodOptions) (RuntimeMethodResponse, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/methods"
-	query := url.Values{}
-	headers := http.Header{}
-	var output RuntimeMethodResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	if options.XBeeOSOperationID != nil {
-		headers.Set("X-BeeOS-Operation-Id", fmt.Sprint(*options.XBeeOSOperationID))
-	}
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "invokeRuntimeMethod", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type OperationsResource struct{ client *BeeOSClient }
-
-func (r *OperationsResource) List(ctx context.Context, instanceId string, options ListRuntimeOperationsOptions) (CloudSkillOperationPage, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/operations"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CloudSkillOperationPage
-	if options.Status != nil {
-		query.Set("status", fmt.Sprint(*options.Status))
-	}
-	if options.Cursor != nil {
-		query.Set("cursor", fmt.Sprint(*options.Cursor))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	if options.Method != nil {
-		query.Set("method", fmt.Sprint(*options.Method))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "listRuntimeOperations", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *OperationsResource) Get(ctx context.Context, operationId string, instanceId string) (CloudSkillOperationDetail, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/operations/" + url.PathEscape(fmt.Sprint(operationId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output CloudSkillOperationDetail
-	var body []byte
-	payload, err := r.client.request(ctx, "getRuntimeOperation", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *OperationsResource) Cancel(ctx context.Context, operationId string, instanceId string, options CancelRuntimeOperationOptions) (CancelRuntimeOperationResponse, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/operations/" + url.PathEscape(fmt.Sprint(operationId)) + "/cancel"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CancelRuntimeOperationResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	if options.XBeeOSOperationID != nil {
-		headers.Set("X-BeeOS-Operation-Id", fmt.Sprint(*options.XBeeOSOperationID))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "cancelRuntimeOperation", "POST", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 type FilesResource struct{ client *BeeOSClient }
 
 func (r *FilesResource) PrepareUpload(ctx context.Context, input FilePrepareUploadInput, options PresignFileUploadOptions) (FileTransferDescriptor, error) {
@@ -5911,245 +5316,6 @@ func (r *FilesResource) GetSummary(ctx context.Context) (FileSummary, error) {
 	return output, err
 }
 
-type McpResource struct{ client *BeeOSClient }
-
-func (r *McpResource) List(ctx context.Context) (ListMCPServersResponse, error) {
-	path := "/mcp/servers"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListMCPServersResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "listMCPServers", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *McpResource) Get(ctx context.Context, serverId string) (GetMCPServerResponse, error) {
-	path := "/mcp/servers/" + url.PathEscape(fmt.Sprint(serverId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output GetMCPServerResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "getMCPServer", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *McpResource) Resolve(ctx context.Context, serverId string) (ResolveMCPServerResponse, error) {
-	path := "/mcp/servers/" + url.PathEscape(fmt.Sprint(serverId)) + "/resolve"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ResolveMCPServerResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "resolveMCPServer", "POST", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type SkillsResource struct{ client *BeeOSClient }
-
-func (r *SkillsResource) List(ctx context.Context, options ListSkillsOptions) (SkillPage, error) {
-	path := "/skills"
-	query := url.Values{}
-	headers := http.Header{}
-	var output SkillPage
-	if options.Ids != nil {
-		query.Set("ids", fmt.Sprint(*options.Ids))
-	}
-	if options.Category != nil {
-		query.Set("category", fmt.Sprint(*options.Category))
-	}
-	if options.Cursor != nil {
-		query.Set("cursor", fmt.Sprint(*options.Cursor))
-	}
-	if options.Q != nil {
-		query.Set("q", fmt.Sprint(*options.Q))
-	}
-	if options.OrderBy != nil {
-		query.Set("order_by", fmt.Sprint(*options.OrderBy))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	if options.Offset != nil {
-		query.Set("offset", fmt.Sprint(*options.Offset))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "listSkills", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *SkillsResource) Create(ctx context.Context, input CreateSkillRequest) (CreateSkillResponse, error) {
-	path := "/skills"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CreateSkillResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "createSkill", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *SkillsResource) Search(ctx context.Context, options SearchSkillsOptions) (SkillPage, error) {
-	path := "/skills/search"
-	query := url.Values{}
-	headers := http.Header{}
-	var output SkillPage
-	if options.Ids != nil {
-		query.Set("ids", fmt.Sprint(*options.Ids))
-	}
-	if options.Category != nil {
-		query.Set("category", fmt.Sprint(*options.Category))
-	}
-	if options.Cursor != nil {
-		query.Set("cursor", fmt.Sprint(*options.Cursor))
-	}
-	if options.Q != nil {
-		query.Set("q", fmt.Sprint(*options.Q))
-	}
-	if options.OrderBy != nil {
-		query.Set("order_by", fmt.Sprint(*options.OrderBy))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	if options.Offset != nil {
-		query.Set("offset", fmt.Sprint(*options.Offset))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "searchSkills", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *SkillsResource) Get(ctx context.Context, id string) (GetSkillResponse, error) {
-	path := "/skills/" + url.PathEscape(fmt.Sprint(id)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output GetSkillResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "getSkill", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *SkillsResource) GetBySlug(ctx context.Context, slug string) (GetSkillBySlugResponse, error) {
-	path := "/skills/by-slug/" + url.PathEscape(fmt.Sprint(slug)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output GetSkillBySlugResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "getSkillBySlug", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *SkillsResource) Categories(ctx context.Context) (ListSkillCategoriesResponse, error) {
-	path := "/skills/categories"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListSkillCategoriesResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "listSkillCategories", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *SkillsResource) Featured(ctx context.Context, options GetFeaturedSkillsOptions) (GetFeaturedSkillsResponse, error) {
-	path := "/featured"
-	query := url.Values{}
-	headers := http.Header{}
-	var output GetFeaturedSkillsResponse
-	if options.Scope != nil {
-		query.Set("scope", fmt.Sprint(*options.Scope))
-	}
-	if options.ScopeValue != nil {
-		query.Set("scope_value", fmt.Sprint(*options.ScopeValue))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "getFeaturedSkills", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type SkillSetsResource struct{ client *BeeOSClient }
-
-func (r *SkillSetsResource) List(ctx context.Context, options ListSkillSetsOptions) (ListSkillSetsResponse, error) {
-	path := "/skillhub/skill-sets"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListSkillSetsResponse
-	if options.Category != nil {
-		query.Set("category", fmt.Sprint(*options.Category))
-	}
-	if options.Page != nil {
-		query.Set("page", fmt.Sprint(*options.Page))
-	}
-	if options.PageSize != nil {
-		query.Set("page_size", fmt.Sprint(*options.PageSize))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "listSkillSets", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *SkillSetsResource) Get(ctx context.Context, slug string) (skillSetDetailView, error) {
-	path := "/skillhub/skill-sets/" + url.PathEscape(fmt.Sprint(slug)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output skillSetDetailView
-	var body []byte
-	payload, err := r.client.request(ctx, "getSkillSet", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 type AutomationsResource struct{ client *BeeOSClient }
 
 func (r *AutomationsResource) Create(ctx context.Context, input ProtoAutomationInput) (CreateAutomationResponse, error) {
@@ -6333,217 +5499,6 @@ func (r *AutomationsResource) CreateWebhook(ctx context.Context, input ProtoAuto
 	}
 	body = encoded
 	payload, err := r.client.request(ctx, "createWebhookAutomation", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type ConnectorsResource struct{ client *BeeOSClient }
-
-func (r *ConnectorsResource) CredentialPut(ctx context.Context, input ProtoPutConnectorCredentialRequest) (PutConnectorCredentialConnectorResponse, error) {
-	path := "/connectors/credential-put"
-	query := url.Values{}
-	headers := http.Header{}
-	var output PutConnectorCredentialConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "PutConnectorCredentialConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) CredentialDelete(ctx context.Context, input ProtoDeleteConnectorCredentialRequest) (DeleteConnectorCredentialConnectorResponse, error) {
-	path := "/connectors/credential-delete"
-	query := url.Values{}
-	headers := http.Header{}
-	var output DeleteConnectorCredentialConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "DeleteConnectorCredentialConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) List(ctx context.Context, input ProtoListInstanceConnectorsRequest) (ListInstanceConnectorsConnectorResponse, error) {
-	path := "/connectors/list"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListInstanceConnectorsConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "ListInstanceConnectorsConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) Install(ctx context.Context, input ProtoInstallManagedConnectorRequest) (InstallManagedConnectorConnectorResponse, error) {
-	path := "/connectors/install"
-	query := url.Values{}
-	headers := http.Header{}
-	var output InstallManagedConnectorConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "InstallManagedConnectorConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) Update(ctx context.Context, input ProtoUpdateManagedConnectorRequest) (UpdateManagedConnectorConnectorResponse, error) {
-	path := "/connectors/update"
-	query := url.Values{}
-	headers := http.Header{}
-	var output UpdateManagedConnectorConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "UpdateManagedConnectorConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) Uninstall(ctx context.Context, input ProtoUninstallManagedConnectorRequest) (UninstallManagedConnectorConnectorResponse, error) {
-	path := "/connectors/uninstall"
-	query := url.Values{}
-	headers := http.Header{}
-	var output UninstallManagedConnectorConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "UninstallManagedConnectorConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) CatalogList(ctx context.Context, input ProtoListMcpServersRequest) (ListMcpServersConnectorResponse, error) {
-	path := "/connectors/catalog-list"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListMcpServersConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "ListMcpServersConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) CatalogGet(ctx context.Context, input ProtoGetMcpServerRequest) (GetMcpServerConnectorResponse, error) {
-	path := "/connectors/catalog-get"
-	query := url.Values{}
-	headers := http.Header{}
-	var output GetMcpServerConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "GetMcpServerConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) CatalogCategories(ctx context.Context, input ProtoMcpListCategoriesRequest) (ListCategoriesConnectorResponse, error) {
-	path := "/connectors/catalog-categories"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ListCategoriesConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "ListCategoriesConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) CatalogPrepare(ctx context.Context, input ProtoResolveMcpPreparationRequest) (ResolvePreparationConnectorResponse, error) {
-	path := "/connectors/catalog-prepare"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ResolvePreparationConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "ResolvePreparationConnector", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConnectorsResource) CatalogResolve(ctx context.Context, input ProtoResolveInstallRequest) (ResolveInstallConnectorResponse, error) {
-	path := "/connectors/catalog-resolve"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ResolveInstallConnectorResponse
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "ResolveInstallConnector", "POST", path, "", query, headers, body, "application/json")
 	if err != nil {
 		return output, err
 	}
@@ -6893,6 +5848,25 @@ func (r *HarnessesResource) List(ctx context.Context) (ListHarnessesResponse, er
 	return output, err
 }
 
+func (r *HarnessesResource) Create(ctx context.Context, input UHPHarnessCreate) (UHPHarness, error) {
+	path := "/harnesses"
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPHarness
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "createHarness", "POST", path, "/uhp/v1", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
 func (r *HarnessesResource) Get(ctx context.Context, harnessid string) (UHPHarness, error) {
 	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
 	query := url.Values{}
@@ -6900,6 +5874,39 @@ func (r *HarnessesResource) Get(ctx context.Context, harnessid string) (UHPHarne
 	var output UHPHarness
 	var body []byte
 	payload, err := r.client.request(ctx, "getHarness", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *HarnessesResource) Update(ctx context.Context, harnessid string, input UHPHarnessCreate) (UHPHarness, error) {
+	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPHarness
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "updateHarness", "PUT", path, "/uhp/v1", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *HarnessesResource) Delete(ctx context.Context, harnessid string) (DeleteHarnessResponse, error) {
+	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output DeleteHarnessResponse
+	var body []byte
+	payload, err := r.client.request(ctx, "deleteHarness", "DELETE", path, "/uhp/v1", query, headers, body, "")
 	if err != nil {
 		return output, err
 	}

@@ -548,91 +548,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/instances/{instanceId}/runtime-capabilities": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get runtime capabilities */
-        get: operations["getRuntimeCapabilities"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/methods": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Invoke a runtime method */
-        post: operations["invokeRuntimeMethod"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/operations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List active runtime operations */
-        get: operations["listRuntimeOperations"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/operations/{operationId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a runtime operation */
-        get: operations["getRuntimeOperation"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/operations/{operationId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Cancel a runtime operation */
-        post: operations["cancelRuntimeOperation"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/instances/{instanceId}/terminal-sessions": {
         parameters: {
             query?: never;
@@ -747,150 +662,6 @@ export interface paths {
         patch: operations["renameFile"];
         trace?: never;
     };
-    "/mcp/servers": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listMCPServers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/mcp/servers/{serverId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getMCPServer"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/mcp/servers/{serverId}/resolve": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["resolveMCPServer"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/skills": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listSkills"];
-        put?: never;
-        post: operations["createSkill"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/skills/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["searchSkills"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/skills/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getSkill"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/skills/by-slug/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getSkillBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/skills/categories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listSkillCategories"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/featured": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getFeaturedSkills"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/agent-templates/{id}": {
         parameters: {
             query?: never;
@@ -899,38 +670,6 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getAgentTemplate"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/skillhub/skill-sets": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["listSkillSets"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/skillhub/skill-sets/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getSkillSet"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1173,182 +912,6 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["createWebhookAutomation"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/credential-put": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["PutConnectorCredentialConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/credential-delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["DeleteConnectorCredentialConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["ListInstanceConnectorsConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/install": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["InstallManagedConnectorConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["UpdateManagedConnectorConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/uninstall": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["UninstallManagedConnectorConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/catalog-list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["ListMcpServersConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/catalog-get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["GetMcpServerConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/catalog-categories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["ListCategoriesConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/catalog-prepare": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["ResolvePreparationConnector"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/connectors/catalog-resolve": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["ResolveInstallConnector"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1659,7 +1222,11 @@ export interface paths {
         /** List configured harnesses */
         get: operations["listHarnesses"];
         put?: never;
-        post?: never;
+        /**
+         * Create a harness
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. instance_id and name are required; default_model is honored only here. skills are rejected on create (422 beeos_field_not_supported); add them with PUT. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).
+         */
+        post: operations["createHarness"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1675,9 +1242,17 @@ export interface paths {
         };
         /** Get one harness */
         get: operations["getHarness"];
-        put?: never;
+        /**
+         * Replace a harness
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. An absent field is unchanged. When skills is present it is diffed against the installed skills: listed skills with files, content or blob are installed; omitted catalog-origin skills are uninstalled; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).
+         */
+        put: operations["updateHarness"];
         post?: never;
-        delete?: never;
+        /**
+         * Delete a harness
+         * @description Not supported by BeeOS Cloud yet: returns 422 beeos_harness_delete_not_supported once the harness is found.
+         */
+        delete: operations["deleteHarness"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2314,6 +1889,11 @@ export interface components {
              *     a resolved credential to a client.
              */
             auth?: string;
+            /**
+             * Format: date-time
+             * @description BeeOS extension. Expiry of the supplied short-lived credential; the caller refreshes it with another PUT.
+             */
+            expires_at?: string;
         } & {
             [key: string]: JSONValue;
         };
@@ -2386,6 +1966,10 @@ export interface components {
              *     back unchanged, and reads the files from the skill files endpoint.
              */
             blob?: string;
+            /** @description BeeOS extension. SHA-256 of the Files bundle referenced by blob. */
+            sha256?: string;
+            /** @description BeeOS extension. Decimal byte size of the Files bundle referenced by blob. */
+            size_bytes?: string;
         } & {
             [key: string]: JSONValue;
         };
@@ -3057,86 +2641,6 @@ export interface components {
                 [key: string]: JSONValue;
             };
         };
-        Skill: {
-            id: string;
-            slug: string;
-            name: string;
-            description: string;
-            category: string;
-            tags: string[];
-            license: string;
-            status: string;
-            latest_version: string;
-            icon_url: string;
-            author_display_name: string;
-            source_repo_url?: string;
-            latest_version_info?: components["schemas"]["SkillVersionInfo"] | null;
-            files?: components["schemas"]["SkillDetailFile"][];
-            downloads: number;
-            stars: number;
-            created_at: string;
-            updated_at: string;
-        };
-        SkillVersionInfo: {
-            id: string;
-            skill_id: string;
-            version: string;
-            changelog: string;
-            fingerprint: string;
-            license: string;
-            created_at: string;
-            content_url?: string;
-        };
-        SkillDetailFile: {
-            path: string;
-            download_url: string;
-            sha256: string;
-            size: number;
-        };
-        SkillPage: {
-            data: components["schemas"]["Skill"][];
-            total: number;
-            next_cursor?: string;
-        };
-        SkillCategory: {
-            category: string;
-            count: number;
-        };
-        skillSetListView: {
-            id: string;
-            slug: string;
-            display_name: string;
-            summary: string;
-            scene: string;
-            icon_url: string;
-            skill_count: number;
-            updated_at: string;
-        };
-        skillSetMemberView: {
-            id: string;
-            slug: string;
-            name: string;
-            description: string;
-            icon_url: string;
-            downloads: number;
-            stars: number;
-            status: string;
-        };
-        skillSetItemView: {
-            step_note: string;
-            skill: components["schemas"]["skillSetMemberView"];
-        };
-        skillSetDetailView: {
-            id: string;
-            slug: string;
-            display_name: string;
-            summary: string;
-            content: string;
-            scene: string;
-            icon_url: string;
-            items: components["schemas"]["skillSetItemView"][];
-            unavailable_count: number;
-        };
         agentBindWire: {
             status: string;
             bind_id?: string;
@@ -3189,124 +2693,6 @@ export interface components {
             tags: string[];
             harness: string;
             template_version: string;
-        };
-        CloudSkillOperationDetail: {
-            id: string;
-            instanceId: string;
-            target: components["schemas"]["CloudRuntimeOperationTarget"];
-            capability: string;
-            transport: string;
-            sequence: string;
-            cursor: string;
-            /** Format: date-time */
-            createdAt: string;
-            effectState: string;
-            operationId: string;
-            requestOperationId?: string;
-            replayDefaultKey?: boolean;
-            method: string;
-            status: string;
-            terminal: boolean;
-            contractRevision: string;
-            catalogIntent?: components["schemas"]["CloudSkillInstallIntent"] | null;
-            skillIntent?: JSONValue;
-            templateIntent?: components["schemas"]["CloudTemplateIntent"] | null;
-            /** Format: date-time */
-            updatedAt: string;
-            result?: JSONValue;
-            error?: JSONValue;
-            observationCode?: string;
-        };
-        CloudRuntimeOperationTarget: {
-            scope: string;
-            platformAgentId?: string;
-            conversationId?: string;
-        };
-        CloudSkillInstallIntent: {
-            platformAgentId: string;
-            slug: string;
-            version?: string;
-        };
-        CloudTemplateIntent: {
-            name: string;
-            templateId: string;
-            templateVersion?: string;
-        };
-        MCPServer: {
-            id: string;
-            slug?: string;
-            status: string;
-            installs: number;
-            install?: JSONValue;
-            auth?: JSONValue;
-            inputs?: JSONValue;
-            category?: string;
-            tags: string[];
-            display?: JSONValue;
-            iconUrl?: string;
-            info?: JSONValue;
-            createdAt?: string;
-            updatedAt?: string;
-            kind?: string;
-            connectorId?: string;
-            authorizationOptions?: components["schemas"]["catalogAuthorizationOptionDTO"][];
-            actionCount?: number;
-            actions?: components["schemas"]["catalogActionDTO"][];
-            auth_mode?: string;
-            connected: boolean;
-        };
-        catalogCredentialFieldDTO: {
-            key: string;
-            label: string;
-            type: string;
-            required: boolean;
-        };
-        catalogAuthorizationOptionDTO: {
-            configurationRequired: boolean;
-            kind: string;
-            credentialKey?: string;
-            authorizationProfileKey?: string;
-            fields?: components["schemas"]["catalogCredentialFieldDTO"][];
-        };
-        catalogActionDTO: {
-            id: string;
-            connectorId: string;
-            name: string;
-            description: string;
-            inputSchema: JSONValue;
-            outputSchema: JSONValue;
-            requiredScopes: string[];
-        };
-        MCPServerResolution: {
-            name: string;
-            definition: {
-                [key: string]: JSONValue;
-            };
-            id: string;
-            slug?: string;
-            status: string;
-            installs: number;
-            install?: JSONValue;
-            auth?: JSONValue;
-            inputs?: JSONValue;
-            category?: string;
-            tags: string[];
-            display?: JSONValue;
-            iconUrl?: string;
-            info?: JSONValue;
-            createdAt?: string;
-            updatedAt?: string;
-            kind?: string;
-            connectorId?: string;
-            authorizationOptions?: components["schemas"]["catalogAuthorizationOptionDTO"][];
-            actionCount?: number;
-            actions?: components["schemas"]["catalogActionDTO"][];
-            auth_mode?: string;
-            connected: boolean;
-        };
-        CloudSkillOperationPage: {
-            operations: components["schemas"]["CloudSkillOperationDetail"][];
-            nextCursor?: string;
         };
         a2aTaskView: {
             id: string;
@@ -3530,158 +2916,6 @@ export interface components {
             eventFilter?: string;
             mailbox?: string;
         };
-        ProtoPutConnectorCredentialResponse: Record<string, never>;
-        ProtoPutConnectorCredentialRequest: {
-            organizationId?: string;
-            appId?: string;
-            credentialRef?: string;
-            credentialKey?: string;
-            authKind?: string;
-        };
-        ProtoDeleteConnectorCredentialResponse: Record<string, never>;
-        ProtoDeleteConnectorCredentialRequest: {
-            organizationId?: string;
-            appId?: string;
-            credentialRef?: string;
-        };
-        ProtoListInstanceConnectorsResponse: {
-            connectors?: components["schemas"]["ProtoInstanceConnector"][];
-            total?: number;
-        };
-        ProtoInstanceConnector: {
-            catalog?: components["schemas"]["ProtoMcpServer"];
-            installed?: boolean;
-            binding?: components["schemas"]["ProtoConnectorBinding"];
-            credentialStatus?: string;
-        };
-        ProtoMcpServer: {
-            id?: string;
-            slug?: string;
-            status?: string;
-            installs?: string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-            install?: string;
-            auth?: string;
-            inputs?: string;
-            category?: string;
-            tags?: string[];
-            display?: string;
-            iconUrl?: string;
-            info?: string;
-            connectorId?: string;
-            kind?: string;
-            authorizationOptions?: components["schemas"]["ProtoCatalogAuthorizationOption"][];
-            actionCount?: number;
-            actions?: components["schemas"]["ProtoCatalogAction"][];
-        };
-        ProtoCatalogAuthorizationOption: {
-            kind?: string;
-            credentialKey?: string;
-            authorizationProfileKey?: string;
-            fields?: components["schemas"]["ProtoCatalogCredentialField"][];
-            configurationRequired?: boolean;
-        };
-        ProtoCatalogCredentialField: {
-            key?: string;
-            label?: string;
-            type?: string;
-            required?: boolean;
-        };
-        ProtoCatalogAction: {
-            id?: string;
-            connectorId?: string;
-            name?: string;
-            description?: string;
-            inputSchema?: string;
-            outputSchema?: string;
-            requiredScopes?: string[];
-        };
-        ProtoConnectorBinding: {
-            id?: string;
-            connectorId?: string;
-            credentialRef?: string;
-            enabled?: boolean;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-            organizationId?: string;
-            appId?: string;
-        };
-        ProtoListInstanceConnectorsRequest: {
-            agentInstanceId?: string;
-            installedOnly?: boolean;
-            category?: string;
-            tags?: string[];
-            query?: string;
-            limit?: number;
-            offset?: number;
-            organizationId?: string;
-            appId?: string;
-        };
-        ProtoInstallManagedConnectorRequest: {
-            agentInstanceId?: string;
-            marketEntryId?: string;
-            credentialRef?: string;
-            organizationId?: string;
-            appId?: string;
-        };
-        ProtoUpdateManagedConnectorRequest: {
-            agentInstanceId?: string;
-            connectorId?: string;
-            enabled?: boolean;
-            credentialRef?: string;
-            organizationId?: string;
-            appId?: string;
-        };
-        ProtoUninstallManagedConnectorResponse: Record<string, never>;
-        ProtoUninstallManagedConnectorRequest: {
-            agentInstanceId?: string;
-            connectorId?: string;
-            organizationId?: string;
-            appId?: string;
-        };
-        ProtoListMcpServersResponse: {
-            servers?: components["schemas"]["ProtoMcpServer"][];
-            total?: number;
-        };
-        ProtoListMcpServersRequest: {
-            category?: string;
-            tags?: string[];
-            query?: string;
-            limit?: number;
-            offset?: number;
-        };
-        ProtoGetMcpServerResponse: {
-            server?: components["schemas"]["ProtoMcpServer"];
-        };
-        ProtoGetMcpServerRequest: {
-            id?: string;
-        };
-        ProtoListCategoriesResponse: {
-            categories?: components["schemas"]["ProtoCategoryCount"][];
-        };
-        ProtoCategoryCount: {
-            category?: string;
-            count?: number;
-        };
-        ProtoMcpListCategoriesRequest: Record<string, never>;
-        ProtoResolveMcpPreparationRequest: {
-            id?: string;
-        };
-        ProtoResolveInstallResponse: {
-            serverName?: string;
-            serverConfigJson?: string;
-            authMode?: string;
-            oneClickEligible?: boolean;
-            warnings?: string[];
-        };
-        ProtoResolveInstallRequest: {
-            id?: string;
-        };
         RuntimeMethodResponse: {
             /** @enum {string} */
             jsonrpc: "2.0";
@@ -3727,36 +2961,6 @@ export interface components {
             }[];
         };
         A2AOutputPart: components["schemas"]["A2ATextPartOut"] | components["schemas"]["A2AFilePartOut"] | components["schemas"]["A2ADataPartOut"];
-        RuntimeMethodAvailability: {
-            enabled: boolean;
-            minimumRuntimeRpcProtocolVersion: number;
-            minimumRuntimeContractRevision?: string;
-        };
-        RuntimeCapabilitySupport: {
-            service: boolean;
-            minimumRuntimeRpcProtocolVersion?: number;
-        };
-        RuntimeCapabilityDocument: {
-            manifestId: string;
-            contractRevision: string;
-            runtimeRpcProtocolVersion: number;
-            runtimeEpoch: string;
-            serviceMethods: string[];
-            conversationMethods: string[];
-            methodAvailability: {
-                [key: string]: components["schemas"]["RuntimeMethodAvailability"];
-            };
-            conversationMethodAvailability: {
-                [key: string]: components["schemas"]["RuntimeMethodAvailability"];
-            };
-            capabilities: {
-                [key: string]: components["schemas"]["RuntimeCapabilitySupport"];
-            };
-            generatedAt: string;
-            expiresAt: string;
-            terminalTransport?: string;
-            canvasTransport?: string;
-        };
         RealtimeTicketHeader: {
             alg: string;
             typ: string;
@@ -3818,6 +3022,29 @@ export interface components {
         DeviceBindingErrorResponse: {
             error: string;
             message: string;
+        };
+        UHPHarnessCreate: {
+            name?: string;
+            base: string;
+            /** @description BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent. */
+            default_model?: string;
+            system_prompt?: string;
+            /** @description Not accepted by BeeOS Cloud yet: a non-empty list returns 422 beeos_mcp_not_supported. */
+            mcp_servers?: components["schemas"]["UHPMcpServer"][];
+            skills?: components["schemas"]["UHPSkill"][];
+            /** @description Requires the `plugins` capability. Each item needs `files` or `blob`. */
+            plugins?: components["schemas"]["UHPPlugin"][];
+            /** @description An environment id of the caller's scope, or empty. Requires the `environments` capability. */
+            environment?: string;
+            disabled_tools?: string[];
+            max_step?: number | null;
+            timeout_seconds?: number | null;
+            /** @description BeeOS extension. Instance that hosts a new harness (create only). */
+            instance_id?: string;
+            /** @description BeeOS extension. Agent template applied to the harness. */
+            template_id?: string;
+        } & {
+            [key: string]: JSONValue;
         };
         UHPCreateResponseJSONRequest: {
             /** @description A bare string is shorthand for one user message. */
@@ -5473,250 +4700,6 @@ export interface operations {
             };
         };
     };
-    getRuntimeCapabilities: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Fenced runtime capability manifest */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["RuntimeCapabilityDocument"];
-                };
-            };
-            /** @description Cloud Server error */
-            401: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            404: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    invokeRuntimeMethod: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-                "X-BeeOS-Operation-Id"?: string;
-            };
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @enum {string} */
-                    jsonrpc: "2.0";
-                    id: string;
-                    method: string;
-                    params: JSONValue;
-                };
-            };
-        };
-        responses: {
-            /** @description JSON-RPC success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["RuntimeMethodResponse"];
-                };
-            };
-            /** @description Operation accepted */
-            202: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["RuntimeMethodResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    listRuntimeOperations: {
-        parameters: {
-            query?: {
-                status?: "active";
-                cursor?: string;
-                limit?: number;
-                method?: string;
-            };
-            header?: never;
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Active owner-scoped operations */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["CloudSkillOperationPage"];
-                };
-            };
-            /** @description Cloud Server error */
-            400: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            401: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            404: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getRuntimeOperation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                operationId: string;
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Reduced durable operation snapshot */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["CloudSkillOperationDetail"];
-                };
-            };
-            /** @description Cloud Server error */
-            404: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    cancelRuntimeOperation: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-                "X-BeeOS-Operation-Id"?: string;
-            };
-            path: {
-                operationId: string;
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Cancellation requested */
-            202: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        status: string;
-                        operationId: string;
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
     createTerminalSession: {
         parameters: {
             query?: never;
@@ -6143,359 +5126,6 @@ export interface operations {
             };
         };
     };
-    listMCPServers: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["MCPServer"][];
-                        total: number;
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getMCPServer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["MCPServer"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    resolveMCPServer: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["MCPServerResolution"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    listSkills: {
-        parameters: {
-            query?: {
-                ids?: string;
-                category?: string;
-                cursor?: string;
-                q?: string;
-                order_by?: string;
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["SkillPage"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    createSkill: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    slug: string;
-                    name: string;
-                    description?: string;
-                    category?: string;
-                    license?: string;
-                    version: string;
-                    changelog?: string;
-                    tags?: string[];
-                    files: {
-                        path: string;
-                        content: string;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            /** @description Success */
-            201: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["Skill"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    searchSkills: {
-        parameters: {
-            query?: {
-                ids?: string;
-                category?: string;
-                cursor?: string;
-                q?: string;
-                order_by?: string;
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["SkillPage"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getSkill: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["Skill"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getSkillBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["Skill"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    listSkillCategories: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["SkillCategory"][];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getFeaturedSkills: {
-        parameters: {
-            query?: {
-                scope?: string;
-                scope_value?: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["Skill"][];
-                        total: number;
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
     getAgentTemplate: {
         parameters: {
             query?: never;
@@ -6514,73 +5144,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["agentTemplateCatalogView"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    listSkillSets: {
-        parameters: {
-            query?: {
-                category?: string;
-                page?: number;
-                page_size?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["skillSetListView"][];
-                        total: number;
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getSkillSet: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["skillSetDetailView"];
                 };
             };
             /** @description Cloud Server error */
@@ -7394,391 +5957,6 @@ export interface operations {
             };
         };
     };
-    PutConnectorCredentialConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoPutConnectorCredentialRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ProtoPutConnectorCredentialResponse"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    DeleteConnectorCredentialConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoDeleteConnectorCredentialRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ProtoDeleteConnectorCredentialResponse"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    ListInstanceConnectorsConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoListInstanceConnectorsRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ProtoListInstanceConnectorsResponse"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    InstallManagedConnectorConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoInstallManagedConnectorRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: JSONValue;
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    UpdateManagedConnectorConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoUpdateManagedConnectorRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: JSONValue;
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    UninstallManagedConnectorConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoUninstallManagedConnectorRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ProtoUninstallManagedConnectorResponse"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    ListMcpServersConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoListMcpServersRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ProtoListMcpServersResponse"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    GetMcpServerConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoGetMcpServerRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ProtoGetMcpServerResponse"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    ListCategoriesConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoMcpListCategoriesRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ProtoListCategoriesResponse"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    ResolvePreparationConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoResolveMcpPreparationRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: JSONValue;
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    ResolveInstallConnector: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProtoResolveInstallRequest"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["ProtoResolveInstallResponse"];
-                    };
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
     transcribeAudio: {
         parameters: {
             query?: never;
@@ -8560,6 +6738,84 @@ export interface operations {
             };
         };
     };
+    createHarness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UHPHarnessCreate"];
+            };
+        };
+        responses: {
+            /** @description The harness */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPHarness"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            409: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            422: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            502: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            503: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            504: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
     getHarness: {
         parameters: {
             query?: never;
@@ -8581,6 +6837,131 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    updateHarness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                harness_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UHPHarnessCreate"];
+            };
+        };
+        responses: {
+            /** @description The harness */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPHarness"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            409: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            422: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            502: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            503: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            504: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    deleteHarness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                harness_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        deleted: boolean;
+                    };
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            422: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
             /** @description UHP protocol error envelope */
             default: {
                 headers: {
@@ -8988,30 +7369,11 @@ export type A2AArtifact = components["schemas"]["A2AArtifact"];
 export type A2ATextPartOut = components["schemas"]["A2ATextPartOut"];
 export type A2AFilePartOut = components["schemas"]["A2AFilePartOut"];
 export type A2ADataPartOut = components["schemas"]["A2ADataPartOut"];
-export type Skill = components["schemas"]["Skill"];
-export type SkillVersionInfo = components["schemas"]["SkillVersionInfo"];
-export type SkillDetailFile = components["schemas"]["SkillDetailFile"];
-export type SkillPage = components["schemas"]["SkillPage"];
-export type SkillCategory = components["schemas"]["SkillCategory"];
-export type skillSetListView = components["schemas"]["skillSetListView"];
-export type skillSetMemberView = components["schemas"]["skillSetMemberView"];
-export type skillSetItemView = components["schemas"]["skillSetItemView"];
-export type skillSetDetailView = components["schemas"]["skillSetDetailView"];
 export type agentBindWire = components["schemas"]["agentBindWire"];
 export type bindRuntimeWire = components["schemas"]["bindRuntimeWire"];
 export type agentBindDetailsWire = components["schemas"]["agentBindDetailsWire"];
 export type portalBindWire = components["schemas"]["portalBindWire"];
 export type agentTemplateCatalogView = components["schemas"]["agentTemplateCatalogView"];
-export type CloudSkillOperationDetail = components["schemas"]["CloudSkillOperationDetail"];
-export type CloudRuntimeOperationTarget = components["schemas"]["CloudRuntimeOperationTarget"];
-export type CloudSkillInstallIntent = components["schemas"]["CloudSkillInstallIntent"];
-export type CloudTemplateIntent = components["schemas"]["CloudTemplateIntent"];
-export type MCPServer = components["schemas"]["MCPServer"];
-export type catalogCredentialFieldDTO = components["schemas"]["catalogCredentialFieldDTO"];
-export type catalogAuthorizationOptionDTO = components["schemas"]["catalogAuthorizationOptionDTO"];
-export type catalogActionDTO = components["schemas"]["catalogActionDTO"];
-export type MCPServerResolution = components["schemas"]["MCPServerResolution"];
-export type CloudSkillOperationPage = components["schemas"]["CloudSkillOperationPage"];
 export type a2aTaskView = components["schemas"]["a2aTaskView"];
 export type CreateServerInstanceInput = components["schemas"]["CreateServerInstanceInput"];
 export type ServerUsageSummary = components["schemas"]["ServerUsageSummary"];
@@ -9031,46 +7393,18 @@ export type ProtoAutomationRun = components["schemas"]["ProtoAutomationRun"];
 export type ProtoAutomationRunInput = components["schemas"]["ProtoAutomationRunInput"];
 export type ProtoListAutomationRunsResponse = components["schemas"]["ProtoListAutomationRunsResponse"];
 export type ProtoAutomationWebhookInput = components["schemas"]["ProtoAutomationWebhookInput"];
-export type ProtoPutConnectorCredentialResponse = components["schemas"]["ProtoPutConnectorCredentialResponse"];
-export type ProtoPutConnectorCredentialRequest = components["schemas"]["ProtoPutConnectorCredentialRequest"];
-export type ProtoDeleteConnectorCredentialResponse = components["schemas"]["ProtoDeleteConnectorCredentialResponse"];
-export type ProtoDeleteConnectorCredentialRequest = components["schemas"]["ProtoDeleteConnectorCredentialRequest"];
-export type ProtoListInstanceConnectorsResponse = components["schemas"]["ProtoListInstanceConnectorsResponse"];
-export type ProtoInstanceConnector = components["schemas"]["ProtoInstanceConnector"];
-export type ProtoMcpServer = components["schemas"]["ProtoMcpServer"];
-export type ProtoCatalogAuthorizationOption = components["schemas"]["ProtoCatalogAuthorizationOption"];
-export type ProtoCatalogCredentialField = components["schemas"]["ProtoCatalogCredentialField"];
-export type ProtoCatalogAction = components["schemas"]["ProtoCatalogAction"];
-export type ProtoConnectorBinding = components["schemas"]["ProtoConnectorBinding"];
-export type ProtoListInstanceConnectorsRequest = components["schemas"]["ProtoListInstanceConnectorsRequest"];
-export type ProtoInstallManagedConnectorRequest = components["schemas"]["ProtoInstallManagedConnectorRequest"];
-export type ProtoUpdateManagedConnectorRequest = components["schemas"]["ProtoUpdateManagedConnectorRequest"];
-export type ProtoUninstallManagedConnectorResponse = components["schemas"]["ProtoUninstallManagedConnectorResponse"];
-export type ProtoUninstallManagedConnectorRequest = components["schemas"]["ProtoUninstallManagedConnectorRequest"];
-export type ProtoListMcpServersResponse = components["schemas"]["ProtoListMcpServersResponse"];
-export type ProtoListMcpServersRequest = components["schemas"]["ProtoListMcpServersRequest"];
-export type ProtoGetMcpServerResponse = components["schemas"]["ProtoGetMcpServerResponse"];
-export type ProtoGetMcpServerRequest = components["schemas"]["ProtoGetMcpServerRequest"];
-export type ProtoListCategoriesResponse = components["schemas"]["ProtoListCategoriesResponse"];
-export type ProtoCategoryCount = components["schemas"]["ProtoCategoryCount"];
-export type ProtoMcpListCategoriesRequest = components["schemas"]["ProtoMcpListCategoriesRequest"];
-export type ProtoResolveMcpPreparationRequest = components["schemas"]["ProtoResolveMcpPreparationRequest"];
-export type ProtoResolveInstallResponse = components["schemas"]["ProtoResolveInstallResponse"];
-export type ProtoResolveInstallRequest = components["schemas"]["ProtoResolveInstallRequest"];
 export type RuntimeMethodResponse = components["schemas"]["RuntimeMethodResponse"];
 export type CanvasShare = components["schemas"]["CanvasShare"];
 export type CanvasSnapshot = components["schemas"]["CanvasSnapshot"];
 export type A2AAgentCard = components["schemas"]["A2AAgentCard"];
 export type A2AOutputPart = components["schemas"]["A2AOutputPart"];
-export type RuntimeMethodAvailability = components["schemas"]["RuntimeMethodAvailability"];
-export type RuntimeCapabilitySupport = components["schemas"]["RuntimeCapabilitySupport"];
-export type RuntimeCapabilityDocument = components["schemas"]["RuntimeCapabilityDocument"];
 export type RealtimeTicketHeader = components["schemas"]["RealtimeTicketHeader"];
 export type TerminalTicketClaims = components["schemas"]["TerminalTicketClaims"];
 export type CanvasTicketClaims = components["schemas"]["CanvasTicketClaims"];
 export type TerminalSessionDocument = components["schemas"]["TerminalSessionDocument"];
 export type CanvasSessionDocument = components["schemas"]["CanvasSessionDocument"];
 export type DeviceBindingErrorResponse = components["schemas"]["DeviceBindingErrorResponse"];
+export type UHPHarnessCreate = components["schemas"]["UHPHarnessCreate"];
 export type UHPCreateResponseJSONRequest = components["schemas"]["UHPCreateResponseJSONRequest"];
 export type UHPCreateResponseStreamRequest = components["schemas"]["UHPCreateResponseStreamRequest"];
 export type CreateClientSessionResponse = operations["createClientSession"]["responses"][200]["content"]["application/json"];
@@ -9141,13 +7475,6 @@ export type InvokeAgentResponse = operations["invokeAgent"]["responses"][200]["c
 export type InvokeAgentInput = NonNullable<operations["invokeAgent"]["requestBody"]>["content"]["application/json"];
 export type GetUsageSummaryResponse = operations["getUsageSummary"]["responses"][200]["content"]["application/json"];
 export type GetUsageSummaryQuery = NonNullable<operations["getUsageSummary"]["parameters"]["query"]>;
-export type GetRuntimeCapabilitiesResponse = operations["getRuntimeCapabilities"]["responses"][200]["content"]["application/json"];
-export type InvokeRuntimeMethodResponse = operations["invokeRuntimeMethod"]["responses"][200]["content"]["application/json"];
-export type InvokeRuntimeMethodInput = NonNullable<operations["invokeRuntimeMethod"]["requestBody"]>["content"]["application/json"];
-export type ListRuntimeOperationsResponse = operations["listRuntimeOperations"]["responses"][200]["content"]["application/json"];
-export type ListRuntimeOperationsQuery = NonNullable<operations["listRuntimeOperations"]["parameters"]["query"]>;
-export type GetRuntimeOperationResponse = operations["getRuntimeOperation"]["responses"][200]["content"]["application/json"];
-export type CancelRuntimeOperationResponse = operations["cancelRuntimeOperation"]["responses"][202]["content"]["application/json"];
 export type CreateTerminalSessionResponse = operations["createTerminalSession"]["responses"][201]["content"]["application/json"];
 export type CreateTerminalSessionInput = NonNullable<operations["createTerminalSession"]["requestBody"]>["content"]["application/json"];
 export type CreateCanvasSessionResponse = operations["createCanvasSession"]["responses"][201]["content"]["application/json"];
@@ -9164,24 +7491,7 @@ export type GetFileResponse = operations["getFile"]["responses"][200]["content"]
 export type RenameFileResponse = operations["renameFile"]["responses"][200]["content"]["application/json"];
 export type RenameFileInput = NonNullable<operations["renameFile"]["requestBody"]>["content"]["application/json"];
 export type DeleteFileResponse = void;
-export type ListMCPServersResponse = operations["listMCPServers"]["responses"][200]["content"]["application/json"];
-export type GetMCPServerResponse = operations["getMCPServer"]["responses"][200]["content"]["application/json"];
-export type ResolveMCPServerResponse = operations["resolveMCPServer"]["responses"][200]["content"]["application/json"];
-export type ListSkillsResponse = operations["listSkills"]["responses"][200]["content"]["application/json"];
-export type ListSkillsQuery = NonNullable<operations["listSkills"]["parameters"]["query"]>;
-export type CreateSkillResponse = operations["createSkill"]["responses"][201]["content"]["application/json"];
-export type CreateSkillInput = NonNullable<operations["createSkill"]["requestBody"]>["content"]["application/json"];
-export type SearchSkillsResponse = operations["searchSkills"]["responses"][200]["content"]["application/json"];
-export type SearchSkillsQuery = NonNullable<operations["searchSkills"]["parameters"]["query"]>;
-export type GetSkillResponse = operations["getSkill"]["responses"][200]["content"]["application/json"];
-export type GetSkillBySlugResponse = operations["getSkillBySlug"]["responses"][200]["content"]["application/json"];
-export type ListSkillCategoriesResponse = operations["listSkillCategories"]["responses"][200]["content"]["application/json"];
-export type GetFeaturedSkillsResponse = operations["getFeaturedSkills"]["responses"][200]["content"]["application/json"];
-export type GetFeaturedSkillsQuery = NonNullable<operations["getFeaturedSkills"]["parameters"]["query"]>;
 export type GetAgentTemplateResponse = operations["getAgentTemplate"]["responses"][200]["content"]["application/json"];
-export type ListSkillSetsResponse = operations["listSkillSets"]["responses"][200]["content"]["application/json"];
-export type ListSkillSetsQuery = NonNullable<operations["listSkillSets"]["parameters"]["query"]>;
-export type GetSkillSetResponse = operations["getSkillSet"]["responses"][200]["content"]["application/json"];
 export type CreateShareFileShareResponse = operations["createShareFileShare"]["responses"][200]["content"]["application/json"];
 export type GetShareFileShareResponse = operations["getShareFileShare"]["responses"][200]["content"]["application/json"];
 export type RevokeShareFileShareResponse = void;
@@ -9213,28 +7523,6 @@ export type ListAutomationRunsQuery = NonNullable<operations["listAutomationRuns
 export type GetAutomationRunResponse = operations["getAutomationRun"]["responses"][200]["content"]["application/json"];
 export type CreateWebhookAutomationResponse = operations["createWebhookAutomation"]["responses"][201]["content"]["application/json"];
 export type CreateWebhookAutomationInput = NonNullable<operations["createWebhookAutomation"]["requestBody"]>["content"]["application/json"];
-export type PutConnectorCredentialConnectorResponse = operations["PutConnectorCredentialConnector"]["responses"][200]["content"]["application/json"];
-export type PutConnectorCredentialConnectorInput = NonNullable<operations["PutConnectorCredentialConnector"]["requestBody"]>["content"]["application/json"];
-export type DeleteConnectorCredentialConnectorResponse = operations["DeleteConnectorCredentialConnector"]["responses"][200]["content"]["application/json"];
-export type DeleteConnectorCredentialConnectorInput = NonNullable<operations["DeleteConnectorCredentialConnector"]["requestBody"]>["content"]["application/json"];
-export type ListInstanceConnectorsConnectorResponse = operations["ListInstanceConnectorsConnector"]["responses"][200]["content"]["application/json"];
-export type ListInstanceConnectorsConnectorInput = NonNullable<operations["ListInstanceConnectorsConnector"]["requestBody"]>["content"]["application/json"];
-export type InstallManagedConnectorConnectorResponse = operations["InstallManagedConnectorConnector"]["responses"][200]["content"]["application/json"];
-export type InstallManagedConnectorConnectorInput = NonNullable<operations["InstallManagedConnectorConnector"]["requestBody"]>["content"]["application/json"];
-export type UpdateManagedConnectorConnectorResponse = operations["UpdateManagedConnectorConnector"]["responses"][200]["content"]["application/json"];
-export type UpdateManagedConnectorConnectorInput = NonNullable<operations["UpdateManagedConnectorConnector"]["requestBody"]>["content"]["application/json"];
-export type UninstallManagedConnectorConnectorResponse = operations["UninstallManagedConnectorConnector"]["responses"][200]["content"]["application/json"];
-export type UninstallManagedConnectorConnectorInput = NonNullable<operations["UninstallManagedConnectorConnector"]["requestBody"]>["content"]["application/json"];
-export type ListMcpServersConnectorResponse = operations["ListMcpServersConnector"]["responses"][200]["content"]["application/json"];
-export type ListMcpServersConnectorInput = NonNullable<operations["ListMcpServersConnector"]["requestBody"]>["content"]["application/json"];
-export type GetMcpServerConnectorResponse = operations["GetMcpServerConnector"]["responses"][200]["content"]["application/json"];
-export type GetMcpServerConnectorInput = NonNullable<operations["GetMcpServerConnector"]["requestBody"]>["content"]["application/json"];
-export type ListCategoriesConnectorResponse = operations["ListCategoriesConnector"]["responses"][200]["content"]["application/json"];
-export type ListCategoriesConnectorInput = NonNullable<operations["ListCategoriesConnector"]["requestBody"]>["content"]["application/json"];
-export type ResolvePreparationConnectorResponse = operations["ResolvePreparationConnector"]["responses"][200]["content"]["application/json"];
-export type ResolvePreparationConnectorInput = NonNullable<operations["ResolvePreparationConnector"]["requestBody"]>["content"]["application/json"];
-export type ResolveInstallConnectorResponse = operations["ResolveInstallConnector"]["responses"][200]["content"]["application/json"];
-export type ResolveInstallConnectorInput = NonNullable<operations["ResolveInstallConnector"]["requestBody"]>["content"]["application/json"];
 export type TranscribeAudioResponse = operations["transcribeAudio"]["responses"][200]["content"]["application/json"];
 export type TranscribeAudioInput = NonNullable<operations["transcribeAudio"]["requestBody"]>["content"]["multipart/form-data"];
 export type GetShareCanvasResponse = operations["getShareCanvas"]["responses"][200]["content"]["application/json"];
@@ -9264,7 +7552,12 @@ export type GetA2ATaskQuery = NonNullable<operations["getA2ATask"]["parameters"]
 export type CancelA2ATaskResponse = operations["cancelA2ATask"]["responses"][200]["content"]["application/json"];
 export type GetDiscoveryResponse = operations["getDiscovery"]["responses"][200]["content"]["application/json"];
 export type ListHarnessesResponse = operations["listHarnesses"]["responses"][200]["content"]["application/json"];
+export type CreateHarnessResponse = operations["createHarness"]["responses"][200]["content"]["application/json"];
+export type CreateHarnessInput = NonNullable<operations["createHarness"]["requestBody"]>["content"]["application/json"];
 export type GetHarnessResponse = operations["getHarness"]["responses"][200]["content"]["application/json"];
+export type UpdateHarnessResponse = operations["updateHarness"]["responses"][200]["content"]["application/json"];
+export type UpdateHarnessInput = NonNullable<operations["updateHarness"]["requestBody"]>["content"]["application/json"];
+export type DeleteHarnessResponse = operations["deleteHarness"]["responses"][200]["content"]["application/json"];
 export type ListModelsResponse = operations["listModels"]["responses"][200]["content"]["application/json"];
 export type ListHarnessModelsResponse = operations["listHarnessModels"]["responses"][200]["content"]["application/json"];
 export type CreateResponseResponse = operations["createResponse"]["responses"][200]["content"]["application/json"];
