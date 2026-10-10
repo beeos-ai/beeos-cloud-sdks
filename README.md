@@ -38,30 +38,11 @@ diagnostics; transport failures without an HTTP response remain transport errors
 Python uses a 30-second default timeout, configurable with `timeout=...` and
 preserved by `with_external_user`.
 
-### Skills and MCP runtime methods
+### Removed catalog modules
 
 3.0.0 removes the skill catalog, featured skills, skill sets, MCP server catalog
-and connector modules. Catalogs and connected accounts belong to the calling
-product; Cloud only installs what the caller supplies. Upload the skill zip with
-`files.prepareUpload` and `files.confirmUpload`, then install it:
-
-```ts
-await instance.skills.install({
-  agentId: 'agent-id',
-  skillKey: 'weather',
-  artifact: { fileId: file.file_id, sha256: file.checksum_sha256, sizeBytes: String(file.size_bytes) },
-  version: '1.2.0',
-}, 'install-weather-1');
-await instance.mcp.set({
-  name: 'github',
-  endpoint: { url: 'https://mcp.example.com/mcp', transport: 'streamable-http' },
-  credential: { headers: { Authorization: 'Bearer <short-lived token>' }, expiresAt: '2026-10-10T12:00:00Z' },
-}, 'mcp-github-1');
-```
-
-`skills/update` takes the same `{skillKey, artifact, version?}` fields.
-`mcp/prepare` is removed. Runtime method params are `JSONValue` in all three
-clients; the authoritative schemas are published by `beeos-ai/beeos-cloud-types` (`@beeos-ai/beeos-types`).
+and connector (connected account) modules. Those catalogs belong to the calling
+product.
 
 `JSONValue` represents genuinely open protocol extension fields. The SDK exposes
 only operations registered by the pinned producer; the 14 unregistered operations

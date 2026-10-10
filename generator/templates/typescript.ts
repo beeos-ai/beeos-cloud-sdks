@@ -402,6 +402,7 @@ class MethodsModule {
   };
   readonly mcp = {
     list: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "mcp/list", params, idempotencyKey),
+    prepare: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "mcp/prepare", params, idempotencyKey),
     set: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "mcp/set", params, idempotencyKey),
     unset: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "mcp/unset", params, idempotencyKey),
   };
@@ -426,7 +427,7 @@ export class Instance {
   readonly skills: { list: C14Call; install: C14Call; update: C14Call; uninstall: C14Call };
   readonly models: { list: C14Call };
   readonly cron: { list: C14Call; getStatus: C14Call; add: C14Call; update: C14Call; remove: C14Call; run: C14Call; listRuns: C14Call };
-  readonly mcp: { list: C14Call; set: C14Call; unset: C14Call };
+  readonly mcp: { list: C14Call; prepare: C14Call; set: C14Call; unset: C14Call };
   readonly sessions: { setMode: C14Call; setModel: C14Call; clear: C14Call; cancel: C14Call };
   readonly canvas: { toggle: C14Call; clear: C14Call; reference: C14Call; setDimensions: C14Call };
 
@@ -436,7 +437,7 @@ export class Instance {
     this.skills = { list: invoke("skills/list"), install: invoke("skills/install"), update: invoke("skills/update"), uninstall: invoke("skills/uninstall") };
     this.models = { list: invoke("models/list") };
     this.cron = { list: invoke("cron/list"), getStatus: invoke("cron/status"), add: invoke("cron/add"), update: invoke("cron/update"), remove: invoke("cron/remove"), run: invoke("cron/run"), listRuns: invoke("cron/runs") };
-    this.mcp = { list: invoke("mcp/list"), set: invoke("mcp/set"), unset: invoke("mcp/unset") };
+    this.mcp = { list: invoke("mcp/list"), prepare: invoke("mcp/prepare"), set: invoke("mcp/set"), unset: invoke("mcp/unset") };
     this.sessions = { setMode: invoke("session/set_mode"), setModel: invoke("session/set_model"), clear: invoke("session/clear"), cancel: invoke("session/cancel") };
     this.canvas = { toggle: invoke("canvas/toggle"), clear: invoke("canvas/clear"), reference: invoke("canvas/reference"), setDimensions: invoke("canvas/dimensions") };
   }
