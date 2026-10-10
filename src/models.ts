@@ -548,91 +548,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/instances/{instanceId}/runtime-capabilities": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get runtime capabilities */
-        get: operations["getRuntimeCapabilities"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/methods": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Invoke a runtime method */
-        post: operations["invokeRuntimeMethod"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/operations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List active runtime operations */
-        get: operations["listRuntimeOperations"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/operations/{operationId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a runtime operation */
-        get: operations["getRuntimeOperation"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/instances/{instanceId}/operations/{operationId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Cancel a runtime operation */
-        post: operations["cancelRuntimeOperation"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/instances/{instanceId}/terminal-sessions": {
         parameters: {
             query?: never;
@@ -1307,7 +1222,11 @@ export interface paths {
         /** List configured harnesses */
         get: operations["listHarnesses"];
         put?: never;
-        post?: never;
+        /**
+         * Create a harness
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.
+         */
+        post: operations["createHarness"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1323,9 +1242,17 @@ export interface paths {
         };
         /** Get one harness */
         get: operations["getHarness"];
-        put?: never;
+        /**
+         * Replace a harness
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.
+         */
+        put: operations["updateHarness"];
         post?: never;
-        delete?: never;
+        /**
+         * Delete a harness
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.
+         */
+        delete: operations["deleteHarness"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1962,6 +1889,11 @@ export interface components {
              *     a resolved credential to a client.
              */
             auth?: string;
+            /**
+             * Format: date-time
+             * @description BeeOS extension. Expiry of the supplied short-lived credential; the caller refreshes it with another PUT.
+             */
+            expires_at?: string;
         } & {
             [key: string]: JSONValue;
         };
@@ -2034,6 +1966,10 @@ export interface components {
              *     back unchanged, and reads the files from the skill files endpoint.
              */
             blob?: string;
+            /** @description BeeOS extension. SHA-256 of the Files bundle referenced by blob. */
+            sha256?: string;
+            /** @description BeeOS extension. Decimal byte size of the Files bundle referenced by blob. */
+            size_bytes?: string;
         } & {
             [key: string]: JSONValue;
         };
@@ -2758,52 +2694,6 @@ export interface components {
             agent_framework: string;
             template_version: string;
         };
-        CloudSkillOperationDetail: {
-            id: string;
-            instanceId: string;
-            target: components["schemas"]["CloudRuntimeOperationTarget"];
-            capability: string;
-            transport: string;
-            sequence: string;
-            cursor: string;
-            /** Format: date-time */
-            createdAt: string;
-            effectState: string;
-            operationId: string;
-            requestOperationId?: string;
-            replayDefaultKey?: boolean;
-            method: string;
-            status: string;
-            terminal: boolean;
-            contractRevision: string;
-            catalogIntent?: components["schemas"]["CloudSkillInstallIntent"] | null;
-            skillIntent?: JSONValue;
-            templateIntent?: components["schemas"]["CloudTemplateIntent"] | null;
-            /** Format: date-time */
-            updatedAt: string;
-            result?: JSONValue;
-            error?: JSONValue;
-            observationCode?: string;
-        };
-        CloudRuntimeOperationTarget: {
-            scope: string;
-            platformAgentId?: string;
-            conversationId?: string;
-        };
-        CloudSkillInstallIntent: {
-            platformAgentId: string;
-            slug: string;
-            version?: string;
-        };
-        CloudTemplateIntent: {
-            name: string;
-            templateId: string;
-            templateVersion?: string;
-        };
-        CloudSkillOperationPage: {
-            operations: components["schemas"]["CloudSkillOperationDetail"][];
-            nextCursor?: string;
-        };
         a2aTaskView: {
             id: string;
             contextId: string;
@@ -3071,36 +2961,6 @@ export interface components {
             }[];
         };
         A2AOutputPart: components["schemas"]["A2ATextPartOut"] | components["schemas"]["A2AFilePartOut"] | components["schemas"]["A2ADataPartOut"];
-        RuntimeMethodAvailability: {
-            enabled: boolean;
-            minimumRuntimeRpcProtocolVersion: number;
-            minimumRuntimeContractRevision?: string;
-        };
-        RuntimeCapabilitySupport: {
-            service: boolean;
-            minimumRuntimeRpcProtocolVersion?: number;
-        };
-        RuntimeCapabilityDocument: {
-            manifestId: string;
-            contractRevision: string;
-            runtimeRpcProtocolVersion: number;
-            runtimeEpoch: string;
-            serviceMethods: string[];
-            conversationMethods: string[];
-            methodAvailability: {
-                [key: string]: components["schemas"]["RuntimeMethodAvailability"];
-            };
-            conversationMethodAvailability: {
-                [key: string]: components["schemas"]["RuntimeMethodAvailability"];
-            };
-            capabilities: {
-                [key: string]: components["schemas"]["RuntimeCapabilitySupport"];
-            };
-            generatedAt: string;
-            expiresAt: string;
-            terminalTransport?: string;
-            canvasTransport?: string;
-        };
         RealtimeTicketHeader: {
             alg: string;
             typ: string;
@@ -3162,6 +3022,27 @@ export interface components {
         DeviceBindingErrorResponse: {
             error: string;
             message: string;
+        };
+        UHPHarnessCreate: {
+            name?: string;
+            base: string;
+            default_model?: string;
+            system_prompt?: string;
+            mcp_servers?: components["schemas"]["UHPMcpServer"][];
+            skills?: components["schemas"]["UHPSkill"][];
+            /** @description Requires the `plugins` capability. Each item needs `files` or `blob`. */
+            plugins?: components["schemas"]["UHPPlugin"][];
+            /** @description An environment id of the caller's scope, or empty. Requires the `environments` capability. */
+            environment?: string;
+            disabled_tools?: string[];
+            max_step?: number | null;
+            timeout_seconds?: number | null;
+            /** @description BeeOS extension. Instance that hosts a new harness (create only). */
+            instance_id?: string;
+            /** @description BeeOS extension. Agent template applied to the harness. */
+            template_id?: string;
+        } & {
+            [key: string]: JSONValue;
         };
         UHPCreateResponseJSONRequest: {
             /** @description A bare string is shorthand for one user message. */
@@ -4804,250 +4685,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ServerUsageSummary"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getRuntimeCapabilities: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Fenced runtime capability manifest */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["RuntimeCapabilityDocument"];
-                };
-            };
-            /** @description Cloud Server error */
-            401: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            404: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    invokeRuntimeMethod: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-                "X-BeeOS-Operation-Id"?: string;
-            };
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @enum {string} */
-                    jsonrpc: "2.0";
-                    id: string;
-                    method: string;
-                    params: JSONValue;
-                };
-            };
-        };
-        responses: {
-            /** @description JSON-RPC success */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["RuntimeMethodResponse"];
-                };
-            };
-            /** @description Operation accepted */
-            202: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["RuntimeMethodResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    listRuntimeOperations: {
-        parameters: {
-            query?: {
-                status?: "active";
-                cursor?: string;
-                limit?: number;
-                method?: string;
-            };
-            header?: never;
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Active owner-scoped operations */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["CloudSkillOperationPage"];
-                };
-            };
-            /** @description Cloud Server error */
-            400: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            401: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            404: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    getRuntimeOperation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                operationId: string;
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Reduced durable operation snapshot */
-            200: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["CloudSkillOperationDetail"];
-                };
-            };
-            /** @description Cloud Server error */
-            404: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Cloud Server error */
-            default: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    cancelRuntimeOperation: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-                "X-BeeOS-Operation-Id"?: string;
-            };
-            path: {
-                operationId: string;
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Cancellation requested */
-            202: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": {
-                        status: string;
-                        operationId: string;
-                    };
                 };
             };
             /** @description Cloud Server error */
@@ -7099,6 +6736,75 @@ export interface operations {
             };
         };
     };
+    createHarness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UHPHarnessCreate"];
+            };
+        };
+        responses: {
+            /** @description The harness */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPHarness"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            422: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            502: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            503: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            504: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
     getHarness: {
         parameters: {
             query?: never;
@@ -7120,6 +6826,149 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    updateHarness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                harness_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UHPHarnessCreate"];
+            };
+        };
+        responses: {
+            /** @description The harness */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPHarness"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            422: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            502: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            503: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            504: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+        };
+    };
+    deleteHarness: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                harness_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": {
+                        id: string;
+                        deleted: boolean;
+                    };
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description UHP protocol error envelope */
+            422: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            502: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            503: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            504: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
             /** @description UHP protocol error envelope */
             default: {
                 headers: {
@@ -7532,11 +7381,6 @@ export type bindRuntimeWire = components["schemas"]["bindRuntimeWire"];
 export type agentBindDetailsWire = components["schemas"]["agentBindDetailsWire"];
 export type portalBindWire = components["schemas"]["portalBindWire"];
 export type agentTemplateCatalogView = components["schemas"]["agentTemplateCatalogView"];
-export type CloudSkillOperationDetail = components["schemas"]["CloudSkillOperationDetail"];
-export type CloudRuntimeOperationTarget = components["schemas"]["CloudRuntimeOperationTarget"];
-export type CloudSkillInstallIntent = components["schemas"]["CloudSkillInstallIntent"];
-export type CloudTemplateIntent = components["schemas"]["CloudTemplateIntent"];
-export type CloudSkillOperationPage = components["schemas"]["CloudSkillOperationPage"];
 export type a2aTaskView = components["schemas"]["a2aTaskView"];
 export type CreateServerInstanceInput = components["schemas"]["CreateServerInstanceInput"];
 export type ServerUsageSummary = components["schemas"]["ServerUsageSummary"];
@@ -7561,15 +7405,13 @@ export type CanvasShare = components["schemas"]["CanvasShare"];
 export type CanvasSnapshot = components["schemas"]["CanvasSnapshot"];
 export type A2AAgentCard = components["schemas"]["A2AAgentCard"];
 export type A2AOutputPart = components["schemas"]["A2AOutputPart"];
-export type RuntimeMethodAvailability = components["schemas"]["RuntimeMethodAvailability"];
-export type RuntimeCapabilitySupport = components["schemas"]["RuntimeCapabilitySupport"];
-export type RuntimeCapabilityDocument = components["schemas"]["RuntimeCapabilityDocument"];
 export type RealtimeTicketHeader = components["schemas"]["RealtimeTicketHeader"];
 export type TerminalTicketClaims = components["schemas"]["TerminalTicketClaims"];
 export type CanvasTicketClaims = components["schemas"]["CanvasTicketClaims"];
 export type TerminalSessionDocument = components["schemas"]["TerminalSessionDocument"];
 export type CanvasSessionDocument = components["schemas"]["CanvasSessionDocument"];
 export type DeviceBindingErrorResponse = components["schemas"]["DeviceBindingErrorResponse"];
+export type UHPHarnessCreate = components["schemas"]["UHPHarnessCreate"];
 export type UHPCreateResponseJSONRequest = components["schemas"]["UHPCreateResponseJSONRequest"];
 export type UHPCreateResponseStreamRequest = components["schemas"]["UHPCreateResponseStreamRequest"];
 export type CreateClientSessionResponse = operations["createClientSession"]["responses"][200]["content"]["application/json"];
@@ -7640,13 +7482,6 @@ export type InvokeAgentResponse = operations["invokeAgent"]["responses"][200]["c
 export type InvokeAgentInput = NonNullable<operations["invokeAgent"]["requestBody"]>["content"]["application/json"];
 export type GetUsageSummaryResponse = operations["getUsageSummary"]["responses"][200]["content"]["application/json"];
 export type GetUsageSummaryQuery = NonNullable<operations["getUsageSummary"]["parameters"]["query"]>;
-export type GetRuntimeCapabilitiesResponse = operations["getRuntimeCapabilities"]["responses"][200]["content"]["application/json"];
-export type InvokeRuntimeMethodResponse = operations["invokeRuntimeMethod"]["responses"][200]["content"]["application/json"];
-export type InvokeRuntimeMethodInput = NonNullable<operations["invokeRuntimeMethod"]["requestBody"]>["content"]["application/json"];
-export type ListRuntimeOperationsResponse = operations["listRuntimeOperations"]["responses"][200]["content"]["application/json"];
-export type ListRuntimeOperationsQuery = NonNullable<operations["listRuntimeOperations"]["parameters"]["query"]>;
-export type GetRuntimeOperationResponse = operations["getRuntimeOperation"]["responses"][200]["content"]["application/json"];
-export type CancelRuntimeOperationResponse = operations["cancelRuntimeOperation"]["responses"][202]["content"]["application/json"];
 export type CreateTerminalSessionResponse = operations["createTerminalSession"]["responses"][201]["content"]["application/json"];
 export type CreateTerminalSessionInput = NonNullable<operations["createTerminalSession"]["requestBody"]>["content"]["application/json"];
 export type CreateCanvasSessionResponse = operations["createCanvasSession"]["responses"][201]["content"]["application/json"];
@@ -7724,7 +7559,12 @@ export type GetA2ATaskQuery = NonNullable<operations["getA2ATask"]["parameters"]
 export type CancelA2ATaskResponse = operations["cancelA2ATask"]["responses"][200]["content"]["application/json"];
 export type GetDiscoveryResponse = operations["getDiscovery"]["responses"][200]["content"]["application/json"];
 export type ListHarnessesResponse = operations["listHarnesses"]["responses"][200]["content"]["application/json"];
+export type CreateHarnessResponse = operations["createHarness"]["responses"][200]["content"]["application/json"];
+export type CreateHarnessInput = NonNullable<operations["createHarness"]["requestBody"]>["content"]["application/json"];
 export type GetHarnessResponse = operations["getHarness"]["responses"][200]["content"]["application/json"];
+export type UpdateHarnessResponse = operations["updateHarness"]["responses"][200]["content"]["application/json"];
+export type UpdateHarnessInput = NonNullable<operations["updateHarness"]["requestBody"]>["content"]["application/json"];
+export type DeleteHarnessResponse = operations["deleteHarness"]["responses"][200]["content"]["application/json"];
 export type ListModelsResponse = operations["listModels"]["responses"][200]["content"]["application/json"];
 export type ListHarnessModelsResponse = operations["listHarnessModels"]["responses"][200]["content"]["application/json"];
 export type CreateResponseResponse = operations["createResponse"]["responses"][200]["content"]["application/json"];

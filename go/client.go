@@ -601,6 +601,7 @@ type UHPMcpServer struct {
 	Enabled              *bool                  `json:"enabled,omitempty"`
 	Headers              map[string]string      `json:"headers,omitempty"`
 	Auth                 *string                `json:"auth,omitempty"`
+	ExpiresAt            *string                `json:"expires_at,omitempty"`
 	AdditionalProperties map[string]JSONValue   `json:"-"`
 }
 
@@ -643,6 +644,7 @@ func (v *UHPMcpServer) UnmarshalJSON(data []byte) error {
 	delete(fields, "enabled")
 	delete(fields, "headers")
 	delete(fields, "auth")
+	delete(fields, "expires_at")
 	decoded.AdditionalProperties = map[string]JSONValue{}
 	for key, raw := range fields {
 		var value JSONValue
@@ -728,6 +730,8 @@ type UHPSkill struct {
 	Files                []UHPSkillFile       `json:"files,omitempty"`
 	Content              *string              `json:"content,omitempty"`
 	Blob                 *string              `json:"blob,omitempty"`
+	Sha256               *string              `json:"sha256,omitempty"`
+	SizeBytes            *string              `json:"size_bytes,omitempty"`
 	AdditionalProperties map[string]JSONValue `json:"-"`
 }
 
@@ -769,6 +773,8 @@ func (v *UHPSkill) UnmarshalJSON(data []byte) error {
 	delete(fields, "files")
 	delete(fields, "content")
 	delete(fields, "blob")
+	delete(fields, "sha256")
+	delete(fields, "size_bytes")
 	decoded.AdditionalProperties = map[string]JSONValue{}
 	for key, raw := range fields {
 		var value JSONValue
@@ -2053,55 +2059,6 @@ type agentTemplateCatalogView struct {
 	TemplateVersion string   `json:"template_version"`
 }
 
-type CloudSkillOperationDetail struct {
-	ID                 string                      `json:"id"`
-	InstanceID         string                      `json:"instanceId"`
-	Target             CloudRuntimeOperationTarget `json:"target"`
-	Capability         string                      `json:"capability"`
-	Transport          string                      `json:"transport"`
-	Sequence           string                      `json:"sequence"`
-	Cursor             string                      `json:"cursor"`
-	CreatedAt          string                      `json:"createdAt"`
-	EffectState        string                      `json:"effectState"`
-	OperationID        string                      `json:"operationId"`
-	RequestOperationID *string                     `json:"requestOperationId,omitempty"`
-	ReplayDefaultKey   *bool                       `json:"replayDefaultKey,omitempty"`
-	Method             string                      `json:"method"`
-	Status             string                      `json:"status"`
-	Terminal           bool                        `json:"terminal"`
-	ContractRevision   string                      `json:"contractRevision"`
-	CatalogIntent      *CloudSkillInstallIntent    `json:"catalogIntent,omitempty"`
-	SkillIntent        *JSONValue                  `json:"skillIntent,omitempty"`
-	TemplateIntent     *CloudTemplateIntent        `json:"templateIntent,omitempty"`
-	UpdatedAt          string                      `json:"updatedAt"`
-	Result             *JSONValue                  `json:"result,omitempty"`
-	Error              *JSONValue                  `json:"error,omitempty"`
-	ObservationCode    *string                     `json:"observationCode,omitempty"`
-}
-
-type CloudRuntimeOperationTarget struct {
-	Scope           string  `json:"scope"`
-	PlatformAgentID *string `json:"platformAgentId,omitempty"`
-	ConversationID  *string `json:"conversationId,omitempty"`
-}
-
-type CloudSkillInstallIntent struct {
-	PlatformAgentID string  `json:"platformAgentId"`
-	Slug            string  `json:"slug"`
-	Version         *string `json:"version,omitempty"`
-}
-
-type CloudTemplateIntent struct {
-	Name            string  `json:"name"`
-	TemplateID      string  `json:"templateId"`
-	TemplateVersion *string `json:"templateVersion,omitempty"`
-}
-
-type CloudSkillOperationPage struct {
-	Operations []CloudSkillOperationDetail `json:"operations"`
-	NextCursor *string                     `json:"nextCursor,omitempty"`
-}
-
 type a2aTaskView struct {
 	ID                string               `json:"id"`
 	ContextID         string               `json:"contextId"`
@@ -2369,33 +2326,6 @@ func (v *A2AOutputPart) UnmarshalJSON(data []byte) error {
 	}
 }
 
-type RuntimeMethodAvailability struct {
-	Enabled                          bool    `json:"enabled"`
-	MinimumRuntimeRpcProtocolVersion int64   `json:"minimumRuntimeRpcProtocolVersion"`
-	MinimumRuntimeContractRevision   *string `json:"minimumRuntimeContractRevision,omitempty"`
-}
-
-type RuntimeCapabilitySupport struct {
-	Service                          bool   `json:"service"`
-	MinimumRuntimeRpcProtocolVersion *int64 `json:"minimumRuntimeRpcProtocolVersion,omitempty"`
-}
-
-type RuntimeCapabilityDocument struct {
-	ManifestID                     string                               `json:"manifestId"`
-	ContractRevision               string                               `json:"contractRevision"`
-	RuntimeRpcProtocolVersion      int64                                `json:"runtimeRpcProtocolVersion"`
-	RuntimeEpoch                   string                               `json:"runtimeEpoch"`
-	ServiceMethods                 []string                             `json:"serviceMethods"`
-	ConversationMethods            []string                             `json:"conversationMethods"`
-	MethodAvailability             map[string]RuntimeMethodAvailability `json:"methodAvailability"`
-	ConversationMethodAvailability map[string]RuntimeMethodAvailability `json:"conversationMethodAvailability"`
-	Capabilities                   map[string]RuntimeCapabilitySupport  `json:"capabilities"`
-	GeneratedAt                    string                               `json:"generatedAt"`
-	ExpiresAt                      string                               `json:"expiresAt"`
-	TerminalTransport              *string                              `json:"terminalTransport,omitempty"`
-	CanvasTransport                *string                              `json:"canvasTransport,omitempty"`
-}
-
 type RealtimeTicketHeader struct {
 	Alg string `json:"alg"`
 	Typ string `json:"typ"`
@@ -2458,6 +2388,81 @@ type CanvasSessionDocument struct {
 type DeviceBindingErrorResponse struct {
 	Error   string `json:"error"`
 	Message string `json:"message"`
+}
+
+type UHPHarnessCreate struct {
+	Name                 *string              `json:"name,omitempty"`
+	Base                 string               `json:"base"`
+	DefaultModel         *string              `json:"default_model,omitempty"`
+	SystemPrompt         *string              `json:"system_prompt,omitempty"`
+	McpServers           []UHPMcpServer       `json:"mcp_servers,omitempty"`
+	Skills               []UHPSkill           `json:"skills,omitempty"`
+	Plugins              []UHPPlugin          `json:"plugins,omitempty"`
+	Environment          *string              `json:"environment,omitempty"`
+	DisabledTools        []string             `json:"disabled_tools,omitempty"`
+	MaxStep              *int64               `json:"max_step,omitempty"`
+	TimeoutSeconds       *int64               `json:"timeout_seconds,omitempty"`
+	InstanceID           *string              `json:"instance_id,omitempty"`
+	TemplateID           *string              `json:"template_id,omitempty"`
+	AdditionalProperties map[string]JSONValue `json:"-"`
+}
+
+func (v UHPHarnessCreate) MarshalJSON() ([]byte, error) {
+	type plain UHPHarnessCreate
+	encoded, err := json.Marshal(plain(v))
+	if err != nil {
+		return nil, err
+	}
+	values := map[string]json.RawMessage{}
+	for key, value := range v.AdditionalProperties {
+		raw, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		values[key] = raw
+	}
+	var known map[string]json.RawMessage
+	if err := json.Unmarshal(encoded, &known); err != nil {
+		return nil, err
+	}
+	for key, value := range known {
+		values[key] = value
+	}
+	return json.Marshal(values)
+}
+func (v *UHPHarnessCreate) UnmarshalJSON(data []byte) error {
+	type plain UHPHarnessCreate
+	var decoded plain
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		return err
+	}
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	delete(fields, "name")
+	delete(fields, "base")
+	delete(fields, "default_model")
+	delete(fields, "system_prompt")
+	delete(fields, "mcp_servers")
+	delete(fields, "skills")
+	delete(fields, "plugins")
+	delete(fields, "environment")
+	delete(fields, "disabled_tools")
+	delete(fields, "max_step")
+	delete(fields, "timeout_seconds")
+	delete(fields, "instance_id")
+	delete(fields, "template_id")
+	decoded.AdditionalProperties = map[string]JSONValue{}
+	for key, raw := range fields {
+		var value JSONValue
+		if err := json.Unmarshal(raw, &value); err != nil {
+			return err
+		}
+		decoded.AdditionalProperties[key] = value
+	}
+	*v = UHPHarnessCreate(decoded)
+	return nil
 }
 
 type UHPCreateResponseJSONRequest struct {
@@ -2716,35 +2721,6 @@ type GetUsageSummaryOptions struct {
 	Period         *GetUsageSummaryOptionsPeriod `json:"period,omitempty"`
 	ExternalUserID *string                       `json:"external_user_id,omitempty"`
 	Category       *string                       `json:"category,omitempty"`
-}
-
-type InvokeRuntimeMethodRequest struct {
-	JSONrpc InvokeRuntimeMethodRequestJSONrpc `json:"jsonrpc"`
-	ID      string                            `json:"id"`
-	Method  string                            `json:"method"`
-	Params  JSONValue                         `json:"params"`
-}
-
-type InvokeRuntimeMethodOptions struct {
-	IdempotencyKey    string  `json:"Idempotency-Key"`
-	XBeeOSOperationID *string `json:"X-BeeOS-Operation-Id,omitempty"`
-}
-
-type ListRuntimeOperationsOptions struct {
-	Status *ListRuntimeOperationsOptionsStatus `json:"status,omitempty"`
-	Cursor *string                             `json:"cursor,omitempty"`
-	Limit  *int64                              `json:"limit,omitempty"`
-	Method *string                             `json:"method,omitempty"`
-}
-
-type CancelRuntimeOperationResponse struct {
-	Status      string `json:"status"`
-	OperationID string `json:"operationId"`
-}
-
-type CancelRuntimeOperationOptions struct {
-	IdempotencyKey    string  `json:"Idempotency-Key"`
-	XBeeOSOperationID *string `json:"X-BeeOS-Operation-Id,omitempty"`
 }
 
 type CreateTerminalSessionRequest struct {
@@ -3050,6 +3026,11 @@ type GetA2ATaskOptions struct {
 
 type ListHarnessesResponse struct {
 	Harnesses []UHPHarness `json:"harnesses"`
+}
+
+type DeleteHarnessResponse struct {
+	ID      string `json:"id"`
+	Deleted bool   `json:"deleted"`
 }
 
 type CreateResponseOptions struct {
@@ -3696,18 +3677,6 @@ const (
 	GetUsageSummaryOptionsPeriodMonth GetUsageSummaryOptionsPeriod = "month"
 )
 
-type InvokeRuntimeMethodRequestJSONrpc string
-
-const (
-	InvokeRuntimeMethodRequestJSONrpc20 InvokeRuntimeMethodRequestJSONrpc = "2.0"
-)
-
-type ListRuntimeOperationsOptionsStatus string
-
-const (
-	ListRuntimeOperationsOptionsStatusActive ListRuntimeOperationsOptionsStatus = "active"
-)
-
 type CreateShareReplyResponseData struct {
 	Slug      string `json:"slug"`
 	CreatedAt string `json:"created_at"`
@@ -3846,32 +3815,8 @@ func decodeErrorBody[T APIErrorBody](schema string, payload []byte) (APIErrorBod
 }
 func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody, error) {
 	switch operation {
-	case "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "invokeRuntimeMethod", "cancelRuntimeOperation", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
+	case "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
 
-		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-	case "getRuntimeCapabilities":
-		if status == 401 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		if status == 404 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-	case "listRuntimeOperations":
-		if status == 400 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		if status == 401 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		if status == 404 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
-		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-	case "getRuntimeOperation":
-		if status == 404 {
-			return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
-		}
 		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "createTerminalSession", "createCanvasSession":
 		if status == 400 {
@@ -3898,8 +3843,39 @@ func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody,
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "createHarness":
+		if status == 422 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 502 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 503 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 504 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 	case "getHarness", "listHarnessModels", "getResponse", "deleteResponse", "getResponseInputItems", "cancelResponse":
 		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "updateHarness", "deleteHarness":
+		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 422 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 502 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 503 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 504 {
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
@@ -3950,8 +3926,6 @@ type BeeOSClient struct {
 	Messages       *MessagesResource
 	Tasks          *TasksResource
 	Usage          *UsageResource
-	Methods        *MethodsResource
-	Operations     *OperationsResource
 	Files          *FilesResource
 	Automations    *AutomationsResource
 	Audio          *AudioResource
@@ -3979,8 +3953,6 @@ func (c *BeeOSClient) initResources() {
 	c.Messages = &MessagesResource{client: c}
 	c.Tasks = &TasksResource{client: c}
 	c.Usage = &UsageResource{client: c}
-	c.Methods = &MethodsResource{client: c}
-	c.Operations = &OperationsResource{client: c}
 	c.Files = &FilesResource{client: c}
 	c.Automations = &AutomationsResource{client: c}
 	c.Audio = &AudioResource{client: c}
@@ -5126,105 +5098,6 @@ func (r *UsageResource) GetSummary(ctx context.Context, options GetUsageSummaryO
 	return output, err
 }
 
-type MethodsResource struct{ client *BeeOSClient }
-
-func (r *MethodsResource) GetCapabilities(ctx context.Context, instanceId string) (RuntimeCapabilityDocument, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/runtime-capabilities"
-	query := url.Values{}
-	headers := http.Header{}
-	var output RuntimeCapabilityDocument
-	var body []byte
-	payload, err := r.client.request(ctx, "getRuntimeCapabilities", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *MethodsResource) Invoke(ctx context.Context, instanceId string, input InvokeRuntimeMethodRequest, options InvokeRuntimeMethodOptions) (RuntimeMethodResponse, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/methods"
-	query := url.Values{}
-	headers := http.Header{}
-	var output RuntimeMethodResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	if options.XBeeOSOperationID != nil {
-		headers.Set("X-BeeOS-Operation-Id", fmt.Sprint(*options.XBeeOSOperationID))
-	}
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "invokeRuntimeMethod", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type OperationsResource struct{ client *BeeOSClient }
-
-func (r *OperationsResource) List(ctx context.Context, instanceId string, options ListRuntimeOperationsOptions) (CloudSkillOperationPage, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/operations"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CloudSkillOperationPage
-	if options.Status != nil {
-		query.Set("status", fmt.Sprint(*options.Status))
-	}
-	if options.Cursor != nil {
-		query.Set("cursor", fmt.Sprint(*options.Cursor))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	if options.Method != nil {
-		query.Set("method", fmt.Sprint(*options.Method))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "listRuntimeOperations", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *OperationsResource) Get(ctx context.Context, operationId string, instanceId string) (CloudSkillOperationDetail, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/operations/" + url.PathEscape(fmt.Sprint(operationId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output CloudSkillOperationDetail
-	var body []byte
-	payload, err := r.client.request(ctx, "getRuntimeOperation", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *OperationsResource) Cancel(ctx context.Context, operationId string, instanceId string, options CancelRuntimeOperationOptions) (CancelRuntimeOperationResponse, error) {
-	path := "/instances/" + url.PathEscape(fmt.Sprint(instanceId)) + "/operations/" + url.PathEscape(fmt.Sprint(operationId)) + "/cancel"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CancelRuntimeOperationResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	if options.XBeeOSOperationID != nil {
-		headers.Set("X-BeeOS-Operation-Id", fmt.Sprint(*options.XBeeOSOperationID))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "cancelRuntimeOperation", "POST", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 type FilesResource struct{ client *BeeOSClient }
 
 func (r *FilesResource) PrepareUpload(ctx context.Context, input FilePrepareUploadInput, options PresignFileUploadOptions) (FileTransferDescriptor, error) {
@@ -5961,6 +5834,25 @@ func (r *HarnessesResource) List(ctx context.Context) (ListHarnessesResponse, er
 	return output, err
 }
 
+func (r *HarnessesResource) Create(ctx context.Context, input UHPHarnessCreate) (UHPHarness, error) {
+	path := "/harnesses"
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPHarness
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "createHarness", "POST", path, "/uhp/v1", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
 func (r *HarnessesResource) Get(ctx context.Context, harnessid string) (UHPHarness, error) {
 	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
 	query := url.Values{}
@@ -5968,6 +5860,39 @@ func (r *HarnessesResource) Get(ctx context.Context, harnessid string) (UHPHarne
 	var output UHPHarness
 	var body []byte
 	payload, err := r.client.request(ctx, "getHarness", "GET", path, "/uhp/v1", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *HarnessesResource) Update(ctx context.Context, harnessid string, input UHPHarnessCreate) (UHPHarness, error) {
+	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output UHPHarness
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "updateHarness", "PUT", path, "/uhp/v1", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *HarnessesResource) Delete(ctx context.Context, harnessid string) (DeleteHarnessResponse, error) {
+	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output DeleteHarnessResponse
+	var body []byte
+	payload, err := r.client.request(ctx, "deleteHarness", "DELETE", path, "/uhp/v1", query, headers, body, "")
 	if err != nil {
 		return output, err
 	}

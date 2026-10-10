@@ -77,7 +77,7 @@ describe("BeeOSClient", () => {
     expect(JSON.stringify(calls.map((call) => call.body))).not.toContain("bsk_");
   });
 
-  it("uses FILE-API-001 presign-upload and METHOD-API-002 JSON-RPC", async () => {
+  it("uses FILE-API-001 presign-upload and UHP harness management", async () => {
     const calls: Array<{ url: string; method: string | undefined; body: string | undefined }> = [];
     const client = new BeeOSClient({
       baseURL: "https://api.cloud.beeos.ai/v1/",
@@ -92,20 +92,22 @@ describe("BeeOSClient", () => {
     await client.files.prepareUpload({ filename: "a.txt", content_type: "text/plain", size_bytes: 1 }, "idem-1");
     await client.files.resolveDownload("file_1");
     await client.instances.getStatus("inst_1");
-    await client.methods.invoke("inst_1", "models/list", {}, "idem-2");
-    await client.instances.open("inst_1").agents.create({ name: "a" }, "idem-3");
-    await client.methods.canvas.setDimensions("inst_1", { width: 1, height: 1 }, "idem-4");
+    await client.harnesses.create({ base: "openclaw", name: "a", instance_id: "inst_1" });
+    await client.harnesses.update("chrn_1", { base: "openclaw", skills: [{ name: "weather", blob: "file_1", sha256: "a".repeat(64), size_bytes: "12" }], template_id: "tpl_1" });
+    await client.harnesses.delete("chrn_1");
+    await client.harnesses.listModels("chrn_1");
     expect(calls[0].url).toContain("/deploy/regions");
     expect(calls[1].url).toContain("/deploy/models");
     expect(calls[2].url).toContain("/files/presign-upload");
     expect(calls[3].method).toBe("GET");
     expect(calls[3].url).toMatch(/\/files\/file_1$/);
     expect(calls[4].url).toContain("/instances/inst_1/status");
-    expect(calls[5].url).toMatch(/\/instances\/inst_1\/methods$/);
-    expect(JSON.parse(calls[5].body ?? "{}")).toMatchObject({ jsonrpc: "2.0", id: "idem-2", method: "models/list" });
-    expect(calls[6].url).toMatch(/\/instances\/inst_1\/methods$/);
-    expect(JSON.parse(calls[6].body ?? "{}")).toMatchObject({ jsonrpc: "2.0", id: "idem-3", method: "agent/create" });
-    expect(JSON.parse(calls[7].body ?? "{}")).toMatchObject({ method: "canvas/dimensions", id: "idem-4" });
+    expect(calls[5]).toMatchObject({ method: "POST", url: "https://api.cloud.beeos.ai/uhp/v1/harnesses" });
+    expect(JSON.parse(calls[5].body ?? "{}")).toMatchObject({ base: "openclaw", instance_id: "inst_1" });
+    expect(calls[6]).toMatchObject({ method: "PUT", url: "https://api.cloud.beeos.ai/uhp/v1/harnesses/chrn_1" });
+    expect(JSON.parse(calls[6].body ?? "{}")).toMatchObject({ template_id: "tpl_1", skills: [{ name: "weather", blob: "file_1" }] });
+    expect(calls[7]).toMatchObject({ method: "DELETE", url: "https://api.cloud.beeos.ai/uhp/v1/harnesses/chrn_1" });
+    expect(calls[8].url).toBe("https://api.cloud.beeos.ai/uhp/v1/harnesses/chrn_1/models");
   });
 
   it("verifies task webhook HMAC", () => {
@@ -242,5 +244,6 @@ it('removes the inactive server resources and methods in v2', () => {
   for (const resource of ['images', 'imageVersions', 'eventSessions', 'taskWebhooks', 'runtime']) expect(resource in client).toBe(false);
   for (const method of ['getHistory', 'getLimits']) expect(method in client.usage).toBe(false);
   expect('send' in client.messages).toBe(false);
-  expect('getEvents' in client.operations).toBe(false);
+  expect('methods' in client).toBe(false);
+  expect('operations' in client).toBe(false);
 });

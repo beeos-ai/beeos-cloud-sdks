@@ -3,7 +3,7 @@
 The TypeScript package `@beeos-ai/cloud-sdk`, Python distribution
 `beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v3` share
 one contract: [`spec/server.openapi.json`](spec/server.openapi.json). Version
-3.0.0 generates typed request, response, query, and error models for the 110
+3.0.0 generates typed request, response, query, and error models for the 108
 registered Server operations. Inactive API methods and their models are removed.
 
 ```ts
@@ -37,6 +37,42 @@ Malformed or unrecognized error bodies use `invalid_response` and retain raw
 diagnostics; transport failures without an HTTP response remain transport errors.
 Python uses a 30-second default timeout, configurable with `timeout=...` and
 preserved by `with_external_user`.
+
+### Harness management (UHP)
+
+Instance agents are managed only through UHP harnesses (`client.harnesses`,
+`/uhp/v1/harnesses`): `create` (BeeOS extension `instance_id` selects the
+hosting instance), `update` (PUT with a full `HarnessCreate` body), `delete`,
+`get`, `list`, and `listModels`. Skills go in `skills[]` as `files[]` or as
+`blob` (a Cloud Files `file_...` id, with BeeOS extensions `sha256` and
+`size_bytes`); MCP servers go in `mcp_servers[]` with short-lived `headers` or
+`auth` plus `expires_at`. Cloud never stores or refreshes MCP credentials: send
+another PUT with fresh credentials before `expires_at`. `template_id` applies an
+agent template; `default_model` sets the harness model, and a single turn can
+override it with the Responses `model` field.
+
+Harness writes are synchronous. Cloud submits the runtime operations and waits
+up to 45 seconds before answering, so use an HTTP timeout of at least 60
+seconds for these calls (the Python default of 30 seconds is too short). Results:
+
+- `200`: every change is applied; the body is the resulting harness.
+- `422`: validation failed and nothing was submitted; fix the request.
+- `502` `harness_error`: some items failed; `error.detail.operations[]` lists
+  each item's `kind`, `name` and `status`. Succeeded items are applied; resend
+  the corrected request to retry the rest.
+- `504` `beeos_harness_update_in_progress`: the work is still running. Wait for
+  `Retry-After` and resend the identical request; Cloud re-attaches to the
+  in-flight operations instead of starting new ones.
+
+Concurrent writers are not locked; the last write wins. There is no ETag or
+`If-Match` support and no skill files endpoint.
+
+### Removed runtime methods
+
+3.0.0 removes the runtime methods module (`/instances/{instanceId}/methods`
+and its skills, models, MCP, cron, agent, session and canvas facades), the
+runtime operations module and runtime capabilities. Cron has no replacement;
+conversation turns use `client.responses`.
 
 ### Removed catalog modules
 

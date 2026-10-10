@@ -65,13 +65,14 @@ class ClientTests(unittest.TestCase):
             client.identity.create_client_session({"client_type": "web", "requested_capabilities": []}, {"Idempotency-Key": "operation-1"})
             self.assertEqual(send.call_args.args[0].get_header("X-beeos-external-user-id"), "user-1")
 
-    def test_rpc_string_id_and_required_idempotency(self):
+    def test_harness_update_sends_uhp_body_with_extensions(self):
         client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime")
-        with patch("beeos_cloud_sdk.urlopen", return_value=io.BytesIO(b'{"jsonrpc":"2.0","id":"rpc-1","result":{}}')) as send:
-            client.methods.invoke("instance-1", {"jsonrpc": "2.0", "id": "rpc-1", "method": "agent.invoke", "params": {}}, {"Idempotency-Key": "operation-1"})
+        with patch("beeos_cloud_sdk.urlopen", return_value=io.BytesIO(b'{"id":"chrn_1","name":"a","base":"openclaw"}')) as send:
+            client.harnesses.update("chrn_1", {"base": "openclaw", "template_id": "tpl_1"})
             request = send.call_args.args[0]
-            self.assertEqual(json.loads(request.data)["id"], "rpc-1")
-            self.assertEqual(request.get_header("Idempotency-key"), "operation-1")
+            self.assertEqual(request.get_method(), "PUT")
+            self.assertTrue(request.full_url.endswith("/uhp/v1/harnesses/chrn_1"))
+            self.assertEqual(json.loads(request.data)["template_id"], "tpl_1")
 
     def test_optional_task_cancel_body_can_be_omitted(self):
         client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime").with_external_user("user-1")
