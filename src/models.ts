@@ -1224,7 +1224,7 @@ export interface paths {
         put?: never;
         /**
          * Create a harness
-         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. instance_id and name are required; default_model is honored only here. skills are rejected on create (422 beeos_field_not_supported); add them with PUT. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).
          */
         post: operations["createHarness"];
         delete?: never;
@@ -1244,13 +1244,13 @@ export interface paths {
         get: operations["getHarness"];
         /**
          * Replace a harness
-         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. An absent field is unchanged. When skills is present it is diffed against the installed skills: listed skills with files, content or blob are installed; omitted catalog-origin skills are uninstalled; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).
          */
         put: operations["updateHarness"];
         post?: never;
         /**
          * Delete a harness
-         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.
+         * @description Not supported by BeeOS Cloud yet: returns 422 beeos_harness_delete_not_supported once the harness is found.
          */
         delete: operations["deleteHarness"];
         options?: never;
@@ -3026,8 +3026,10 @@ export interface components {
         UHPHarnessCreate: {
             name?: string;
             base: string;
+            /** @description BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent. */
             default_model?: string;
             system_prompt?: string;
+            /** @description Not accepted by BeeOS Cloud yet: a non-empty list returns 422 beeos_mcp_not_supported. */
             mcp_servers?: components["schemas"]["UHPMcpServer"][];
             skills?: components["schemas"]["UHPSkill"][];
             /** @description Requires the `plugins` capability. Each item needs `files` or `blob`. */
@@ -6759,6 +6761,15 @@ export interface operations {
                 };
             };
             /** @description UHP protocol error envelope */
+            409: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
             422: {
                 headers: {
                     [name: string]: JSONValue | undefined;
@@ -6863,6 +6874,15 @@ export interface operations {
             };
             404: components["responses"]["NotFound"];
             /** @description UHP protocol error envelope */
+            409: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
             422: {
                 headers: {
                     [name: string]: JSONValue | undefined;
@@ -6935,33 +6955,6 @@ export interface operations {
             404: components["responses"]["NotFound"];
             /** @description UHP protocol error envelope */
             422: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPErrorEnvelope"];
-                };
-            };
-            /** @description UHP protocol error envelope */
-            502: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPErrorEnvelope"];
-                };
-            };
-            /** @description UHP protocol error envelope */
-            503: {
-                headers: {
-                    [name: string]: JSONValue | undefined;
-                };
-                content: {
-                    "application/json": components["schemas"]["UHPErrorEnvelope"];
-                };
-            };
-            /** @description UHP protocol error envelope */
-            504: {
                 headers: {
                     [name: string]: JSONValue | undefined;
                 };

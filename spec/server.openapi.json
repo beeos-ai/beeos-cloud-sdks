@@ -6407,7 +6407,7 @@
         ],
         "operationId": "createHarness",
         "summary": "Create a harness",
-        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.",
+        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. instance_id and name are required; default_model is honored only here. skills are rejected on create (422 beeos_field_not_supported); add them with PUT. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).",
         "requestBody": {
           "required": true,
           "content": {
@@ -6425,6 +6425,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UHPHarness"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
                 }
               }
             }
@@ -6552,7 +6562,7 @@
         ],
         "operationId": "updateHarness",
         "summary": "Replace a harness",
-        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.",
+        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. An absent field is unchanged. When skills is present it is diffed against the installed skills: listed skills with files, content or blob are installed; omitted catalog-origin skills are uninstalled; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).",
         "requestBody": {
           "required": true,
           "content": {
@@ -6576,6 +6586,16 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
           },
           "422": {
             "description": "UHP protocol error envelope",
@@ -6655,7 +6675,7 @@
         ],
         "operationId": "deleteHarness",
         "summary": "Delete a harness",
-        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After.",
+        "description": "Not supported by BeeOS Cloud yet: returns 422 beeos_harness_delete_not_supported once the harness is found.",
         "responses": {
           "200": {
             "description": "Deleted",
@@ -6684,36 +6704,6 @@
             "$ref": "#/components/responses/NotFound"
           },
           "422": {
-            "description": "UHP protocol error envelope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPErrorEnvelope"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "UHP protocol error envelope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPErrorEnvelope"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "UHP protocol error envelope",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UHPErrorEnvelope"
-                }
-              }
-            }
-          },
-          "504": {
             "description": "UHP protocol error envelope",
             "content": {
               "application/json": {
@@ -7039,7 +7029,7 @@
         ],
         "operationId": "deleteResponse",
         "summary": "Delete a stored response",
-        "description": "Must not cancel a running task \u2014 deletion and cancellation are different intentions.",
+        "description": "Must not cancel a running task — deletion and cancellation are different intentions.",
         "responses": {
           "200": {
             "description": "Deleted",
@@ -7173,7 +7163,7 @@
         ],
         "operationId": "cancelResponse",
         "summary": "Cancel a running task",
-        "description": "Idempotent. Cancelling an already-terminal task succeeds and changes nothing \u2014 a client\nretrying a cancel after a dropped connection must not be punished for having succeeded.\n",
+        "description": "Idempotent. Cancelling an already-terminal task succeeds and changes nothing — a client\nretrying a cancel after a dropped connection must not be punished for having succeeded.\n",
         "responses": {
           "200": {
             "description": "The Response, now cancelling or terminal",
@@ -8789,7 +8779,7 @@
           },
           "base": {
             "type": "string",
-            "description": "Opaque. Not enumerated by this specification \u2014 a client must treat it as a string, or the\nprotocol would need revising every time a harness is released.\n",
+            "description": "Opaque. Not enumerated by this specification — a client must treat it as a string, or the\nprotocol would need revising every time a harness is released.\n",
             "examples": [
               "codex",
               "claude-code",
@@ -8997,7 +8987,7 @@
         "required": [
           "name"
         ],
-        "description": "A skill is a FOLDER, not a file. A server must materialise the whole folder where the agent\ncan read it \u2014 materialising only SKILL.md breaks every skill carrying references, scripts or\ndata. Round-tripping a harness through GET and PUT must not lose skill contents.\n",
+        "description": "A skill is a FOLDER, not a file. A server must materialise the whole folder where the agent\ncan read it — materialising only SKILL.md breaks every skill carrying references, scripts or\ndata. Round-tripping a harness through GET and PUT must not lose skill contents.\n",
         "properties": {
           "name": {
             "type": "string"
@@ -9180,7 +9170,7 @@
           },
           "extensions": {
             "type": "object",
-            "description": "Client-specific data keyed by reverse-domain namespace, per Agent Plugins \u00a78.",
+            "description": "Client-specific data keyed by reverse-domain namespace, per Agent Plugins §8.",
             "additionalProperties": {
               "type": "object",
               "additionalProperties": {
@@ -9405,14 +9395,14 @@
                 "$ref": "#/components/schemas/JSONValue"
               }
             },
-            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. A UHP harness invokes and executes tools\nitself and reports them in `output`; there is no input path for a tool result, so the\nclient-executed tool loop this field implies cannot be completed by a conformant server.\nConfigure tools on the harness instead \u2014 see Harnesses \u00a74.1. Tasks \u00a71.4.\n"
+            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. A UHP harness invokes and executes tools\nitself and reports them in `output`; there is no input path for a tool result, so the\nclient-executed tool loop this field implies cannot be completed by a conformant server.\nConfigure tools on the harness instead — see Harnesses §4.1. Tasks §1.4.\n"
           },
           "include": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. No values are enumerated, so any string a\nserver recognised would be one it named itself. Tasks \u00a71.4.\n"
+            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. No values are enumerated, so any string a\nserver recognised would be one it named itself. Tasks §1.4.\n"
           },
           "background": {
             "type": "boolean",
@@ -9527,7 +9517,7 @@
                 "items": {
                   "type": "string"
                 },
-                "description": "Request fields the server did not act on, by name, in any order. Required when the\nrequest carried `tools` or `include`, which are reserved and ignored. A silently\nignored field is indistinguishable from an honoured one. Tasks \u00a71.1 and \u00a71.4.\n"
+                "description": "Request fields the server did not act on, by name, in any order. Required when the\nrequest carried `tools` or `include`, which are reserved and ignored. A silently\nignored field is indistinguishable from an honoured one. Tasks §1.1 and §1.4.\n"
               }
             },
             "additionalProperties": {
@@ -12319,7 +12309,8 @@
             "type": "string"
           },
           "default_model": {
-            "type": "string"
+            "type": "string",
+            "description": "BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent."
           },
           "system_prompt": {
             "type": "string"
@@ -12328,7 +12319,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UHPMcpServer"
-            }
+            },
+            "description": "Not accepted by BeeOS Cloud yet: a non-empty list returns 422 beeos_mcp_not_supported."
           },
           "skills": {
             "type": "array",

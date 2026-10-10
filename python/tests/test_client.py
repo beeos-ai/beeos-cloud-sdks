@@ -73,6 +73,7 @@ class ClientTests(unittest.TestCase):
             self.assertEqual(request.get_method(), "PUT")
             self.assertTrue(request.full_url.endswith("/uhp/v1/harnesses/chrn_1"))
             self.assertEqual(json.loads(request.data)["template_id"], "tpl_1")
+            self.assertEqual(send.call_args.kwargs["timeout"], 60.0)
 
     def test_optional_task_cancel_body_can_be_omitted(self):
         client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime").with_external_user("user-1")

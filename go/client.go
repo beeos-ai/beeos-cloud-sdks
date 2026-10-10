@@ -3844,6 +3844,9 @@ func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody,
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 	case "createHarness":
+		if status == 409 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
 		if status == 422 {
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
@@ -3862,8 +3865,11 @@ func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody,
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
-	case "updateHarness", "deleteHarness":
+	case "updateHarness":
 		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 409 {
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		if status == 422 {
@@ -3876,6 +3882,14 @@ func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody,
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		if status == 504 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+	case "deleteHarness":
+		if status == 404 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 422 {
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)

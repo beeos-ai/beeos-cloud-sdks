@@ -41,31 +41,49 @@ preserved by `with_external_user`.
 ### Harness management (UHP)
 
 Instance agents are managed only through UHP harnesses (`client.harnesses`,
-`/uhp/v1/harnesses`): `create` (BeeOS extension `instance_id` selects the
-hosting instance), `update` (PUT with a full `HarnessCreate` body), `delete`,
-`get`, `list`, and `listModels`. Skills go in `skills[]` as `files[]` or as
-`blob` (a Cloud Files `file_...` id, with BeeOS extensions `sha256` and
-`size_bytes`); MCP servers go in `mcp_servers[]` with short-lived `headers` or
-`auth` plus `expires_at`. Cloud never stores or refreshes MCP credentials: send
-another PUT with fresh credentials before `expires_at`. `template_id` applies an
-agent template; `default_model` sets the harness model, and a single turn can
-override it with the Responses `model` field.
+`/uhp/v1/harnesses`). The discovery capability `harness_management` is still
+`false`; these calls work as described below regardless.
+
+- `create`: BeeOS extension `instance_id` and `name` are required.
+  `default_model` is honored only here. Skills are rejected on create (422);
+  add them with `update`.
+- `update` (PUT): an absent field is unchanged. When `skills` is present it is
+  diffed against the installed skills: listed skills with `files[]`, `content`
+  or `blob` (a Cloud Files `file_...` id with BeeOS extensions `sha256` and
+  `size_bytes`) are installed; omitted catalog-origin skills are uninstalled; a
+  listed skill that is not installed and has no files, content or blob returns
+  422; `enabled: false` on a fresh install returns 422. `template_id` applies an
+  agent template. `base` is immutable.
+- `get`, `list`, and `listModels` read the current state. A single turn can
+  pick its model with the Responses `model` field.
+
+Not supported by BeeOS Cloud yet (422):
+
+| Request | Code |
+|---|---|
+| `delete` | `beeos_harness_delete_not_supported` |
+| non-empty `mcp_servers` | `beeos_mcp_not_supported` |
+| `default_model` different from the current one on `update` (without `template_id`) | `beeos_field_not_supported` |
+| name change, `system_prompt`, `disabled_tools`, `environment`, `max_step`, `timeout_seconds`, `plugins` | `beeos_field_not_supported` |
 
 Harness writes are synchronous. Cloud submits the runtime operations and waits
 up to 45 seconds before answering, so use an HTTP timeout of at least 60
-seconds for these calls (the Python default of 30 seconds is too short). Results:
+seconds (the Python client uses at least 60 seconds for harness writes).
 
 - `200`: every change is applied; the body is the resulting harness.
-- `422`: validation failed and nothing was submitted; fix the request.
+- `422`: validation failed or the request is unsupported; nothing was submitted.
+- `409` `beeos_harness_busy`: a different write to this harness is in flight;
+  retry after `Retry-After`.
 - `502` `harness_error`: some items failed; `error.detail.operations[]` lists
   each item's `kind`, `name` and `status`. Succeeded items are applied; resend
   the corrected request to retry the rest.
+- `503` `harness_unavailable`: the instance is not running or the operation
+  journal is unavailable.
 - `504` `beeos_harness_update_in_progress`: the work is still running. Wait for
   `Retry-After` and resend the identical request; Cloud re-attaches to the
   in-flight operations instead of starting new ones.
 
-Concurrent writers are not locked; the last write wins. There is no ETag or
-`If-Match` support and no skill files endpoint.
+There is no ETag or `If-Match` support and no skill files endpoint.
 
 ### Removed runtime methods
 
