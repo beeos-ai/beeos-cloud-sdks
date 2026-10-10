@@ -426,6 +426,7 @@ UHPMcpServer = TypedDict("UHPMcpServer", {
     "enabled": "NotRequired[bool]",
     "headers": "NotRequired[dict[str, str]]",
     "auth": "NotRequired[str]",
+    "expires_at": "NotRequired[str]",
 })
 
 UHPPluginMcpServer = TypedDict("UHPPluginMcpServer", {
@@ -446,6 +447,8 @@ UHPSkill = TypedDict("UHPSkill", {
     "files": "NotRequired[list[UHPSkillFile]]",
     "content": "NotRequired[str]",
     "blob": "NotRequired[str]",
+    "sha256": "NotRequired[str]",
+    "size_bytes": "NotRequired[str]",
 })
 
 UHPSkillFile = TypedDict("UHPSkillFile", {
@@ -916,55 +919,6 @@ agentTemplateCatalogView = TypedDict("agentTemplateCatalogView", {
     "template_version": "Required[str]",
 })
 
-CloudSkillOperationDetail = TypedDict("CloudSkillOperationDetail", {
-    "id": "Required[str]",
-    "instanceId": "Required[str]",
-    "target": "Required[CloudRuntimeOperationTarget]",
-    "capability": "Required[str]",
-    "transport": "Required[str]",
-    "sequence": "Required[str]",
-    "cursor": "Required[str]",
-    "createdAt": "Required[str]",
-    "effectState": "Required[str]",
-    "operationId": "Required[str]",
-    "requestOperationId": "NotRequired[str]",
-    "replayDefaultKey": "NotRequired[bool]",
-    "method": "Required[str]",
-    "status": "Required[str]",
-    "terminal": "Required[bool]",
-    "contractRevision": "Required[str]",
-    "catalogIntent": "NotRequired[CloudSkillInstallIntent | None]",
-    "skillIntent": "NotRequired[JSONValue]",
-    "templateIntent": "NotRequired[CloudTemplateIntent | None]",
-    "updatedAt": "Required[str]",
-    "result": "NotRequired[JSONValue]",
-    "error": "NotRequired[JSONValue]",
-    "observationCode": "NotRequired[str]",
-})
-
-CloudRuntimeOperationTarget = TypedDict("CloudRuntimeOperationTarget", {
-    "scope": "Required[str]",
-    "platformAgentId": "NotRequired[str]",
-    "conversationId": "NotRequired[str]",
-})
-
-CloudSkillInstallIntent = TypedDict("CloudSkillInstallIntent", {
-    "platformAgentId": "Required[str]",
-    "slug": "Required[str]",
-    "version": "NotRequired[str]",
-})
-
-CloudTemplateIntent = TypedDict("CloudTemplateIntent", {
-    "name": "Required[str]",
-    "templateId": "Required[str]",
-    "templateVersion": "NotRequired[str]",
-})
-
-CloudSkillOperationPage = TypedDict("CloudSkillOperationPage", {
-    "operations": "Required[list[CloudSkillOperationDetail]]",
-    "nextCursor": "NotRequired[str]",
-})
-
 a2aTaskView = TypedDict("a2aTaskView", {
     "id": "Required[str]",
     "contextId": "Required[str]",
@@ -1178,33 +1132,6 @@ A2AAgentCard = TypedDict("A2AAgentCard", {
 
 A2AOutputPart: TypeAlias = "A2ATextPartOut | A2AFilePartOut | A2ADataPartOut"
 
-RuntimeMethodAvailability = TypedDict("RuntimeMethodAvailability", {
-    "enabled": "Required[bool]",
-    "minimumRuntimeRpcProtocolVersion": "Required[int]",
-    "minimumRuntimeContractRevision": "NotRequired[str]",
-})
-
-RuntimeCapabilitySupport = TypedDict("RuntimeCapabilitySupport", {
-    "service": "Required[bool]",
-    "minimumRuntimeRpcProtocolVersion": "NotRequired[int]",
-})
-
-RuntimeCapabilityDocument = TypedDict("RuntimeCapabilityDocument", {
-    "manifestId": "Required[str]",
-    "contractRevision": "Required[str]",
-    "runtimeRpcProtocolVersion": "Required[int]",
-    "runtimeEpoch": "Required[str]",
-    "serviceMethods": "Required[list[str]]",
-    "conversationMethods": "Required[list[str]]",
-    "methodAvailability": "Required[dict[str, RuntimeMethodAvailability]]",
-    "conversationMethodAvailability": "Required[dict[str, RuntimeMethodAvailability]]",
-    "capabilities": "Required[dict[str, RuntimeCapabilitySupport]]",
-    "generatedAt": "Required[str]",
-    "expiresAt": "Required[str]",
-    "terminalTransport": "NotRequired[str]",
-    "canvasTransport": "NotRequired[str]",
-})
-
 RealtimeTicketHeader = TypedDict("RealtimeTicketHeader", {
     "alg": "Required[str]",
     "typ": "Required[str]",
@@ -1267,6 +1194,22 @@ CanvasSessionDocument = TypedDict("CanvasSessionDocument", {
 DeviceBindingErrorResponse = TypedDict("DeviceBindingErrorResponse", {
     "error": "Required[str]",
     "message": "Required[str]",
+})
+
+UHPHarnessCreate = TypedDict("UHPHarnessCreate", {
+    "name": "NotRequired[str]",
+    "base": "Required[str]",
+    "default_model": "NotRequired[str]",
+    "system_prompt": "NotRequired[str]",
+    "mcp_servers": "NotRequired[list[UHPMcpServer]]",
+    "skills": "NotRequired[list[UHPSkill]]",
+    "plugins": "NotRequired[list[UHPPlugin]]",
+    "environment": "NotRequired[str]",
+    "disabled_tools": "NotRequired[list[str]]",
+    "max_step": "NotRequired[int | None]",
+    "timeout_seconds": "NotRequired[int | None]",
+    "instance_id": "NotRequired[str]",
+    "template_id": "NotRequired[str]",
 })
 
 UHPCreateResponseJSONRequest = TypedDict("UHPCreateResponseJSONRequest", {
@@ -1468,35 +1411,6 @@ GetUsageSummaryOptions = TypedDict("GetUsageSummaryOptions", {
     "period": "NotRequired[Literal[\"day\", \"week\", \"month\"]]",
     "external_user_id": "NotRequired[str]",
     "category": "NotRequired[str]",
-})
-
-InvokeRuntimeMethodRequest = TypedDict("InvokeRuntimeMethodRequest", {
-    "jsonrpc": "Required[Literal[\"2.0\"]]",
-    "id": "Required[str]",
-    "method": "Required[str]",
-    "params": "Required[JSONValue]",
-})
-
-InvokeRuntimeMethodOptions = TypedDict("InvokeRuntimeMethodOptions", {
-    "Idempotency-Key": "Required[str]",
-    "X-BeeOS-Operation-Id": "NotRequired[str]",
-})
-
-ListRuntimeOperationsOptions = TypedDict("ListRuntimeOperationsOptions", {
-    "status": "NotRequired[Literal[\"active\"]]",
-    "cursor": "NotRequired[str]",
-    "limit": "NotRequired[int]",
-    "method": "NotRequired[str]",
-})
-
-CancelRuntimeOperationResponse = TypedDict("CancelRuntimeOperationResponse", {
-    "status": "Required[str]",
-    "operationId": "Required[str]",
-})
-
-CancelRuntimeOperationOptions = TypedDict("CancelRuntimeOperationOptions", {
-    "Idempotency-Key": "Required[str]",
-    "X-BeeOS-Operation-Id": "NotRequired[str]",
 })
 
 CreateTerminalSessionRequest = TypedDict("CreateTerminalSessionRequest", {
@@ -1804,6 +1718,11 @@ ListHarnessesResponse = TypedDict("ListHarnessesResponse", {
     "harnesses": "Required[list[UHPHarness]]",
 })
 
+DeleteHarnessResponse = TypedDict("DeleteHarnessResponse", {
+    "id": "Required[str]",
+    "deleted": "Required[bool]",
+})
+
 CreateResponseOptions = TypedDict("CreateResponseOptions", {
     "Idempotency-Key": "NotRequired[str]",
     "UHP-Version": "NotRequired[str]",
@@ -2008,7 +1927,7 @@ class InvalidResponseBody(TypedDict):
     raw_body: bytes
     reason: str
 
-_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"createAgentTask":{"default":"ErrorResponse"},"listAgentTasks":{"default":"ErrorResponse"},"getAgentTask":{"default":"ErrorResponse"},"listAgentTaskMessages":{"default":"ErrorResponse"},"cancelAgentTask":{"default":"ErrorResponse"},"continueAgentTask":{"default":"ErrorResponse"},"invokeAgent":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"getRuntimeCapabilities":{"401":"ErrorResponse","404":"ErrorResponse","default":"ErrorResponse"},"invokeRuntimeMethod":{"default":"ErrorResponse"},"listRuntimeOperations":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","default":"ErrorResponse"},"getRuntimeOperation":{"404":"ErrorResponse","default":"ErrorResponse"},"cancelRuntimeOperation":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
+_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"createAgentTask":{"default":"ErrorResponse"},"listAgentTasks":{"default":"ErrorResponse"},"getAgentTask":{"default":"ErrorResponse"},"listAgentTaskMessages":{"default":"ErrorResponse"},"cancelAgentTask":{"default":"ErrorResponse"},"continueAgentTask":{"default":"ErrorResponse"},"invokeAgent":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createHarness":{"409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"updateHarness":{"404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteHarness":{"404":"UHPErrorEnvelope","422":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
 
 def _matches_error_body(schema: str | None, value: JSONValue) -> bool:
     if not isinstance(value, dict):
@@ -2019,6 +1938,9 @@ def _matches_error_body(schema: str | None, value: JSONValue) -> bool:
     if schema == "DeviceBindingErrorResponse":
         return isinstance(value.get("error"), str) and value.get("error") != "" and isinstance(value.get("message"), str)
     return schema == "ErrorResponse" and isinstance(value.get("code"), str) and value.get("code") != "" and isinstance(value.get("message"), str)
+
+_HARNESS_WRITES = frozenset({"createHarness", "updateHarness", "deleteHarness"})
+_HARNESS_WRITE_TIMEOUT = 60.0
 
 class APIError(Exception):
     def __init__(self, status: int, body: ErrorResponse | DeviceBindingErrorResponse | UHPErrorEnvelope | InvalidResponseBody) -> None:
@@ -2040,8 +1962,6 @@ class BeeOSClient:
         self.messages = MessagesResource(self)
         self.tasks = TasksResource(self)
         self.usage = UsageResource(self)
-        self.methods = MethodsResource(self)
-        self.operations = OperationsResource(self)
         self.files = FilesResource(self)
         self.automations = AutomationsResource(self)
         self.audio = AudioResource(self)
@@ -2074,7 +1994,8 @@ class BeeOSClient:
 
     def _open(self, request: URLRequest, operation: str) -> HTTPResponse:
         try:
-            return cast(HTTPResponse, urlopen(request, timeout=self.timeout))
+            timeout = max(self.timeout, _HARNESS_WRITE_TIMEOUT) if operation in _HARNESS_WRITES else self.timeout
+            return cast(HTTPResponse, urlopen(request, timeout=timeout))
         except HTTPError as error:
             with error:
                 payload = error.read()
@@ -2728,70 +2649,6 @@ class UsageResource:
         return cast("ServerUsageSummary", json.loads(payload))
 
 
-class MethodsResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def get_capabilities(self, instance_id: str) -> RuntimeCapabilityDocument:
-        path = f"/instances/{quote(str(instance_id), safe='')}/runtime-capabilities"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("getRuntimeCapabilities", "GET", path, "", query, headers, None, "")
-        return cast("RuntimeCapabilityDocument", json.loads(payload))
-
-    def invoke(self, instance_id: str, input: InvokeRuntimeMethodRequest, options: InvokeRuntimeMethodOptions) -> RuntimeMethodResponse:
-        path = f"/instances/{quote(str(instance_id), safe='')}/methods"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        if "X-BeeOS-Operation-Id" in opts:
-            headers["X-BeeOS-Operation-Id"] = str(opts["X-BeeOS-Operation-Id"])
-        payload = self._client._request("invokeRuntimeMethod", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("RuntimeMethodResponse", json.loads(payload))
-
-
-class OperationsResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def list(self, instance_id: str, options: ListRuntimeOperationsOptions | None = None) -> CloudSkillOperationPage:
-        path = f"/instances/{quote(str(instance_id), safe='')}/operations"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "status" in opts:
-            query["status"] = str(opts["status"])
-        if "cursor" in opts:
-            query["cursor"] = str(opts["cursor"])
-        if "limit" in opts:
-            query["limit"] = str(opts["limit"])
-        if "method" in opts:
-            query["method"] = str(opts["method"])
-        payload = self._client._request("listRuntimeOperations", "GET", path, "", query, headers, None, "")
-        return cast("CloudSkillOperationPage", json.loads(payload))
-
-    def get(self, operation_id: str, instance_id: str) -> CloudSkillOperationDetail:
-        path = f"/instances/{quote(str(instance_id), safe='')}/operations/{quote(str(operation_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("getRuntimeOperation", "GET", path, "", query, headers, None, "")
-        return cast("CloudSkillOperationDetail", json.loads(payload))
-
-    def cancel(self, operation_id: str, instance_id: str, options: CancelRuntimeOperationOptions) -> CancelRuntimeOperationResponse:
-        path = f"/instances/{quote(str(instance_id), safe='')}/operations/{quote(str(operation_id), safe='')}/cancel"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        if "X-BeeOS-Operation-Id" in opts:
-            headers["X-BeeOS-Operation-Id"] = str(opts["X-BeeOS-Operation-Id"])
-        payload = self._client._request("cancelRuntimeOperation", "POST", path, "", query, headers, None, "")
-        return cast("CancelRuntimeOperationResponse", json.loads(payload))
-
-
 class FilesResource:
     def __init__(self, client: BeeOSClient) -> None:
         self._client = client
@@ -3219,12 +3076,33 @@ class HarnessesResource:
         payload = self._client._request("listHarnesses", "GET", path, "/uhp/v1", query, headers, None, "")
         return cast("ListHarnessesResponse", json.loads(payload))
 
+    def create(self, input: UHPHarnessCreate) -> UHPHarness:
+        path = f"/harnesses"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("createHarness", "POST", path, "/uhp/v1", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("UHPHarness", json.loads(payload))
+
     def get(self, harness_id: str) -> UHPHarness:
         path = f"/harnesses/{quote(str(harness_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
         payload = self._client._request("getHarness", "GET", path, "/uhp/v1", query, headers, None, "")
         return cast("UHPHarness", json.loads(payload))
+
+    def update(self, harness_id: str, input: UHPHarnessCreate) -> UHPHarness:
+        path = f"/harnesses/{quote(str(harness_id), safe='')}"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("updateHarness", "PUT", path, "/uhp/v1", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("UHPHarness", json.loads(payload))
+
+    def delete(self, harness_id: str) -> DeleteHarnessResponse:
+        path = f"/harnesses/{quote(str(harness_id), safe='')}"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("deleteHarness", "DELETE", path, "/uhp/v1", query, headers, None, "")
+        return cast("DeleteHarnessResponse", json.loads(payload))
 
     def list_all_models(self) -> UHPModelCatalog:
         path = f"/models"

@@ -59,7 +59,7 @@ merge(V/'t06-server.openapi.json');merge(V/'t07-server.openapi.json');merge(B/'o
 p=B/'openapi/beeos-platform-v1.yaml';d=load(p)
 for n,v in d['components']['schemas'].items():S.setdefault(n,resolve(v,p))
 for path,ops in d['paths'].items():
- if any(s in path for s in ['/webhooks','/runtime-capabilities','/methods','/operations','/terminal-sessions','/canvas-sessions']):
+ if any(s in path for s in ['/webhooks','/terminal-sessions','/canvas-sessions']):
   for m,o in ops.items():
    if m in ['get','post','put','patch','delete']:
     spec['paths'].setdefault(path.replace('/api/v1',''),{})[m]=resolve(o,p)
@@ -69,7 +69,7 @@ u_paths=['/v1/uhp','/v1/harnesses','/v1/harnesses/{harness_id}','/v1/models','/v
 for path,ops in d['paths'].items():
  if path in u_paths:
   for m,o in ops.items():
-   if m in ['get','post','delete']:
+   if m in ['get','post','put','delete']:
     o=resolve(o,p,'UHP');o['x-sdk-base-path']='/uhp/v1';o['x-sdk-provenance']='openapi/uhp/uhp-2026-10-04.openapi.yaml';spec['paths'].setdefault('/uhp'+path,{})[m]=o
 # Extract exact JSON-tagged producer structs. Open JSON is explicit and recursive.
 S['JSONValue']={'description':'A genuinely open JSON value (provider/plugin parameters or arbitrary metadata).','oneOf':[{'type':'null'},{'type':'boolean'},{'type':'number'},{'type':'string'},arr(ref('JSONValue')),{'type':'object','additionalProperties':ref('JSONValue')}]}
@@ -133,7 +133,7 @@ op('/usage/summary','get','getUsageSummary','usage','getSummary','ServerUsageSum
 # Files are not enveloped: exact service projections.
 for path,method,oid,name,res,body,query,headers,status in [('/files/presign-upload','post','presignFileUpload','prepareUpload','FileTransferDescriptor','FilePrepareUploadInput',None,[idem],'201'),('/files/{fileId}/confirm','post','confirmFileUpload','confirmUpload','FileFile','FileConfirmInput',None,[idem],'200'),('/files','get','listFiles','list','FilePage',None,[param(n) for n in ['content_type','since','status','file_type','category','source','q','instance_id','agent_id','sort','sort_dir']]+[param(n,typ=ints) for n in ['limit','offset']],None,'200'),('/files/{fileId}','get','getFile','get','FileResolution',None,None,None,'200'),('/files/{fileId}','patch','renameFile','rename','FileFile',obj({'title':strs}),None,None,'200'),('/files/{fileId}','delete','deleteFile','delete',None,None,None,[idem],'204')]:op(path,method,oid,'files',name,res,body,query,headers,status)
 # Existing resource mapping.
-mapping={'createClientSession':('identity','createClientSession'),'refreshClientSession':('identity','refreshClientSession'),'revokeClientSession':('identity','revokeClientSession'),'deleteExternalUser':('identity','deleteExternalUser'),'getExternalUserDeletion':('identity','getExternalUserDeletion'),'listProviders':('catalog','listProviders'),'listRegions':('catalog','listRegions'),'listDeployRegions':('catalog','listRegions'),'listModels':('catalog','listModels'),'listDeployModels':('catalog','listModels'),'listInstanceTemplates':('catalog','listInstanceTemplates'),'getInstanceTemplate':('catalog','getInstanceTemplate'),'listAgentTemplates':('catalog','listAgentTemplates'),'getAgentTemplate':('catalog','getAgentTemplate'),'listInstances':('instances','list'),'updateInstanceMetadata':('instances','update'),'listAgents':('agents','list'),'getAgent':('agents','get'),'updateAgent':('agents','update'),'createConversation':('conversations','create'),'listConversations':('conversations','list'),'getConversation':('conversations','get'),'updateConversation':('conversations','update'),'renameConversation':('conversations','update'),'deleteConversation':('conversations','delete'),'cancelConversation':('conversations','cancel'),'clearConversation':('conversations','clear'),'setConversationModel':('conversations','setModel'),'sendMessage':('messages','send'),'sendConversationMessage':('messages','send'),'listMessages':('messages','list'),'listConversationMessages':('messages','list'),'getMessage':('messages','get'),'createTask':('tasks','create'),'listTasks':('tasks','list'),'listAgentTasks':('tasks','list'),'getTask':('tasks','get'),'listTaskMessages':('tasks','listMessages'),'cancelTask':('tasks','cancel'),'continueTask':('tasks','continueTask'),'registerTaskWebhook':('taskWebhooks','create'),'listTaskWebhooks':('taskWebhooks','list'),'deleteTaskWebhook':('taskWebhooks','delete'),'listWebhookDeliveries':('taskWebhooks','listDeliveries'),'redeliverWebhook':('taskWebhooks','redeliver'),'getRuntimeCapabilities':('methods','getCapabilities'),'invokeRuntimeMethod':('methods','invoke'),'getUsageHistory':('usage','getHistory'),'getUsageLimits':('usage','getLimits'),'getDiscovery':('catalog','getDiscovery'),'listHarnesses':('harnesses','list'),'getHarness':('harnesses','get'),'listHarnessModels':('harnesses','listModels'),'createResponse':('responses','create'),'getResponse':('responses','get'),'listResponseInputItems':('responses','getInputItems'),'getResponseInputItems':('responses','getInputItems'),'cancelResponse':('responses','cancel'),'deleteResponse':('responses','delete'),'streamResponseEvents':('responses','getEvents')}
+mapping={'createClientSession':('identity','createClientSession'),'refreshClientSession':('identity','refreshClientSession'),'revokeClientSession':('identity','revokeClientSession'),'deleteExternalUser':('identity','deleteExternalUser'),'getExternalUserDeletion':('identity','getExternalUserDeletion'),'listProviders':('catalog','listProviders'),'listRegions':('catalog','listRegions'),'listDeployRegions':('catalog','listRegions'),'listModels':('catalog','listModels'),'listDeployModels':('catalog','listModels'),'listInstanceTemplates':('catalog','listInstanceTemplates'),'getInstanceTemplate':('catalog','getInstanceTemplate'),'listAgentTemplates':('catalog','listAgentTemplates'),'getAgentTemplate':('catalog','getAgentTemplate'),'listInstances':('instances','list'),'updateInstanceMetadata':('instances','update'),'listAgents':('agents','list'),'getAgent':('agents','get'),'updateAgent':('agents','update'),'createConversation':('conversations','create'),'listConversations':('conversations','list'),'getConversation':('conversations','get'),'updateConversation':('conversations','update'),'renameConversation':('conversations','update'),'deleteConversation':('conversations','delete'),'cancelConversation':('conversations','cancel'),'clearConversation':('conversations','clear'),'setConversationModel':('conversations','setModel'),'sendMessage':('messages','send'),'sendConversationMessage':('messages','send'),'listMessages':('messages','list'),'listConversationMessages':('messages','list'),'getMessage':('messages','get'),'createTask':('tasks','create'),'listTasks':('tasks','list'),'listAgentTasks':('tasks','list'),'getTask':('tasks','get'),'listTaskMessages':('tasks','listMessages'),'cancelTask':('tasks','cancel'),'continueTask':('tasks','continueTask'),'registerTaskWebhook':('taskWebhooks','create'),'listTaskWebhooks':('taskWebhooks','list'),'deleteTaskWebhook':('taskWebhooks','delete'),'listWebhookDeliveries':('taskWebhooks','listDeliveries'),'redeliverWebhook':('taskWebhooks','redeliver'),'getUsageHistory':('usage','getHistory'),'getUsageLimits':('usage','getLimits'),'getDiscovery':('catalog','getDiscovery'),'listHarnesses':('harnesses','list'),'getHarness':('harnesses','get'),'listHarnessModels':('harnesses','listModels'),'createResponse':('responses','create'),'getResponse':('responses','get'),'listResponseInputItems':('responses','getInputItems'),'getResponseInputItems':('responses','getInputItems'),'cancelResponse':('responses','cancel'),'deleteResponse':('responses','delete'),'streamResponseEvents':('responses','getEvents')}
 # Classify exact producer routes.
 live=set()
 for p in (B/'services/openapi-gateway/internal/beeoscloud').glob('*.go'):
@@ -178,8 +178,32 @@ d=load(B/'openapi/uhp/uhp-2026-10-04.openapi.yaml')
 spec['components']['headers']={n:resolve(v,B/'openapi/uhp/uhp-2026-10-04.openapi.yaml','UHP') for n,v in d['components'].get('headers',{}).items()}
 S['ErrorResponse']=obj({'code':strs,'message':strs,'request_id':strs},['code','message','request_id'])
 spec['components']['responses']['Error']={'description':'Cloud Server error envelope. UHP operations use the protocol envelope.','content':{'application/json':{'schema':ref('ErrorResponse')}}}
-# Remove optional upstream Harness CRUD absent in BeeOS producer (not legacy methods).
-spec['paths']['/uhp/v1/harnesses'].pop('post',None);spec['paths']['/uhp/v1/harnesses/{harness_id}'].pop('delete',None)
+# Harness management replaces runtime methods: BeeOS extension fields and synchronous write outcomes.
+S['UHPHarnessCreate']['properties']['instance_id']={'type':'string','description':'BeeOS extension. Instance that hosts a new harness (create only).'}
+S['UHPHarnessCreate']['properties']['template_id']={'type':'string','description':'BeeOS extension. Agent template applied to the harness.'}
+S['UHPSkill']['properties']['sha256']={'type':'string','description':'BeeOS extension. SHA-256 of the Files bundle referenced by blob.'}
+S['UHPSkill']['properties']['size_bytes']={'type':'string','description':'BeeOS extension. Decimal byte size of the Files bundle referenced by blob.'}
+S['UHPMcpServer']['properties']['expires_at']={'type':'string','format':'date-time','description':'BeeOS extension. Expiry of the supplied short-lived credential; the caller refreshes it with another PUT.'}
+harness_sync='Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable.'
+harness_unsupported=' Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).'
+harness_descriptions={
+ 'createHarness':harness_sync+' instance_id and name are required; default_model is honored only here. skills are rejected on create (422 beeos_field_not_supported); add them with PUT.'+harness_unsupported,
+ 'updateHarness':harness_sync+' An absent field is unchanged. When skills is present it is diffed against the installed skills: listed skills with files, content or blob are installed; omitted catalog-origin skills are uninstalled; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported.'+harness_unsupported,
+ 'deleteHarness':'Not supported by BeeOS Cloud yet: returns 422 beeos_harness_delete_not_supported once the harness is found.',
+}
+harness_error_statuses={'createHarness':['409','422','502','503','504'],'updateHarness':['409','422','502','503','504'],'deleteHarness':['422']}
+property_notes={
+ ('UHPHarnessCreate','default_model'):'BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent.',
+ ('UHPHarnessCreate','mcp_servers'):'Not accepted by BeeOS Cloud yet: a non-empty list returns 422 beeos_mcp_not_supported.',
+}
+for (schema,field),note in property_notes.items():S[schema]['properties'][field]['description']=note
+for path,method,oid in [('/uhp/v1/harnesses','post','createHarness'),('/uhp/v1/harnesses/{harness_id}','put','updateHarness'),('/uhp/v1/harnesses/{harness_id}','delete','deleteHarness')]:
+ o=spec['paths'][path][method];o['description']=harness_descriptions[oid]
+ for status in harness_error_statuses[oid]:o['responses'][status]={'description':'UHP protocol error envelope','content':{'application/json':{'schema':ref('UHPErrorEnvelope')}}}
+mapping_harness={'createHarness':'create','updateHarness':'update','deleteHarness':'delete'}
+for path in ['/uhp/v1/harnesses','/uhp/v1/harnesses/{harness_id}']:
+ for o in spec['paths'][path].values():
+  if o['operationId'] in mapping_harness:o['x-sdk-resource'],o['x-sdk-method']='harnesses',mapping_harness[o['operationId']]
 # Resource names from the producer/vendored wire profile.
 extra_mapping={'createAgentConversation':('conversations','create'),'listAgentConversations':('conversations','list'),'getConversationMessage':('messages','get'),'createAgentTask':('tasks','create'),'getAgentTask':('tasks','get'),'listAgentTaskMessages':('tasks','listMessages'),'cancelAgentTask':('tasks','cancel'),'continueAgentTask':('tasks','continueTask'),'listRuntimeOperations':('operations','list'),'getRuntimeOperation':('operations','get'),'cancelRuntimeOperation':('operations','cancel'),'streamRuntimeOperationEvents':('operations','getEvents'),'createTerminalSession':('instances','createTerminalSession'),'createCanvasSession':('instances','createCanvasSession')}
 for path,ops in spec['paths'].items():
@@ -250,7 +274,6 @@ op('/audio/transcribe','post','transcribeAudio','audio','transcribe',obj({'text'
 o=spec['paths']['/audio/transcribe']['post'];o['requestBody']['content']['multipart/form-data']=o['requestBody']['content'].pop('application/json')
 # Exact JSON-RPC envelope (runtime extension params/result remain open JSON).
 S['RuntimeMethodResponse']=obj({'jsonrpc':{'type':'string','enum':['2.0']},'id':{'anyOf':[strs,ints,{'type':'null'}]},'result':ref('JSONValue'),'error':obj({'code':ints,'message':strs,'data':ref('JSONValue')},['code','message'])},['jsonrpc','id'])
-spec['paths']['/instances/{instanceId}/methods']['post']['responses']={'200':{'description':'JSON-RPC success','content':{'application/json':{'schema':ref('RuntimeMethodResponse')}}},'202':{'description':'Operation accepted','content':{'application/json':{'schema':ref('RuntimeMethodResponse')}}},'default':{'$ref':'#/components/responses/Error'}}
 S['FileShareResponse']=obj({'file_id':strs,'slug':strs,'filename':strs,'content_type':strs,'size_bytes':ints,'revoked':{'type':'boolean'}})
 S['FileSummary']=obj({'file_count':ints,'storage_file_count':ints,'used_bytes':ints,'image_count':ints,'video_count':ints,'document_count':ints,'instances':arr(obj({**S['FileOrigin']['properties'],'count':ints},['source','count']))})
 spec['paths']['/audio/transcribe']['post']['responses']['200']['content']['application/json']['schema']=obj({'success':{'type':'boolean'},'data':obj({'text':strs,'duration_seconds':{'type':'number'}})})
@@ -294,16 +317,6 @@ for path,ops in spec['paths'].items():
 S['UHPEvent']=resolve(d['components']['schemas']['Event'],B/'openapi/uhp/uhp-2026-10-04.openapi.yaml','UHP') if 'components' in d and 'Event' in d['components'].get('schemas',{}) else resolve(load(B/'openapi/uhp/uhp-2026-10-04.openapi.yaml')['components']['schemas']['Event'],B/'openapi/uhp/uhp-2026-10-04.openapi.yaml','UHP')
 spec['paths']['/uhp/v1/responses']['post']['x-sdk-event-schema']=ref('UHPEvent')
 spec['paths']['/uhp/v1/responses/{response_id}/events']['get']['responses']['200']['content']['text/event-stream']['schema']=ref('UHPEvent')
-# Correct the Server runtime facade's concrete request/response projections.
-rpc=spec['paths']['/instances/{instanceId}/methods']['post']
-rpc['requestBody']['content']['application/json']['schema']['properties']['id']=strs
-rpc['requestBody']['content']['application/json']['schema']['properties']['params']=ref('JSONValue')
-for a in rpc['parameters']:
- if a['name']=='Idempotency-Key':a['required']=True
-S['RuntimeMethodAvailability']=obj({'enabled':{'type':'boolean'},'minimumRuntimeRpcProtocolVersion':ints,'minimumRuntimeContractRevision':strs},['enabled','minimumRuntimeRpcProtocolVersion'])
-S['RuntimeCapabilitySupport']=obj({'service':{'type':'boolean'},'minimumRuntimeRpcProtocolVersion':ints},['service'])
-S['RuntimeCapabilityDocument']=obj({'manifestId':strs,'contractRevision':strs,'runtimeRpcProtocolVersion':ints,'runtimeEpoch':strs,'serviceMethods':arr(strs),'conversationMethods':arr(strs),'methodAvailability':{'type':'object','additionalProperties':ref('RuntimeMethodAvailability')},'conversationMethodAvailability':{'type':'object','additionalProperties':ref('RuntimeMethodAvailability')},'capabilities':{'type':'object','additionalProperties':ref('RuntimeCapabilitySupport')},'generatedAt':strs,'expiresAt':strs,'terminalTransport':strs,'canvasTransport':strs},['manifestId','contractRevision','runtimeRpcProtocolVersion','runtimeEpoch','serviceMethods','conversationMethods','methodAvailability','conversationMethodAvailability','capabilities','generatedAt','expiresAt'])
-spec['paths']['/instances/{instanceId}/runtime-capabilities']['get']['responses']['200']['content']['application/json']['schema']=ref('RuntimeCapabilityDocument')
 S['RealtimeTicketHeader']=obj({'alg':strs,'typ':strs,'kid':strs})
 S['TerminalTicketClaims']=obj({**{k:strs for k in ['iss','aud','sub','jti','instance_id','platform_agent_id','client_id','conversation_id','resume_terminal_id']},'iat':ints,'exp':ints},['iss','aud','sub','jti','iat','exp','instance_id','platform_agent_id','client_id'])
 S['CanvasTicketClaims']=obj({**{k:strs for k in ['iss','sub','jti','purpose','instance_id','platform_agent_id','client_id','conversation_id','canvas_id','role','session_id']},'aud':arr(strs),'iat':ints,'exp':ints})
@@ -311,17 +324,6 @@ S['TerminalSessionDocument']=obj({'transport':strs,'protocolVersion':ints,'heade
 S['CanvasSessionDocument']=obj({'transport':strs,'protocolVersion':ints,'header':ref('RealtimeTicketHeader'),'relayUrl':strs,'ticket':strs,'issuedAt':{'type':'string','format':'date-time'},'expiresAt':{'type':'string','format':'date-time'},'claims':ref('CanvasTicketClaims')})
 spec['paths']['/instances/{instanceId}/terminal-sessions']['post']['responses']['201']['content']['application/json']['schema']=ref('TerminalSessionDocument')
 spec['paths']['/instances/{instanceId}/canvas-sessions']['post']['responses']['201']['content']['application/json']['schema']=ref('CanvasSessionDocument')
-spec['paths']['/instances/{instanceId}/operations']['get']['responses']['200']['content']['application/json']['schema']=ref('CloudSkillOperationPage')
-spec['paths']['/instances/{instanceId}/operations/{operationId}']['get']['responses']['200']['content']['application/json']['schema']=ref('CloudSkillOperationDetail')
-operation_list=spec['paths']['/instances/{instanceId}/operations']['get']
-for a in operation_list['parameters']:
- if a['name']=='status':a['required']=False
-operation_list['parameters'].append(param('method'))
-cancel=spec['paths']['/instances/{instanceId}/operations/{operationId}/cancel']['post']
-cancel.pop('requestBody',None)
-cancel['responses']={'202':{'description':'Cancellation requested','content':{'application/json':{'schema':obj({'status':strs,'operationId':strs})}}},'default':{'$ref':'#/components/responses/Error'}}
-for a in cancel['parameters']:
- if a['name']=='Idempotency-Key':a['required']=True
 # Live bsk facade errors use its public envelope, rather than the user/JWT platform envelope.
 S['DeviceBindingErrorResponse']=obj({'error':strs,'message':strs})
 for path,ops in spec['paths'].items():

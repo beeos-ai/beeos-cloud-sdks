@@ -51,7 +51,7 @@ it('generates only the live v3 operation set with correct UHP servers and errors
   const spec = JSON.parse(await fs.readFile('spec/server.openapi.json', 'utf8'));
   const ops = Object.entries(spec.paths).flatMap(([route, item]) => Object.values(item as Record<string, {operationId?: string; [key: string]: unknown}>).filter(op => op.operationId).map(op => ({route, op})));
   expect(spec.info.version).toBe('3.0.0');
-  expect(ops).toHaveLength(110);
+  expect(ops).toHaveLength(108);
   expect(ops.every(({op}) => op['x-sdk-activation'] === 'live')).toBe(true);
   for (const {route, op} of ops.filter(({op}) => op.servers)) {
     expect(route.startsWith('/uhp/v1')).toBe(false);
