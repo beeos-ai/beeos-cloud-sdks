@@ -1,9 +1,9 @@
 # BeeOS Cloud Server SDKs
 
 The TypeScript package `@beeos-ai/cloud-sdk`, Python distribution
-`beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v2` share
+`beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v3` share
 one contract: [`spec/server.openapi.json`](spec/server.openapi.json). Version
-2.0.0 generates typed request, response, query, and error models for the 133
+3.0.0 generates typed request, response, query, and error models for the 110
 registered Server operations. Inactive API methods and their models are removed.
 
 ```ts
@@ -37,6 +37,12 @@ Malformed or unrecognized error bodies use `invalid_response` and retain raw
 diagnostics; transport failures without an HTTP response remain transport errors.
 Python uses a 30-second default timeout, configurable with `timeout=...` and
 preserved by `with_external_user`.
+
+### Removed catalog modules
+
+3.0.0 removes the skill catalog, featured skills, skill sets, MCP server catalog
+and connector (connected account) modules. Those catalogs belong to the calling
+product.
 
 `JSONValue` represents genuinely open protocol extension fields. The SDK exposes
 only operations registered by the pinned producer; the 14 unregistered operations
@@ -78,10 +84,10 @@ resource interfaces. Generation requires Node and Go (`gofmt`). The Python devel
 
 No package is published by regeneration. The existing **Publish
 @beeos-ai/cloud-sdk** workflow (`.github/workflows/publish.yml`) publishes the root
-npm package only when a matching `v2.0.0` tag is pushed; it uses GitHub secret
+npm package only when a matching `v3.0.0` tag is pushed; it uses GitHub secret
 `NPM_TOKEN`. The Python package has no publishing workflow in this repository.
 Its wheel must be built and published separately after coordinator approval. The
-Go module resides in `go/`, so its module release tag is `go/v2.0.0`. The import path is `github.com/beeos-ai/beeos-cloud-sdks/go/v2`. Go discovery
+Go module resides in `go/`, so its module release tag is `go/v3.0.0`. The import path is `github.com/beeos-ai/beeos-cloud-sdks/go/v3`. Go discovery
 needs no package-registry secret. These tags and registry writes require the
 separate release authorization.
 

@@ -34,11 +34,7 @@ type Query = Record<string, string | number | boolean | undefined>;
 
 export class BeeOSClient {
   readonly operations: OperationsModule;
-  readonly mcp: McpModule;
-  readonly skills: SkillsModule;
-  readonly skillSets: SkillSetsModule;
   readonly automations: AutomationsModule;
-  readonly connectors: ConnectorsModule;
   readonly audio: AudioModule;
   readonly canvases: CanvasesModule;
   readonly deviceBindings: DeviceBindingsModule;
@@ -60,11 +56,7 @@ export class BeeOSClient {
   constructor(private readonly options: BeeOSClientOptions) {
     if (!options.baseURL || !options.apiKey) throw new Error("Server baseURL and bsk_ apiKey are required");
     this.operations = new OperationsModule(this);
-    this.mcp = new McpModule(this);
-    this.skills = new SkillsModule(this);
-    this.skillSets = new SkillSetsModule(this);
     this.automations = new AutomationsModule(this);
-    this.connectors = new ConnectorsModule(this);
     this.audio = new AudioModule(this);
     this.canvases = new CanvasesModule(this);
     this.deviceBindings = new DeviceBindingsModule(this);
@@ -566,54 +558,6 @@ class OperationsModule {
   }
 }
 
-class McpModule {
-  constructor(private readonly client: BeeOSClient) {}
-  list(): Promise<Models.ListMCPServersResponse> {
-    return this.client.request<Models.ListMCPServersResponse>("GET", `mcp/servers`, {  });
-  }
-  get(serverId: string): Promise<Models.GetMCPServerResponse> {
-    return this.client.request<Models.GetMCPServerResponse>("GET", `mcp/servers/${encodeURIComponent(serverId)}`, {  });
-  }
-  resolve(serverId: string): Promise<Models.ResolveMCPServerResponse> {
-    return this.client.request<Models.ResolveMCPServerResponse>("POST", `mcp/servers/${encodeURIComponent(serverId)}/resolve`, {  });
-  }
-}
-
-class SkillsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  list(query?: Models.ListSkillsQuery): Promise<Models.ListSkillsResponse> {
-    return this.client.request<Models.ListSkillsResponse>("GET", `skills`, { query });
-  }
-  create(input: Models.CreateSkillInput): Promise<Models.CreateSkillResponse> {
-    return this.client.request<Models.CreateSkillResponse>("POST", `skills`, { json: input });
-  }
-  search(query?: Models.SearchSkillsQuery): Promise<Models.SearchSkillsResponse> {
-    return this.client.request<Models.SearchSkillsResponse>("GET", `skills/search`, { query });
-  }
-  get(id: string): Promise<Models.GetSkillResponse> {
-    return this.client.request<Models.GetSkillResponse>("GET", `skills/${encodeURIComponent(id)}`, {  });
-  }
-  getBySlug(slug: string): Promise<Models.GetSkillBySlugResponse> {
-    return this.client.request<Models.GetSkillBySlugResponse>("GET", `skills/by-slug/${encodeURIComponent(slug)}`, {  });
-  }
-  categories(): Promise<Models.ListSkillCategoriesResponse> {
-    return this.client.request<Models.ListSkillCategoriesResponse>("GET", `skills/categories`, {  });
-  }
-  featured(query?: Models.GetFeaturedSkillsQuery): Promise<Models.GetFeaturedSkillsResponse> {
-    return this.client.request<Models.GetFeaturedSkillsResponse>("GET", `featured`, { query });
-  }
-}
-
-class SkillSetsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  list(query?: Models.ListSkillSetsQuery): Promise<Models.ListSkillSetsResponse> {
-    return this.client.request<Models.ListSkillSetsResponse>("GET", `skillhub/skill-sets`, { query });
-  }
-  get(slug: string): Promise<Models.GetSkillSetResponse> {
-    return this.client.request<Models.GetSkillSetResponse>("GET", `skillhub/skill-sets/${encodeURIComponent(slug)}`, {  });
-  }
-}
-
 class AutomationsModule {
   constructor(private readonly client: BeeOSClient) {}
   create(input: Models.CreateAutomationInput): Promise<Models.CreateAutomationResponse> {
@@ -648,43 +592,6 @@ class AutomationsModule {
   }
   createWebhook(input: Models.CreateWebhookAutomationInput): Promise<Models.CreateWebhookAutomationResponse> {
     return this.client.request<Models.CreateWebhookAutomationResponse>("POST", `automations/webhooks`, { json: input });
-  }
-}
-
-class ConnectorsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  credentialPut(input: Models.PutConnectorCredentialConnectorInput): Promise<Models.PutConnectorCredentialConnectorResponse> {
-    return this.client.request<Models.PutConnectorCredentialConnectorResponse>("POST", `connectors/credential-put`, { json: input });
-  }
-  credentialDelete(input: Models.DeleteConnectorCredentialConnectorInput): Promise<Models.DeleteConnectorCredentialConnectorResponse> {
-    return this.client.request<Models.DeleteConnectorCredentialConnectorResponse>("POST", `connectors/credential-delete`, { json: input });
-  }
-  list(input: Models.ListInstanceConnectorsConnectorInput): Promise<Models.ListInstanceConnectorsConnectorResponse> {
-    return this.client.request<Models.ListInstanceConnectorsConnectorResponse>("POST", `connectors/list`, { json: input });
-  }
-  install(input: Models.InstallManagedConnectorConnectorInput): Promise<Models.InstallManagedConnectorConnectorResponse> {
-    return this.client.request<Models.InstallManagedConnectorConnectorResponse>("POST", `connectors/install`, { json: input });
-  }
-  update(input: Models.UpdateManagedConnectorConnectorInput): Promise<Models.UpdateManagedConnectorConnectorResponse> {
-    return this.client.request<Models.UpdateManagedConnectorConnectorResponse>("POST", `connectors/update`, { json: input });
-  }
-  uninstall(input: Models.UninstallManagedConnectorConnectorInput): Promise<Models.UninstallManagedConnectorConnectorResponse> {
-    return this.client.request<Models.UninstallManagedConnectorConnectorResponse>("POST", `connectors/uninstall`, { json: input });
-  }
-  catalogList(input: Models.ListMcpServersConnectorInput): Promise<Models.ListMcpServersConnectorResponse> {
-    return this.client.request<Models.ListMcpServersConnectorResponse>("POST", `connectors/catalog-list`, { json: input });
-  }
-  catalogGet(input: Models.GetMcpServerConnectorInput): Promise<Models.GetMcpServerConnectorResponse> {
-    return this.client.request<Models.GetMcpServerConnectorResponse>("POST", `connectors/catalog-get`, { json: input });
-  }
-  catalogCategories(input: Models.ListCategoriesConnectorInput): Promise<Models.ListCategoriesConnectorResponse> {
-    return this.client.request<Models.ListCategoriesConnectorResponse>("POST", `connectors/catalog-categories`, { json: input });
-  }
-  catalogPrepare(input: Models.ResolvePreparationConnectorInput): Promise<Models.ResolvePreparationConnectorResponse> {
-    return this.client.request<Models.ResolvePreparationConnectorResponse>("POST", `connectors/catalog-prepare`, { json: input });
-  }
-  catalogResolve(input: Models.ResolveInstallConnectorInput): Promise<Models.ResolveInstallConnectorResponse> {
-    return this.client.request<Models.ResolveInstallConnectorResponse>("POST", `connectors/catalog-resolve`, { json: input });
   }
 }
 
