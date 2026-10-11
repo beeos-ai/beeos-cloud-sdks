@@ -205,22 +205,24 @@ func TestResponseEventsAreIncrementalAndTyped(t *testing.T) {
 	}
 }
 
-func TestRPCStringIDAndRequiredIdempotency(t *testing.T) {
+func TestHarnessUpdateSendsUHPBodyWithExtensions(t *testing.T) {
 	client := testClient(t, func(request *http.Request) (*http.Response, error) {
-		if request.Header.Get("Idempotency-Key") != "operation-1" {
-			t.Fatal("idempotency missing")
+		if request.Method != http.MethodPut || request.URL.Path != "/uhp/v1/harnesses/chrn_1" {
+			t.Fatalf("unexpected request %s %s", request.Method, request.URL.Path)
 		}
-		var input InvokeRuntimeMethodRequest
+		var input map[string]any
 		if err := json.NewDecoder(request.Body).Decode(&input); err != nil {
 			t.Fatal(err)
 		}
-		if input.ID != "rpc-1" {
-			t.Fatal("string RPC ID missing")
+		if input["template_id"] != "tpl_1" || input["base"] != "openclaw" {
+			t.Fatalf("harness body=%v", input)
 		}
-		return mockResponse(200, `{"jsonrpc":"2.0","id":"rpc-1","result":{}}`), nil
+		return mockResponse(200, `{"id":"chrn_1","name":"a","base":"openclaw"}`), nil
 	})
-	if _, err := client.Methods.Invoke(context.Background(), "instance-1", InvokeRuntimeMethodRequest{JSONrpc: "2.0", ID: "rpc-1", Method: "agent.invoke", Params: JSONValue(`{}`)}, InvokeRuntimeMethodOptions{IdempotencyKey: "operation-1"}); err != nil {
-		t.Fatal(err)
+	templateID := "tpl_1"
+	harness, err := client.Harnesses.Update(context.Background(), "chrn_1", UHPHarnessCreate{Base: "openclaw", TemplateID: &templateID})
+	if err != nil || harness.ID != "chrn_1" {
+		t.Fatalf("harness=%+v err=%v", harness, err)
 	}
 }
 

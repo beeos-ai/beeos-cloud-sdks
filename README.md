@@ -3,7 +3,7 @@
 The TypeScript package `@beeos-ai/cloud-sdk`, Python distribution
 `beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v3` share
 one contract: [`spec/server.openapi.json`](spec/server.openapi.json). Version
-3.0.0 generates typed request, response, query, and error models for the 110
+3.0.0 generates typed request, response, query, and error models for the 108
 registered Server operations. Inactive API methods and their models are removed.
 
 ```ts
@@ -37,6 +37,60 @@ Malformed or unrecognized error bodies use `invalid_response` and retain raw
 diagnostics; transport failures without an HTTP response remain transport errors.
 Python uses a 30-second default timeout, configurable with `timeout=...` and
 preserved by `with_external_user`.
+
+### Harness management (UHP)
+
+Instance agents are managed only through UHP harnesses (`client.harnesses`,
+`/uhp/v1/harnesses`). The discovery capability `harness_management` is still
+`false`; these calls work as described below regardless.
+
+- `create`: BeeOS extension `instance_id` and `name` are required.
+  `default_model` is honored only here. Skills are rejected on create (422);
+  add them with `update`.
+- `update` (PUT): an absent field is unchanged. When `skills` is present it is
+  diffed against the installed skills: listed skills with `files[]`, `content`
+  or `blob` (a Cloud Files `file_...` id with BeeOS extensions `sha256` and
+  `size_bytes`) are installed; omitted catalog-origin skills are uninstalled; a
+  listed skill that is not installed and has no files, content or blob returns
+  422; `enabled: false` on a fresh install returns 422. `template_id` applies an
+  agent template. `base` is immutable.
+- `get`, `list`, and `listModels` read the current state. A single turn can
+  pick its model with the Responses `model` field.
+
+Not supported by BeeOS Cloud yet (422):
+
+| Request | Code |
+|---|---|
+| `delete` | `beeos_harness_delete_not_supported` |
+| non-empty `mcp_servers` | `beeos_mcp_not_supported` |
+| `default_model` different from the current one on `update` (without `template_id`) | `beeos_field_not_supported` |
+| name change, `system_prompt`, `disabled_tools`, `environment`, `max_step`, `timeout_seconds`, `plugins` | `beeos_field_not_supported` |
+
+Harness writes are synchronous. Cloud submits the runtime operations and waits
+up to 45 seconds before answering, so use an HTTP timeout of at least 60
+seconds (the Python client uses at least 60 seconds for harness writes).
+
+- `200`: every change is applied; the body is the resulting harness.
+- `422`: validation failed or the request is unsupported; nothing was submitted.
+- `409` `beeos_harness_busy`: a different write to this harness is in flight;
+  retry after `Retry-After`.
+- `502` `harness_error`: some items failed; `error.detail.operations[]` lists
+  each item's `kind`, `name` and `status`. Succeeded items are applied; resend
+  the corrected request to retry the rest.
+- `503` `harness_unavailable`: the instance is not running or the operation
+  journal is unavailable.
+- `504` `beeos_harness_update_in_progress`: the work is still running. Wait for
+  `Retry-After` and resend the identical request; Cloud re-attaches to the
+  in-flight operations instead of starting new ones.
+
+There is no ETag or `If-Match` support and no skill files endpoint.
+
+### Removed runtime methods
+
+3.0.0 removes the runtime methods module (`/instances/{instanceId}/methods`
+and its skills, models, MCP, cron, agent, session and canvas facades), the
+runtime operations module and runtime capabilities. Cron has no replacement;
+conversation turns use `client.responses`.
 
 ### Removed catalog modules
 

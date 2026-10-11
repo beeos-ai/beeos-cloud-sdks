@@ -39,7 +39,6 @@ export class BeeOSClient {
   readonly tasks: TasksModule;
   readonly files: FilesModule;
   readonly appWebhooks: AppWebhooksModule;
-  readonly methods: MethodsModule;
 
   constructor(private readonly options: BeeOSClientOptions) {
     if (!options.baseURL || !options.apiKey) throw new Error("Server baseURL and bsk_ apiKey are required");
@@ -53,7 +52,6 @@ export class BeeOSClient {
     this.tasks = new TasksModule(this);
     this.files = new FilesModule(this);
     this.appWebhooks = new AppWebhooksModule(this);
-    this.methods = new MethodsModule(this);
   }
 
   withExternalUser(id: string): BeeOSClient {
@@ -185,9 +183,6 @@ class InstancesModule {
   }
   delete(id: string, idempotencyKey: string, version: number) {
     return this.client.request("DELETE", `instances/${id}`, { idempotencyKey, headers: { "If-Match": `"${version}"` } });
-  }
-  open(id: string) {
-    return new Instance(this.client, id);
   }
 }
 
@@ -363,89 +358,4 @@ function parseVersionedSignature(value: string): { timestamp: number; signatures
     if (key === "v1") signatures.push(raw);
   }
   return timestamp && signatures.length ? { timestamp, signatures } : null;
-}
-
-class MethodsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  getCapabilities(instanceId: string) {
-    return this.client.request("GET", `instances/${instanceId}/runtime-capabilities`);
-  }
-  invoke(instanceId: string, method: string, params: unknown, idempotencyKey: string) {
-    return this.client.request("POST", `instances/${instanceId}/methods`, {
-      json: { jsonrpc: "2.0", id: idempotencyKey, method, params },
-      idempotencyKey,
-    });
-  }
-  readonly agents = {
-    create: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "agent/create", params, idempotencyKey),
-    update: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "agent/update", params, idempotencyKey),
-    delete: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "agent/delete", params, idempotencyKey),
-    applyTemplate: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "agent/applyTemplate", params, idempotencyKey),
-  };
-  readonly skills = {
-    list: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "skills/list", params, idempotencyKey),
-    install: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "skills/install", params, idempotencyKey),
-    update: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "skills/update", params, idempotencyKey),
-    uninstall: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "skills/uninstall", params, idempotencyKey),
-  };
-  readonly models = {
-    list: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "models/list", params, idempotencyKey),
-  };
-  readonly cron = {
-    list: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "cron/list", params, idempotencyKey),
-    getStatus: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "cron/status", params, idempotencyKey),
-    add: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "cron/add", params, idempotencyKey),
-    update: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "cron/update", params, idempotencyKey),
-    remove: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "cron/remove", params, idempotencyKey),
-    run: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "cron/run", params, idempotencyKey),
-    listRuns: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "cron/runs", params, idempotencyKey),
-  };
-  readonly mcp = {
-    list: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "mcp/list", params, idempotencyKey),
-    prepare: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "mcp/prepare", params, idempotencyKey),
-    set: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "mcp/set", params, idempotencyKey),
-    unset: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "mcp/unset", params, idempotencyKey),
-  };
-  readonly sessions = {
-    setMode: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "session/set_mode", params, idempotencyKey),
-    setModel: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "session/set_model", params, idempotencyKey),
-    clear: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "session/clear", params, idempotencyKey),
-    cancel: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "session/cancel", params, idempotencyKey),
-  };
-  readonly canvas = {
-    toggle: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "canvas/toggle", params, idempotencyKey),
-    clear: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "canvas/clear", params, idempotencyKey),
-    reference: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "canvas/reference", params, idempotencyKey),
-    setDimensions: (instanceId: string, params: unknown, idempotencyKey: string) => this.invoke(instanceId, "canvas/dimensions", params, idempotencyKey),
-  };
-}
-
-type C14Call = (params: unknown, idempotencyKey: string) => Promise<unknown>;
-
-export class Instance {
-  readonly agents: { create: C14Call; update: C14Call; delete: C14Call; applyTemplate: C14Call };
-  readonly skills: { list: C14Call; install: C14Call; update: C14Call; uninstall: C14Call };
-  readonly models: { list: C14Call };
-  readonly cron: { list: C14Call; getStatus: C14Call; add: C14Call; update: C14Call; remove: C14Call; run: C14Call; listRuns: C14Call };
-  readonly mcp: { list: C14Call; prepare: C14Call; set: C14Call; unset: C14Call };
-  readonly sessions: { setMode: C14Call; setModel: C14Call; clear: C14Call; cancel: C14Call };
-  readonly canvas: { toggle: C14Call; clear: C14Call; reference: C14Call; setDimensions: C14Call };
-
-  constructor(private readonly client: BeeOSClient, readonly id: string) {
-    const invoke = (method: string): C14Call => (params, idempotencyKey) => this.client.methods.invoke(this.id, method, params, idempotencyKey);
-    this.agents = { create: invoke("agent/create"), update: invoke("agent/update"), delete: invoke("agent/delete"), applyTemplate: invoke("agent/applyTemplate") };
-    this.skills = { list: invoke("skills/list"), install: invoke("skills/install"), update: invoke("skills/update"), uninstall: invoke("skills/uninstall") };
-    this.models = { list: invoke("models/list") };
-    this.cron = { list: invoke("cron/list"), getStatus: invoke("cron/status"), add: invoke("cron/add"), update: invoke("cron/update"), remove: invoke("cron/remove"), run: invoke("cron/run"), listRuns: invoke("cron/runs") };
-    this.mcp = { list: invoke("mcp/list"), prepare: invoke("mcp/prepare"), set: invoke("mcp/set"), unset: invoke("mcp/unset") };
-    this.sessions = { setMode: invoke("session/set_mode"), setModel: invoke("session/set_model"), clear: invoke("session/clear"), cancel: invoke("session/cancel") };
-    this.canvas = { toggle: invoke("canvas/toggle"), clear: invoke("canvas/clear"), reference: invoke("canvas/reference"), setDimensions: invoke("canvas/dimensions") };
-  }
-
-  getCapabilities() {
-    return this.client.methods.getCapabilities(this.id);
-  }
-  invoke(method: string, params: unknown, idempotencyKey: string) {
-    return this.client.methods.invoke(this.id, method, params, idempotencyKey);
-  }
 }

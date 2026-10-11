@@ -40,11 +40,10 @@ def typed_stream_usage(client: BeeOSClient) -> None:
 
 
 def typed_runtime_documents(client: BeeOSClient) -> tuple[str, str, str]:
-    capabilities = client.methods.get_capabilities("instance-1")
-    manifest: str = capabilities["manifestId"]
     terminal = client.instances.create_terminal_session("instance-1", {"platformAgentId": "agent-1"})
     websocket_url: str = terminal["websocketUrl"]
     canvas = client.instances.create_canvas_session("instance-1", {"platformAgentId": "agent-1", "conversationId": "conversation-1"})
     relay_url: str = canvas["relayUrl"]
-    client.methods.invoke("instance-1", {"jsonrpc": "2.0", "id": "rpc-1", "method": "agent.invoke", "params": {}}, {"Idempotency-Key": "operation-1"})
-    return manifest, websocket_url, relay_url
+    harness = client.harnesses.update("chrn_1", {"base": "openclaw"})
+    harness_id: str = harness["id"]
+    return harness_id, websocket_url, relay_url

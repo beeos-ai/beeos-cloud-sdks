@@ -33,7 +33,6 @@ export interface BeeOSClientOptions {
 type Query = Record<string, string | number | boolean | undefined>;
 
 export class BeeOSClient {
-  readonly operations: OperationsModule;
   readonly automations: AutomationsModule;
   readonly audio: AudioModule;
   readonly canvases: CanvasesModule;
@@ -51,11 +50,9 @@ export class BeeOSClient {
   readonly tasks: TasksModule;
   readonly files: FilesModule;
   readonly appWebhooks: AppWebhooksModule;
-  readonly methods: MethodsModule;
 
   constructor(private readonly options: BeeOSClientOptions) {
     if (!options.baseURL || !options.apiKey) throw new Error("Server baseURL and bsk_ apiKey are required");
-    this.operations = new OperationsModule(this);
     this.automations = new AutomationsModule(this);
     this.audio = new AudioModule(this);
     this.canvases = new CanvasesModule(this);
@@ -73,7 +70,6 @@ export class BeeOSClient {
     this.tasks = new TasksModule(this);
     this.files = new FilesModule(this);
     this.appWebhooks = new AppWebhooksModule(this);
-    this.methods = new MethodsModule(this);
   }
 
   withExternalUser(id: string): BeeOSClient {
@@ -240,9 +236,6 @@ class InstancesModule {
   }
   delete(id: string, idempotencyKey: string, version: number): Promise<Models.DeleteInstanceResponse> {
     return this.client.request<Models.DeleteInstanceResponse>("DELETE", `instances/${id}`, { idempotencyKey, headers: { "If-Match": `"${version}"` } });
-  }
-  open(id: string) {
-    return new Instance(this.client, id);
   }
 }
 
@@ -460,104 +453,6 @@ function parseVersionedSignature(value: string): { timestamp: number; signatures
   return timestamp && signatures.length ? { timestamp, signatures } : null;
 }
 
-class MethodsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  getCapabilities(instanceId: string): Promise<Models.GetRuntimeCapabilitiesResponse> {
-    return this.client.request<Models.GetRuntimeCapabilitiesResponse>("GET", `instances/${instanceId}/runtime-capabilities`);
-  }
-  invoke(instanceId: string, method: string, params: JSONValue, idempotencyKey: string): Promise<Models.InvokeRuntimeMethodResponse> {
-    return this.client.request<Models.InvokeRuntimeMethodResponse>("POST", `instances/${instanceId}/methods`, {
-      json: { jsonrpc: "2.0", id: idempotencyKey, method, params },
-      idempotencyKey,
-    });
-  }
-  readonly agents = {
-    create: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "agent/create", params, idempotencyKey),
-    update: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "agent/update", params, idempotencyKey),
-    delete: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "agent/delete", params, idempotencyKey),
-    applyTemplate: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "agent/applyTemplate", params, idempotencyKey),
-  };
-  readonly skills = {
-    list: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "skills/list", params, idempotencyKey),
-    install: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "skills/install", params, idempotencyKey),
-    update: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "skills/update", params, idempotencyKey),
-    uninstall: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "skills/uninstall", params, idempotencyKey),
-  };
-  readonly models = {
-    list: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "models/list", params, idempotencyKey),
-  };
-  readonly cron = {
-    list: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "cron/list", params, idempotencyKey),
-    getStatus: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "cron/status", params, idempotencyKey),
-    add: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "cron/add", params, idempotencyKey),
-    update: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "cron/update", params, idempotencyKey),
-    remove: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "cron/remove", params, idempotencyKey),
-    run: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "cron/run", params, idempotencyKey),
-    listRuns: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "cron/runs", params, idempotencyKey),
-  };
-  readonly mcp = {
-    list: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "mcp/list", params, idempotencyKey),
-    prepare: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "mcp/prepare", params, idempotencyKey),
-    set: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "mcp/set", params, idempotencyKey),
-    unset: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "mcp/unset", params, idempotencyKey),
-  };
-  readonly sessions = {
-    setMode: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "session/set_mode", params, idempotencyKey),
-    setModel: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "session/set_model", params, idempotencyKey),
-    clear: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "session/clear", params, idempotencyKey),
-    cancel: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "session/cancel", params, idempotencyKey),
-  };
-  readonly canvas = {
-    toggle: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "canvas/toggle", params, idempotencyKey),
-    clear: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "canvas/clear", params, idempotencyKey),
-    reference: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "canvas/reference", params, idempotencyKey),
-    setDimensions: (instanceId: string, params: JSONValue, idempotencyKey: string) => this.invoke(instanceId, "canvas/dimensions", params, idempotencyKey),
-  };
-}
-
-type C14Call = (params: JSONValue, idempotencyKey: string) => Promise<Models.InvokeRuntimeMethodResponse>;
-
-export class Instance {
-  readonly agents: { create: C14Call; update: C14Call; delete: C14Call; applyTemplate: C14Call };
-  readonly skills: { list: C14Call; install: C14Call; update: C14Call; uninstall: C14Call };
-  readonly models: { list: C14Call };
-  readonly cron: { list: C14Call; getStatus: C14Call; add: C14Call; update: C14Call; remove: C14Call; run: C14Call; listRuns: C14Call };
-  readonly mcp: { list: C14Call; prepare: C14Call; set: C14Call; unset: C14Call };
-  readonly sessions: { setMode: C14Call; setModel: C14Call; clear: C14Call; cancel: C14Call };
-  readonly canvas: { toggle: C14Call; clear: C14Call; reference: C14Call; setDimensions: C14Call };
-
-  constructor(private readonly client: BeeOSClient, readonly id: string) {
-    const invoke = (method: string): C14Call => (params, idempotencyKey) => this.client.methods.invoke(this.id, method, params, idempotencyKey);
-    this.agents = { create: invoke("agent/create"), update: invoke("agent/update"), delete: invoke("agent/delete"), applyTemplate: invoke("agent/applyTemplate") };
-    this.skills = { list: invoke("skills/list"), install: invoke("skills/install"), update: invoke("skills/update"), uninstall: invoke("skills/uninstall") };
-    this.models = { list: invoke("models/list") };
-    this.cron = { list: invoke("cron/list"), getStatus: invoke("cron/status"), add: invoke("cron/add"), update: invoke("cron/update"), remove: invoke("cron/remove"), run: invoke("cron/run"), listRuns: invoke("cron/runs") };
-    this.mcp = { list: invoke("mcp/list"), prepare: invoke("mcp/prepare"), set: invoke("mcp/set"), unset: invoke("mcp/unset") };
-    this.sessions = { setMode: invoke("session/set_mode"), setModel: invoke("session/set_model"), clear: invoke("session/clear"), cancel: invoke("session/cancel") };
-    this.canvas = { toggle: invoke("canvas/toggle"), clear: invoke("canvas/clear"), reference: invoke("canvas/reference"), setDimensions: invoke("canvas/dimensions") };
-  }
-
-  getCapabilities() {
-    return this.client.methods.getCapabilities(this.id);
-  }
-  invoke(method: string, params: JSONValue, idempotencyKey: string) {
-    return this.client.methods.invoke(this.id, method, params, idempotencyKey);
-  }
-}
-
-class OperationsModule {
-  constructor(private readonly client: BeeOSClient) {}
-  list(instanceId: string, query?: Models.ListRuntimeOperationsQuery): Promise<Models.ListRuntimeOperationsResponse> {
-    return this.client.request<Models.ListRuntimeOperationsResponse>("GET", `instances/${encodeURIComponent(instanceId)}/operations`, { query });
-  }
-  get(operationId: string, instanceId: string): Promise<Models.GetRuntimeOperationResponse> {
-    return this.client.request<Models.GetRuntimeOperationResponse>("GET", `instances/${encodeURIComponent(instanceId)}/operations/${encodeURIComponent(operationId)}`, {  });
-  }
-  cancel(operationId: string, instanceId: string, idempotencyKey: string, XBeeOSOperationId?: string): Promise<Models.CancelRuntimeOperationResponse> {
-    return this.client.request<Models.CancelRuntimeOperationResponse>("POST", `instances/${encodeURIComponent(instanceId)}/operations/${encodeURIComponent(operationId)}/cancel`, { idempotencyKey, headers: { ...(XBeeOSOperationId === undefined ? {} : { "X-BeeOS-Operation-Id": XBeeOSOperationId }) } });
-  }
-}
-
 class AutomationsModule {
   constructor(private readonly client: BeeOSClient) {}
   create(input: Models.CreateAutomationInput): Promise<Models.CreateAutomationResponse> {
@@ -673,8 +568,17 @@ class HarnessesModule {
   list(): Promise<Models.ListHarnessesResponse> {
     return this.client.request<Models.ListHarnessesResponse>("GET", `harnesses`, { basePath: "/uhp/v1" });
   }
+  create(input: Models.CreateHarnessInput): Promise<Models.CreateHarnessResponse> {
+    return this.client.request<Models.CreateHarnessResponse>("POST", `harnesses`, { json: input, basePath: "/uhp/v1" });
+  }
   get(harness_id: string): Promise<Models.GetHarnessResponse> {
     return this.client.request<Models.GetHarnessResponse>("GET", `harnesses/${encodeURIComponent(harness_id)}`, { basePath: "/uhp/v1" });
+  }
+  update(harness_id: string, input: Models.UpdateHarnessInput): Promise<Models.UpdateHarnessResponse> {
+    return this.client.request<Models.UpdateHarnessResponse>("PUT", `harnesses/${encodeURIComponent(harness_id)}`, { json: input, basePath: "/uhp/v1" });
+  }
+  delete(harness_id: string): Promise<Models.DeleteHarnessResponse> {
+    return this.client.request<Models.DeleteHarnessResponse>("DELETE", `harnesses/${encodeURIComponent(harness_id)}`, { basePath: "/uhp/v1" });
   }
   listAllModels(): Promise<Models.ListModelsResponse> {
     return this.client.request<Models.ListModelsResponse>("GET", `models`, { basePath: "/uhp/v1" });

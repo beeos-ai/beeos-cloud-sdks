@@ -60,11 +60,6 @@ func typedStreamUsage(ctx context.Context, client *sdk.BeeOSClient) error {
 }
 
 func typedRuntimeDocuments(ctx context.Context, client *sdk.BeeOSClient) (string, error) {
-	capabilities, err := client.Methods.GetCapabilities(ctx, "instance-1")
-	if err != nil {
-		return "", err
-	}
-	var manifest string = capabilities.ManifestID
 	terminal, err := client.Instances.CreateTerminalSession(ctx, "instance-1", sdk.CreateTerminalSessionRequest{PlatformAgentID: "agent-1"})
 	if err != nil {
 		return "", err
@@ -75,7 +70,10 @@ func typedRuntimeDocuments(ctx context.Context, client *sdk.BeeOSClient) (string
 		return "", err
 	}
 	var relayURL string = canvas.RelayURL
-	_, _, _ = manifest, websocketURL, relayURL
-	_, err = client.Methods.Invoke(ctx, "instance-1", sdk.InvokeRuntimeMethodRequest{JSONrpc: "2.0", ID: "rpc-1", Method: "agent.invoke", Params: sdk.JSONValue(`{}`)}, sdk.InvokeRuntimeMethodOptions{IdempotencyKey: "operation-1"})
-	return manifest, err
+	harness, err := client.Harnesses.Update(ctx, "chrn_1", sdk.UHPHarnessCreate{Base: "openclaw"})
+	if err != nil {
+		return "", err
+	}
+	_, _ = websocketURL, relayURL
+	return harness.ID, nil
 }

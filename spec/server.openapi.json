@@ -2855,418 +2855,6 @@
         }
       }
     },
-    "/instances/{instanceId}/runtime-capabilities": {
-      "get": {
-        "operationId": "getRuntimeCapabilities",
-        "summary": "Get runtime capabilities",
-        "responses": {
-          "200": {
-            "description": "Fenced runtime capability manifest",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RuntimeCapabilityDocument"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-resource": "methods",
-        "x-sdk-method": "getCapabilities",
-        "x-sdk-activation": "live",
-        "parameters": [
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/instances/{instanceId}/methods": {
-      "post": {
-        "operationId": "invokeRuntimeMethod",
-        "summary": "Invoke a runtime method",
-        "parameters": [
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            }
-          },
-          {
-            "name": "X-BeeOS-Operation-Id",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "jsonrpc",
-                  "id",
-                  "method",
-                  "params"
-                ],
-                "additionalProperties": false,
-                "properties": {
-                  "jsonrpc": {
-                    "type": "string",
-                    "enum": [
-                      "2.0"
-                    ]
-                  },
-                  "id": {
-                    "type": "string"
-                  },
-                  "method": {
-                    "type": "string"
-                  },
-                  "params": {
-                    "$ref": "#/components/schemas/JSONValue"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "JSON-RPC success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RuntimeMethodResponse"
-                }
-              }
-            }
-          },
-          "202": {
-            "description": "Operation accepted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RuntimeMethodResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-resource": "methods",
-        "x-sdk-method": "invoke",
-        "x-sdk-activation": "live"
-      }
-    },
-    "/instances/{instanceId}/operations": {
-      "get": {
-        "operationId": "listRuntimeOperations",
-        "summary": "List active runtime operations",
-        "parameters": [
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "active"
-              ]
-            }
-          },
-          {
-            "name": "cursor",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "maxLength": 128
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 200
-            }
-          },
-          {
-            "name": "method",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Active owner-scoped operations",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CloudSkillOperationPage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-resource": "operations",
-        "x-sdk-method": "list",
-        "x-sdk-activation": "live"
-      }
-    },
-    "/instances/{instanceId}/operations/{operationId}": {
-      "get": {
-        "operationId": "getRuntimeOperation",
-        "summary": "Get a runtime operation",
-        "responses": {
-          "200": {
-            "description": "Reduced durable operation snapshot",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CloudSkillOperationDetail"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-resource": "operations",
-        "x-sdk-method": "get",
-        "x-sdk-activation": "live",
-        "parameters": [
-          {
-            "name": "operationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/instances/{instanceId}/operations/{operationId}/cancel": {
-      "post": {
-        "operationId": "cancelRuntimeOperation",
-        "summary": "Cancel a runtime operation",
-        "parameters": [
-          {
-            "name": "operationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "instanceId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Idempotency-Key",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            }
-          },
-          {
-            "name": "X-BeeOS-Operation-Id",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "202": {
-            "description": "Cancellation requested",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string"
-                    },
-                    "operationId": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "status",
-                    "operationId"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Cloud Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-sdk-resource": "operations",
-        "x-sdk-method": "cancel",
-        "x-sdk-activation": "live"
-      }
-    },
     "/instances/{instanceId}/terminal-sessions": {
       "post": {
         "operationId": "createTerminalSession",
@@ -6812,6 +6400,107 @@
             "url": "https://api.cloud.beeos.ai/uhp/v1"
           }
         ]
+      },
+      "post": {
+        "tags": [
+          "Harnesses"
+        ],
+        "operationId": "createHarness",
+        "summary": "Create a harness",
+        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. instance_id and name are required; default_model is honored only here. skills are rejected on create (422 beeos_field_not_supported); add them with PUT. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UHPHarnessCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The harness",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPHarness"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "harnesses",
+        "x-sdk-method": "create",
+        "x-sdk-activation": "live",
+        "parameters": [],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
       }
     },
     "/harnesses/{harness_id}": {
@@ -6850,6 +6539,195 @@
         "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
         "x-sdk-resource": "harnesses",
         "x-sdk-method": "get",
+        "x-sdk-activation": "live",
+        "parameters": [
+          {
+            "name": "harness_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Harnesses"
+        ],
+        "operationId": "updateHarness",
+        "summary": "Replace a harness",
+        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. An absent field is unchanged. When skills is present it is diffed against the installed skills: listed skills with files, content or blob are installed; omitted catalog-origin skills are uninstalled; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UHPHarnessCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The harness",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPHarness"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "harnesses",
+        "x-sdk-method": "update",
+        "x-sdk-activation": "live",
+        "parameters": [
+          {
+            "name": "harness_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://api.cloud.beeos.ai/uhp/v1"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Harnesses"
+        ],
+        "operationId": "deleteHarness",
+        "summary": "Delete a harness",
+        "description": "Not supported by BeeOS Cloud yet: returns 422 beeos_harness_delete_not_supported once the harness is found.",
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "deleted"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-base-path": "/uhp/v1",
+        "x-sdk-provenance": "openapi/uhp/uhp-2026-10-04.openapi.yaml",
+        "x-sdk-resource": "harnesses",
+        "x-sdk-method": "delete",
         "x-sdk-activation": "live",
         "parameters": [
           {
@@ -7151,7 +7029,7 @@
         ],
         "operationId": "deleteResponse",
         "summary": "Delete a stored response",
-        "description": "Must not cancel a running task \u2014 deletion and cancellation are different intentions.",
+        "description": "Must not cancel a running task — deletion and cancellation are different intentions.",
         "responses": {
           "200": {
             "description": "Deleted",
@@ -7285,7 +7163,7 @@
         ],
         "operationId": "cancelResponse",
         "summary": "Cancel a running task",
-        "description": "Idempotent. Cancelling an already-terminal task succeeds and changes nothing \u2014 a client\nretrying a cancel after a dropped connection must not be punished for having succeeded.\n",
+        "description": "Idempotent. Cancelling an already-terminal task succeeds and changes nothing — a client\nretrying a cancel after a dropped connection must not be punished for having succeeded.\n",
         "responses": {
           "200": {
             "description": "The Response, now cancelling or terminal",
@@ -8901,7 +8779,7 @@
           },
           "base": {
             "type": "string",
-            "description": "Opaque. Not enumerated by this specification \u2014 a client must treat it as a string, or the\nprotocol would need revising every time a harness is released.\n",
+            "description": "Opaque. Not enumerated by this specification — a client must treat it as a string, or the\nprotocol would need revising every time a harness is released.\n",
             "examples": [
               "codex",
               "claude-code",
@@ -9004,6 +8882,11 @@
           "auth": {
             "type": "string",
             "description": "Bearer token, or a server-side reference the server resolves. A server must never return\na resolved credential to a client.\n"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "BeeOS extension. Expiry of the supplied short-lived credential; the caller refreshes it with another PUT."
           }
         },
         "additionalProperties": {
@@ -9104,7 +8987,7 @@
         "required": [
           "name"
         ],
-        "description": "A skill is a FOLDER, not a file. A server must materialise the whole folder where the agent\ncan read it \u2014 materialising only SKILL.md breaks every skill carrying references, scripts or\ndata. Round-tripping a harness through GET and PUT must not lose skill contents.\n",
+        "description": "A skill is a FOLDER, not a file. A server must materialise the whole folder where the agent\ncan read it — materialising only SKILL.md breaks every skill carrying references, scripts or\ndata. Round-tripping a harness through GET and PUT must not lose skill contents.\n",
         "properties": {
           "name": {
             "type": "string"
@@ -9128,6 +9011,14 @@
           "blob": {
             "type": "string",
             "description": "Server-assigned handle for a bundle stored out of line. A client receives it, passes it\nback unchanged, and reads the files from the skill files endpoint.\n"
+          },
+          "sha256": {
+            "type": "string",
+            "description": "BeeOS extension. SHA-256 of the Files bundle referenced by blob."
+          },
+          "size_bytes": {
+            "type": "string",
+            "description": "BeeOS extension. Decimal byte size of the Files bundle referenced by blob."
           }
         },
         "additionalProperties": {
@@ -9279,7 +9170,7 @@
           },
           "extensions": {
             "type": "object",
-            "description": "Client-specific data keyed by reverse-domain namespace, per Agent Plugins \u00a78.",
+            "description": "Client-specific data keyed by reverse-domain namespace, per Agent Plugins §8.",
             "additionalProperties": {
               "type": "object",
               "additionalProperties": {
@@ -9504,14 +9395,14 @@
                 "$ref": "#/components/schemas/JSONValue"
               }
             },
-            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. A UHP harness invokes and executes tools\nitself and reports them in `output`; there is no input path for a tool result, so the\nclient-executed tool loop this field implies cannot be completed by a conformant server.\nConfigure tools on the harness instead \u2014 see Harnesses \u00a74.1. Tasks \u00a71.4.\n"
+            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. A UHP harness invokes and executes tools\nitself and reports them in `output`; there is no input path for a tool result, so the\nclient-executed tool loop this field implies cannot be completed by a conformant server.\nConfigure tools on the harness instead — see Harnesses §4.1. Tasks §1.4.\n"
           },
           "include": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. No values are enumerated, so any string a\nserver recognised would be one it named itself. Tasks \u00a71.4.\n"
+            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. No values are enumerated, so any string a\nserver recognised would be one it named itself. Tasks §1.4.\n"
           },
           "background": {
             "type": "boolean",
@@ -9626,7 +9517,7 @@
                 "items": {
                   "type": "string"
                 },
-                "description": "Request fields the server did not act on, by name, in any order. Required when the\nrequest carried `tools` or `include`, which are reserved and ignored. A silently\nignored field is indistinguishable from an honoured one. Tasks \u00a71.1 and \u00a71.4.\n"
+                "description": "Request fields the server did not act on, by name, in any order. Required when the\nrequest carried `tools` or `include`, which are reserved and ignored. A silently\nignored field is indistinguishable from an honoured one. Tasks §1.1 and §1.4.\n"
               }
             },
             "additionalProperties": {
@@ -11220,188 +11111,6 @@
         ],
         "additionalProperties": false
       },
-      "CloudSkillOperationDetail": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "instanceId": {
-            "type": "string"
-          },
-          "target": {
-            "$ref": "#/components/schemas/CloudRuntimeOperationTarget"
-          },
-          "capability": {
-            "type": "string"
-          },
-          "transport": {
-            "type": "string"
-          },
-          "sequence": {
-            "type": "string"
-          },
-          "cursor": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "effectState": {
-            "type": "string"
-          },
-          "operationId": {
-            "type": "string"
-          },
-          "requestOperationId": {
-            "type": "string"
-          },
-          "replayDefaultKey": {
-            "type": "boolean"
-          },
-          "method": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "terminal": {
-            "type": "boolean"
-          },
-          "contractRevision": {
-            "type": "string"
-          },
-          "catalogIntent": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CloudSkillInstallIntent"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "skillIntent": {
-            "$ref": "#/components/schemas/JSONValue"
-          },
-          "templateIntent": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CloudTemplateIntent"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "result": {
-            "$ref": "#/components/schemas/JSONValue"
-          },
-          "error": {
-            "$ref": "#/components/schemas/JSONValue"
-          },
-          "observationCode": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "instanceId",
-          "target",
-          "capability",
-          "transport",
-          "sequence",
-          "cursor",
-          "createdAt",
-          "effectState",
-          "operationId",
-          "method",
-          "status",
-          "terminal",
-          "contractRevision",
-          "updatedAt"
-        ],
-        "additionalProperties": false
-      },
-      "CloudRuntimeOperationTarget": {
-        "type": "object",
-        "properties": {
-          "scope": {
-            "type": "string"
-          },
-          "platformAgentId": {
-            "type": "string"
-          },
-          "conversationId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "scope"
-        ],
-        "additionalProperties": false
-      },
-      "CloudSkillInstallIntent": {
-        "type": "object",
-        "properties": {
-          "platformAgentId": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "platformAgentId",
-          "slug"
-        ],
-        "additionalProperties": false
-      },
-      "CloudTemplateIntent": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "templateId": {
-            "type": "string"
-          },
-          "templateVersion": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name",
-          "templateId"
-        ],
-        "additionalProperties": false
-      },
-      "CloudSkillOperationPage": {
-        "type": "object",
-        "properties": {
-          "operations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CloudSkillOperationDetail"
-            }
-          },
-          "nextCursor": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "operations"
-        ],
-        "additionalProperties": false
-      },
       "a2aTaskView": {
         "type": "object",
         "properties": {
@@ -12350,113 +12059,6 @@
           }
         ]
       },
-      "RuntimeMethodAvailability": {
-        "type": "object",
-        "properties": {
-          "enabled": {
-            "type": "boolean"
-          },
-          "minimumRuntimeRpcProtocolVersion": {
-            "type": "integer"
-          },
-          "minimumRuntimeContractRevision": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "enabled",
-          "minimumRuntimeRpcProtocolVersion"
-        ],
-        "additionalProperties": false
-      },
-      "RuntimeCapabilitySupport": {
-        "type": "object",
-        "properties": {
-          "service": {
-            "type": "boolean"
-          },
-          "minimumRuntimeRpcProtocolVersion": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "service"
-        ],
-        "additionalProperties": false
-      },
-      "RuntimeCapabilityDocument": {
-        "type": "object",
-        "properties": {
-          "manifestId": {
-            "type": "string"
-          },
-          "contractRevision": {
-            "type": "string"
-          },
-          "runtimeRpcProtocolVersion": {
-            "type": "integer"
-          },
-          "runtimeEpoch": {
-            "type": "string"
-          },
-          "serviceMethods": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "conversationMethods": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "methodAvailability": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/RuntimeMethodAvailability"
-            }
-          },
-          "conversationMethodAvailability": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/RuntimeMethodAvailability"
-            }
-          },
-          "capabilities": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/RuntimeCapabilitySupport"
-            }
-          },
-          "generatedAt": {
-            "type": "string"
-          },
-          "expiresAt": {
-            "type": "string"
-          },
-          "terminalTransport": {
-            "type": "string"
-          },
-          "canvasTransport": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "manifestId",
-          "contractRevision",
-          "runtimeRpcProtocolVersion",
-          "runtimeEpoch",
-          "serviceMethods",
-          "conversationMethods",
-          "methodAvailability",
-          "conversationMethodAvailability",
-          "capabilities",
-          "generatedAt",
-          "expiresAt"
-        ],
-        "additionalProperties": false
-      },
       "RealtimeTicketHeader": {
         "type": "object",
         "properties": {
@@ -12693,6 +12295,80 @@
           "message"
         ],
         "additionalProperties": false
+      },
+      "UHPHarnessCreate": {
+        "type": "object",
+        "required": [
+          "base"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "base": {
+            "type": "string"
+          },
+          "default_model": {
+            "type": "string",
+            "description": "BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent."
+          },
+          "system_prompt": {
+            "type": "string"
+          },
+          "mcp_servers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UHPMcpServer"
+            },
+            "description": "Not accepted by BeeOS Cloud yet: a non-empty list returns 422 beeos_mcp_not_supported."
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UHPSkill"
+            }
+          },
+          "plugins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UHPPlugin"
+            },
+            "description": "Requires the `plugins` capability. Each item needs `files` or `blob`."
+          },
+          "environment": {
+            "type": "string",
+            "description": "An environment id of the caller's scope, or empty. Requires the `environments` capability."
+          },
+          "disabled_tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "max_step": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "timeout_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "instance_id": {
+            "type": "string",
+            "description": "BeeOS extension. Instance that hosts a new harness (create only)."
+          },
+          "template_id": {
+            "type": "string",
+            "description": "BeeOS extension. Agent template applied to the harness."
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
       }
     },
     "responses": {
