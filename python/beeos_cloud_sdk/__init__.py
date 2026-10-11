@@ -78,7 +78,7 @@ InstanceTemplate = TypedDict("InstanceTemplate", {
     "description": "NotRequired[str]",
     "logo_url": "NotRequired[str]",
     "sort_order": "NotRequired[int]",
-    "agent_framework": "NotRequired[str]",
+    "harness": "NotRequired[str]",
     "provider_id": "NotRequired[str]",
     "specs": "NotRequired[list[CatalogSpec]]",
     "variants": "NotRequired[list[CatalogVariant]]",
@@ -105,7 +105,7 @@ InstanceSummary = TypedDict("InstanceSummary", {
     "app_id": "Required[str]",
     "developer_id": "Required[str]",
     "name": "Required[str]",
-    "agent_framework": "Required[str]",
+    "harness": "Required[str]",
     "provider_id": "Required[str]",
     "region": "Required[str]",
     "os_type": "Required[str]",
@@ -620,7 +620,7 @@ RuntimeInstanceSummary = TypedDict("RuntimeInstanceSummary", {
     "app_id": "Required[str]",
     "developer_id": "Required[str]",
     "name": "Required[str]",
-    "agent_framework": "Required[str]",
+    "harness": "Required[str]",
     "provider_id": "Required[str]",
     "region": "Required[str]",
     "os_type": "Required[str]",
@@ -727,7 +727,7 @@ FileOrigin = TypedDict("FileOrigin", {
     "instance_name": "NotRequired[str]",
     "agent_name": "NotRequired[str]",
     "avatar_url": "NotRequired[str]",
-    "agent_framework": "NotRequired[str]",
+    "harness": "NotRequired[str]",
     "destroyed": "NotRequired[bool]",
 })
 
@@ -881,7 +881,7 @@ agentBindDetailsWire = TypedDict("agentBindDetailsWire", {
     "bind_id": "Required[str]",
     "hostname": "Required[str]",
     "fingerprint_short": "Required[str]",
-    "agent_framework": "Required[str]",
+    "harness": "Required[str]",
     "os_type": "NotRequired[str]",
     "expires_at": "Required[int]",
     "status": "Required[str]",
@@ -915,7 +915,7 @@ agentTemplateCatalogView = TypedDict("agentTemplateCatalogView", {
     "banner_url": "Required[str]",
     "default_model": "Required[str]",
     "tags": "Required[list[str]]",
-    "agent_framework": "Required[str]",
+    "harness": "Required[str]",
     "template_version": "Required[str]",
 })
 
@@ -941,7 +941,7 @@ a2aTaskView = TypedDict("a2aTaskView", {
 CreateServerInstanceInput = TypedDict("CreateServerInstanceInput", {
     "name": "Required[str]",
     "variant_id": "NotRequired[str]",
-    "agent_framework": "NotRequired[Literal[\"openclaw\"]]",
+    "harness": "NotRequired[Literal[\"openclaw\"]]",
     "llm": "NotRequired[RuntimeLLM | None]",
 })
 
@@ -1259,14 +1259,14 @@ ListDeployRegionsOptions = TypedDict("ListDeployRegionsOptions", {
 })
 
 ListDeployModelsOptions = TypedDict("ListDeployModelsOptions", {
-    "agent_framework": "NotRequired[str]",
+    "harness": "NotRequired[str]",
     "search": "NotRequired[str]",
 })
 
 ListInstanceTemplatesOptions = TypedDict("ListInstanceTemplatesOptions", {
     "page": "NotRequired[int]",
     "page_size": "NotRequired[int]",
-    "agent_framework": "NotRequired[str]",
+    "harness": "NotRequired[str]",
     "provider_id": "NotRequired[str]",
     "search": "NotRequired[str]",
 })
@@ -1288,7 +1288,7 @@ ListInstancesOptions = TypedDict("ListInstancesOptions", {
     "page_size": "NotRequired[int]",
     "status": "NotRequired[str]",
     "provider_id": "NotRequired[str]",
-    "agent_framework": "NotRequired[str]",
+    "harness": "NotRequired[str]",
     "cluster_id": "NotRequired[str]",
     "search": "NotRequired[str]",
 })
@@ -1792,7 +1792,7 @@ FileSummaryInstancesItem = TypedDict("FileSummaryInstancesItem", {
     "instance_name": "NotRequired[str]",
     "agent_name": "NotRequired[str]",
     "avatar_url": "NotRequired[str]",
-    "agent_framework": "NotRequired[str]",
+    "harness": "NotRequired[str]",
     "destroyed": "NotRequired[bool]",
     "count": "Required[int]",
 })
@@ -2130,8 +2130,8 @@ class CatalogResource:
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
         opts = options if options is not None else {}
-        if "agent_framework" in opts:
-            query["agent_framework"] = str(opts["agent_framework"])
+        if "harness" in opts:
+            query["harness"] = str(opts["harness"])
         if "search" in opts:
             query["search"] = str(opts["search"])
         payload = self._client._request("listDeployModels", "GET", path, "", query, headers, None, "")
@@ -2146,8 +2146,8 @@ class CatalogResource:
             query["page"] = str(opts["page"])
         if "page_size" in opts:
             query["page_size"] = str(opts["page_size"])
-        if "agent_framework" in opts:
-            query["agent_framework"] = str(opts["agent_framework"])
+        if "harness" in opts:
+            query["harness"] = str(opts["harness"])
         if "provider_id" in opts:
             query["provider_id"] = str(opts["provider_id"])
         if "search" in opts:
@@ -2210,8 +2210,8 @@ class InstancesResource:
             query["status"] = str(opts["status"])
         if "provider_id" in opts:
             query["provider_id"] = str(opts["provider_id"])
-        if "agent_framework" in opts:
-            query["agent_framework"] = str(opts["agent_framework"])
+        if "harness" in opts:
+            query["harness"] = str(opts["harness"])
         if "cluster_id" in opts:
             query["cluster_id"] = str(opts["cluster_id"])
         if "search" in opts:

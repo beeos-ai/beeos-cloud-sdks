@@ -110,7 +110,7 @@ for n,(fields,prefix,body) in models.items():
  S[n]=obj(props,req)
 # Embedded File request base (untagged embed is flattened on JSON wire).
 S['FilePrepareUploadInput']['properties'].update(S['FilePrepareInput']['properties']);S['FilePrepareUploadInput']['required']+=S['FilePrepareInput']['required']
-S['CreateServerInstanceInput']=obj({'name':strs,'variant_id':strs,'agent_framework':{'type':'string','enum':['openclaw']},'llm':{'anyOf':[ref('RuntimeLLM'),{'type':'null'}]}},['name'])
+S['CreateServerInstanceInput']=obj({'name':strs,'variant_id':strs,'harness':{'type':'string','enum':['openclaw']},'llm':{'anyOf':[ref('RuntimeLLM'),{'type':'null'}]}},['name'])
 S['RuntimeInstanceSummary']['properties']['capabilities']=obj({'computer':{'type':'boolean'},'mobile':{'type':'boolean'},'device':{'type':'boolean'},'terminal':{'type':'boolean'}},[])
 S['RuntimeLLMProvider']['properties']['api_key']['writeOnly']=True
 S['RuntimeLLMProvider']['properties']['protocol']={'type':'string','enum':['openai','anthropic']}
