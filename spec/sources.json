@@ -26,7 +26,7 @@
     "dependency": "PyYAML==6.0.3",
     "procedure": "Fetch the split producer remote, review changes in public route registrations and schema producers, update --producer-ref to the reviewed full commit SHA; refresh; npm run generate; run all language strict checks and tests. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes."
   },
-  "version": "2.0.0",
+  "version": "3.0.0",
   "activation": {
     "live": "Registered Server-key producer route; all non-live operations are excluded"
   },
