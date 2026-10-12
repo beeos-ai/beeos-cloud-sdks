@@ -273,7 +273,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get an instance status */
+        /** Get instance status */
         get: operations["getInstanceStatus"];
         put?: never;
         post?: never;
@@ -1123,7 +1123,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get agent bind details */
+        /** Get agent bind session details */
         get: operations["getAgentBindDetails"];
         put?: never;
         post?: never;
@@ -1142,7 +1142,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Confirm an agent bind */
+        /** Confirm an agent bind session */
         post: operations["confirmAgentBind"];
         delete?: never;
         options?: never;
@@ -1513,7 +1513,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Stream the events of a response */
+        /** Stream or resume the events of a response */
         get: operations["getResponseEvents"];
         put?: never;
         post?: never;

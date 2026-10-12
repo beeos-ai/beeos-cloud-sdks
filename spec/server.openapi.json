@@ -1228,7 +1228,7 @@
             }
           }
         },
-        "summary": "Get an instance status"
+        "summary": "Get instance status"
       }
     },
     "/instances/{instanceId}/start": {
@@ -5851,7 +5851,7 @@
           }
         },
         "x-sdk-error-code-field": "error",
-        "summary": "Get agent bind details"
+        "summary": "Get agent bind session details"
       }
     },
     "/agent/bind/{id}/confirm": {
@@ -5930,7 +5930,7 @@
           }
         },
         "x-sdk-error-code-field": "error",
-        "summary": "Confirm an agent bind"
+        "summary": "Confirm an agent bind session"
       }
     },
     "/agent/portal/bind-sessions": {
@@ -7579,9 +7579,9 @@
             }
           }
         },
-        "summary": "Stream the events of a response",
         "x-sdk-base-path": "/uhp/v1",
         "x-sdk-stream": true,
+        "summary": "Stream or resume the events of a response",
         "servers": [
           {
             "url": "https://api.cloud.beeos.ai/uhp/v1"
@@ -12989,5 +12989,5 @@
     }
   },
   "x-producer-repository": "beeos-ai/beeos-cloud-backend",
-  "x-producer-revision": "3f68df5f015162446efcf91a0d0b1fea6c3f154b"
+  "x-producer-revision": "e947aed9134c4443f410903ce717a3a01c15cb73"
 }

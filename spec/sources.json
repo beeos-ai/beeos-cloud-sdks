@@ -2,7 +2,7 @@
   "spec": "server.openapi.json",
   "producer": {
     "repository": "beeos-ai/beeos-cloud-backend",
-    "revision": "3f68df5f015162446efcf91a0d0b1fea6c3f154b",
+    "revision": "e947aed9134c4443f410903ce717a3a01c15cb73",
     "read_method": "git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)"
   },
   "app_sdk": {
@@ -55,7 +55,7 @@
     "app-sdk/t07-server.openapi.json": "338ba08f1af8ca3651e60dcd5b1cda8fa8dbe1586e2ebe287ebf01509f7d2d02",
     "producer/openapi/beeos-cloud/fragments/C01/server.openapi.json": "fbf5213c919620cbf7938a7ddcecf49a2129d2506131a64d89934698089881c8",
     "producer/openapi/beeos-cloud/rest/server-openapi.yaml": "fec9ca025a9c495274c5b23e6f470dcc8056b9e4bdbd95864d4e0811ecda55c9",
-    "producer/openapi/beeos-cloud/rest/server-operation-summaries.json": "0a36b11149ce79d39b36f54683cad159c66dc23044f52a4ab417bbf7c536c09c",
+    "producer/openapi/beeos-cloud/rest/server-operation-summaries.json": "6eefdda9f9451fbee12f4951449546e2dd0e79b6c3158b83af8cb76e43c9bd98",
     "producer/openapi/beeos-cloud/schemas/error.schema.json": "69a345d762826379d2d470a71f6aecf4448a1a16073a5ac3e50cea21e95d3ba0",
     "producer/openapi/beeos-cloud/t04/schemas.json": "35b058938453c76905b67e54ac8ab52edc782fa416e524018dc8e7b5abf47e7d",
     "producer/openapi/beeos-cloud/t04/server-openapi.json": "091c53642324099886c0a4118832ffd9d903e92d59bcb4490709579f2b08a5b1",

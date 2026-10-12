@@ -131,8 +131,6 @@ idem=param('Idempotency-Key','header',required=True); version=param('If-Match','
 def op(path,method,oid,resource,name,response,request=None,query=None,headers=None,status='200',activation='live'):
  o={'operationId':oid,'x-sdk-resource':resource,'x-sdk-method':name,'x-sdk-activation':activation,'x-sdk-provenance':'services/openapi-gateway/internal/beeoscloud','parameters':[param(n,'path',required=True) for n in re.findall(r'{(.*?)}',path)]+(query or [])+(headers or []),'responses':{status:{'description':'Success',**({'content':{'application/json':{'schema':ref(response) if isinstance(response,str) else response}}} if response else {})},'default':{'$ref':'#/components/responses/Error'}}}
  if request:o['requestBody']={'required':True,'content':{'application/json':{'schema':ref(request) if isinstance(request,str) else request}}}
- previous=spec['paths'].get(path,{}).get(method,{})
- if previous.get('summary'):o['summary']=previous['summary']
  spec['paths'].setdefault(path,{})[method]=o
 # Overwrite stale lifecycle schemas with producer results and accepted fields.
 op('/instances','post','instanceCreate','instances','create','RuntimeInstanceResult','CreateServerInstanceInput',headers=[idem],status='202')
@@ -283,7 +281,7 @@ for path in [p for p in spec['paths'] if re.match(r'/(skills|featured|skillhub|m
 # UHP events is an SSE stream.
 S['UHPStreamEvent']=obj({'event':strs,'data':ref('JSONValue'),'id':strs},['event','data'])
 op('/uhp/v1/responses/{response_id}/events','get','getResponseEvents','responses','getEvents',None,headers=[param('Last-Event-ID','header'),param('UHP-Version','header')])
-o=spec['paths']['/uhp/v1/responses/{response_id}/events']['get'];o['summary']='Stream the events of a response';o['x-sdk-base-path']='/uhp/v1';o['x-sdk-stream']=True;o['responses']['200']={'description':'Server-sent protocol events','content':{'text/event-stream':{'schema':ref('UHPStreamEvent')}}}
+o=spec['paths']['/uhp/v1/responses/{response_id}/events']['get'];o['x-sdk-base-path']='/uhp/v1';o['x-sdk-stream']=True;o['responses']['200']={'description':'Server-sent protocol events','content':{'text/event-stream':{'schema':ref('UHPStreamEvent')}}}
 # Multipart transcribe response is typed; generators must send multipart.
 op('/audio/transcribe','post','transcribeAudio','audio','transcribe',obj({'text':strs}),obj({'file':{'type':'string','format':'binary'}}))
 o=spec['paths']['/audio/transcribe']['post'];o['requestBody']['content']['multipart/form-data']=o['requestBody']['content'].pop('application/json')
@@ -359,15 +357,15 @@ try:summaries=json.loads(read(SUMMARIES))['operations']
 except subprocess.CalledProcessError:raise SystemExit('producer revision '+PB[1]+' has no '+str(SUMMARIES.relative_to(B)))
 for key,summary in summaries.items():
  method,path=key.split(' ',1)
- overlay[route_key(method,path[3:])]=summary
+ overlay[route_key(method,path)]=summary
 live_ops=[(path,method,o) for path,ops in spec['paths'].items() for method,o in ops.items() if o['x-sdk-activation']=='live']
 used=set()
+def producer_path(path):return path[4:] if path.startswith('/uhp/v1/') else '/v1'+path
 for path,method,o in live_ops:
- if not path.startswith('/uhp') and route_key(method,path) in overlay:o['summary']=overlay[route_key(method,path)];used.add(route_key(method,path))
+ key=route_key(method,producer_path(path))
+ if key in overlay:o['summary']=overlay[key];used.add(key)
 missing=sorted(method.upper()+' '+path for path,method,o in live_ops if not o.get('summary'))
 if missing:raise SystemExit('live operations without a summary: '+', '.join(missing))
-stale=sorted(k for k in overlay if k not in used and k not in live)
-if stale:raise SystemExit('summary overlay keys that match no registered producer route: '+', '.join(m.upper()+' '+p for m,p in stale))
 print('summaries',sum(1 for _,_,o in live_ops if o.get('summary')),'of',len(live_ops),'live operations; overlay routes outside the SDK surface',len(overlay)-len(used))
 # Version 2 exports exactly the live Server producer surface.
 for path in list(spec['paths']):

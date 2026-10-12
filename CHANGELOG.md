@@ -34,8 +34,8 @@ Not yet published.
 - `conversations.setReasoning` and `conversations.setApprovalMode`
   (`PUT .../conversations/{conversationId}/reasoning` and `/approval-mode`), and the
   `reasoning`, `approval_mode` and `active_response` fields of `Conversation`.
-- Every operation has a `summary`, taken from the producer's
-  `server-operation-summaries.json` (UHP operations keep the UHP protocol summary).
+- Every operation has a `summary`; all of them come from the producer's
+  `server-operation-summaries.json`.
 
 ### Changed
 
