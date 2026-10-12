@@ -79,7 +79,7 @@ Not supported by BeeOS Cloud yet (422):
 |---|---|
 | `delete` | `beeos_harness_delete_not_supported` |
 | `default_model` different from the current one on `update` (without `template_id`) | `beeos_field_not_supported` |
-| name change, non-empty `system_prompt`, `disabled_tools`, `environment` or `plugins`, any `max_step` or `timeout_seconds` (a value equal to what `get` reports is accepted) | `beeos_field_not_supported` |
+| name change, non-empty `system_prompt`, `disabled_tools`, `environment` or `plugins`, any `max_step` or `timeout_seconds` (an unchanged name and empty values are accepted) | `beeos_field_not_supported` |
 | non-empty `mcp_servers` when the instance runtime has no MCP methods | `beeos_mcp_not_supported` |
 
 Harness writes are synchronous. Cloud submits the runtime operations and waits
