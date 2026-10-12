@@ -1,6 +1,5 @@
-import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { BeeOSAPIError, BeeOSClient, verifyTaskWebhookSignature } from "./index.ts";
+import { BeeOSAPIError, BeeOSClient } from "./index.ts";
 
 describe("BeeOSClient", () => {
   it("sends bsk_ and scopes external user without mutating the parent", async () => {
@@ -78,12 +77,12 @@ describe("BeeOSClient", () => {
   });
 
   it("uses FILE-API-001 presign-upload and UHP harness management", async () => {
-    const calls: Array<{ url: string; method: string | undefined; body: string | undefined }> = [];
+    const calls: Array<{ url: string; method: string | undefined; body: string | undefined; idem: string | null }> = [];
     const client = new BeeOSClient({
       baseURL: "https://api.cloud.beeos.ai/v1/",
       apiKey: "bsk_test",
       fetch: async (input, init) => {
-        calls.push({ url: String(input), method: init?.method, body: typeof init?.body === "string" ? init.body : undefined });
+        calls.push({ url: String(input), method: init?.method, body: typeof init?.body === "string" ? init.body : undefined, idem: new Headers(init?.headers).get("Idempotency-Key") });
         return new Response(JSON.stringify({ file_id: "file_1" }), { status: 200, headers: { "Content-Type": "application/json" } });
       },
     });
@@ -93,7 +92,7 @@ describe("BeeOSClient", () => {
     await client.files.resolveDownload("file_1");
     await client.instances.getStatus("inst_1");
     await client.harnesses.create({ base: "openclaw", name: "a", instance_id: "inst_1" });
-    await client.harnesses.update("chrn_1", { base: "openclaw", skills: [{ name: "weather", blob: "file_1", sha256: "a".repeat(64), size_bytes: "12" }], template_id: "tpl_1" });
+    await client.harnesses.update("chrn_1", { base: "openclaw", skills: [{ name: "weather", blob: "file_1", sha256: "a".repeat(64), size_bytes: "12" }], template_id: "tpl_1" }, "retry-1");
     await client.harnesses.delete("chrn_1");
     await client.harnesses.listModels("chrn_1");
     expect(calls[0].url).toContain("/deploy/regions");
@@ -104,19 +103,10 @@ describe("BeeOSClient", () => {
     expect(calls[4].url).toContain("/instances/inst_1/status");
     expect(calls[5]).toMatchObject({ method: "POST", url: "https://api.cloud.beeos.ai/uhp/v1/harnesses" });
     expect(JSON.parse(calls[5].body ?? "{}")).toMatchObject({ base: "openclaw", instance_id: "inst_1" });
-    expect(calls[6]).toMatchObject({ method: "PUT", url: "https://api.cloud.beeos.ai/uhp/v1/harnesses/chrn_1" });
+    expect(calls[6]).toMatchObject({ method: "PUT", url: "https://api.cloud.beeos.ai/uhp/v1/harnesses/chrn_1", idem: "retry-1" });
     expect(JSON.parse(calls[6].body ?? "{}")).toMatchObject({ template_id: "tpl_1", skills: [{ name: "weather", blob: "file_1" }] });
     expect(calls[7]).toMatchObject({ method: "DELETE", url: "https://api.cloud.beeos.ai/uhp/v1/harnesses/chrn_1" });
     expect(calls[8].url).toBe("https://api.cloud.beeos.ai/uhp/v1/harnesses/chrn_1/models");
-  });
-
-  it("verifies task webhook HMAC", () => {
-    const secret = "s".repeat(32);
-    const body = Buffer.from(`{"ok":true}`);
-    const timestamp = Math.floor(Date.now() / 1000);
-    const signature = createHmac("sha256", secret).update(`${timestamp}.`).update(body).digest("hex");
-    const client = new BeeOSClient({ baseURL: "https://api.cloud.beeos.ai/v1/", apiKey: "bsk_test", fetch: async () => new Response("{}", { status: 200 }) });
-    expect(verifyTaskWebhookSignature(body, { "X-BeeOS-Event-Id": "evt_1", "X-BeeOS-Signature": `t=${timestamp},v1=${signature}` }, secret)).toBe(true);
   });
 });
 
@@ -241,7 +231,7 @@ it('keeps transport failures without an HTTP status visible', async () => {
 
 it('removes the inactive server resources and methods in v2', () => {
   const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key' });
-  for (const resource of ['images', 'imageVersions', 'eventSessions', 'taskWebhooks', 'runtime']) expect(resource in client).toBe(false);
+  for (const resource of ['images', 'imageVersions', 'eventSessions', 'taskWebhooks', 'runtime', 'appWebhooks']) expect(resource in client).toBe(false);
   for (const method of ['getHistory', 'getLimits']) expect(method in client.usage).toBe(false);
   expect('send' in client.messages).toBe(false);
   expect('methods' in client).toBe(false);

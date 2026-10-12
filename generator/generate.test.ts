@@ -51,7 +51,7 @@ it('generates only the live v3 operation set with correct UHP servers and errors
   const spec = JSON.parse(await fs.readFile('spec/server.openapi.json', 'utf8'));
   const ops = Object.entries(spec.paths).flatMap(([route, item]) => Object.values(item as Record<string, {operationId?: string; [key: string]: unknown}>).filter(op => op.operationId).map(op => ({route, op})));
   expect(spec.info.version).toBe('3.0.0');
-  expect(ops).toHaveLength(108);
+  expect(ops).toHaveLength(110);
   expect(ops.every(({op}) => op['x-sdk-activation'] === 'live')).toBe(true);
   for (const {route, op} of ops.filter(({op}) => op.servers)) {
     expect(route.startsWith('/uhp/v1')).toBe(false);
@@ -62,4 +62,19 @@ it('generates only the live v3 operation set with correct UHP servers and errors
       for (const status of ['400', '503']) expect(responses[status].content?.['application/json'].schema.$ref).toBe('#/components/schemas/UHPErrorEnvelope');
     }
   }
+});
+
+it('names every request body type identically in all three languages', async () => {
+  const { generate } = await import('./generate.mjs');
+  const { operations, requestBodyType } = await import('./common.mjs');
+  const spec = JSON.parse(await fs.readFile('spec/server.openapi.json', 'utf8'));
+  const files = await generate(spec);
+  const names = [...new Set(operations(spec).map(operation => requestBodyType(spec, operation)).filter(Boolean))];
+  expect(names).toContain('UHPHarnessCreate');
+  for (const name of names) {
+    expect(files['src/models.ts'], name).toMatch(new RegExp(`export type ${name} = `));
+    expect(files['python/beeos_cloud_sdk/__init__.py'], name).toMatch(new RegExp(`^${name}(?: = TypedDict|: TypeAlias)`, 'm'));
+    expect(files['go/client.go'], name).toMatch(new RegExp(`^type ${name} `, 'm'));
+  }
+  expect(files['src/models.ts']).not.toMatch(/export type \w+Input = NonNullable</);
 });

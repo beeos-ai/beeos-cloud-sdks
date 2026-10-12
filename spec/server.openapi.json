@@ -15,6 +15,172 @@
     }
   ],
   "paths": {
+    "/agents/{agentId}/conversations/{conversationId}/approval-mode": {
+      "put": {
+        "operationId": "setConversationApprovalMode",
+        "x-required-scopes": [
+          "conversations:control"
+        ],
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]*\"$"
+            }
+          },
+          {
+            "name": "X-BeeOS-External-User-ID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "x-sdk-client-option": "externalUserId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalModeSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Cloud Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Approval mode desired state confirmed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalModeResultResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-provenance": "App vendored/t07-server.openapi.json",
+        "x-sdk-resource": "conversations",
+        "x-sdk-method": "setApprovalMode",
+        "x-sdk-activation": "live",
+        "summary": "Set the conversation approval mode"
+      }
+    },
+    "/agents/{agentId}/conversations/{conversationId}/reasoning": {
+      "put": {
+        "operationId": "setConversationReasoning",
+        "x-required-scopes": [
+          "conversations:control"
+        ],
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]*\"$"
+            }
+          },
+          {
+            "name": "X-BeeOS-External-User-ID",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "x-sdk-client-option": "externalUserId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasoningSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Cloud Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Reasoning desired state confirmed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReasoningResultResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-provenance": "App vendored/t07-server.openapi.json",
+        "x-sdk-resource": "conversations",
+        "x-sdk-method": "setReasoning",
+        "x-sdk-activation": "live",
+        "summary": "Set the conversation reasoning effort"
+      }
+    },
     "/client-sessions": {
       "post": {
         "operationId": "createClientSession",
@@ -79,7 +245,8 @@
         "x-sdk-provenance": "openapi/beeos-cloud/rest/server-openapi.yaml",
         "x-sdk-resource": "identity",
         "x-sdk-method": "createClientSession",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Create a client session"
       }
     },
     "/client-sessions/{sessionId}/refresh": {
@@ -170,7 +337,8 @@
         "x-sdk-provenance": "openapi/beeos-cloud/rest/server-openapi.yaml",
         "x-sdk-resource": "identity",
         "x-sdk-method": "refreshClientSession",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Refresh a client session"
       }
     },
     "/client-sessions/{sessionId}": {
@@ -227,7 +395,8 @@
         "x-sdk-provenance": "openapi/beeos-cloud/rest/server-openapi.yaml",
         "x-sdk-resource": "identity",
         "x-sdk-method": "revokeClientSession",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Revoke a client session"
       }
     },
     "/external-users/{externalUserId}": {
@@ -282,7 +451,8 @@
         "x-sdk-provenance": "openapi/beeos-cloud/rest/server-openapi.yaml",
         "x-sdk-resource": "identity",
         "x-sdk-method": "deleteExternalUser",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Start external user data deletion"
       }
     },
     "/external-users/{externalUserId}/deletions/{deletionId}": {
@@ -335,7 +505,8 @@
         "x-sdk-provenance": "openapi/beeos-cloud/rest/server-openapi.yaml",
         "x-sdk-resource": "identity",
         "x-sdk-method": "getExternalUserDeletion",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Get an external user data deletion"
       }
     },
     "/providers": {
@@ -382,7 +553,8 @@
         "x-sdk-provenance": "App vendored/t06-server.openapi.json",
         "x-sdk-resource": "catalog",
         "x-sdk-method": "listProviders",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List providers"
       }
     },
     "/deploy/regions": {
@@ -436,7 +608,8 @@
         "x-sdk-provenance": "App vendored/t06-server.openapi.json",
         "x-sdk-resource": "catalog",
         "x-sdk-method": "listRegions",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List deploy regions"
       }
     },
     "/deploy/models": {
@@ -451,7 +624,7 @@
         ],
         "parameters": [
           {
-            "name": "harness",
+            "name": "agent_framework",
             "in": "query",
             "schema": {
               "type": "string"
@@ -490,7 +663,8 @@
         "x-sdk-provenance": "App vendored/t06-server.openapi.json",
         "x-sdk-resource": "catalog",
         "x-sdk-method": "listModels",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List deploy models"
       }
     },
     "/instance-templates": {
@@ -523,7 +697,7 @@
             }
           },
           {
-            "name": "harness",
+            "name": "agent_framework",
             "in": "query",
             "schema": {
               "type": "string"
@@ -569,7 +743,8 @@
         "x-sdk-provenance": "App vendored/t06-server.openapi.json",
         "x-sdk-resource": "catalog",
         "x-sdk-method": "listInstanceTemplates",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List instance templates"
       }
     },
     "/instance-templates/{templateId}": {
@@ -619,7 +794,8 @@
         "x-sdk-provenance": "App vendored/t06-server.openapi.json",
         "x-sdk-resource": "catalog",
         "x-sdk-method": "getInstanceTemplate",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Get an instance template"
       }
     },
     "/agent-templates": {
@@ -700,7 +876,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "List agent templates"
       }
     },
     "/instances": {
@@ -747,7 +924,7 @@
             }
           },
           {
-            "name": "harness",
+            "name": "agent_framework",
             "in": "query",
             "schema": {
               "type": "string"
@@ -793,7 +970,8 @@
         "x-sdk-provenance": "App vendored/t06-server.openapi.json",
         "x-sdk-resource": "instances",
         "x-sdk-method": "list",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List instances"
       },
       "post": {
         "operationId": "instanceCreate",
@@ -842,7 +1020,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Create an instance"
       }
     },
     "/instances/{instanceId}": {
@@ -883,7 +1062,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get an instance"
       },
       "patch": {
         "operationId": "updateInstanceMetadata",
@@ -949,7 +1129,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Update an instance"
       },
       "delete": {
         "operationId": "deleteInstance",
@@ -1004,7 +1185,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Delete an instance"
       }
     },
     "/instances/{instanceId}/status": {
@@ -1045,7 +1227,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get instance status"
       }
     },
     "/instances/{instanceId}/start": {
@@ -1102,7 +1285,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Start an instance"
       }
     },
     "/instances/{instanceId}/stop": {
@@ -1159,7 +1343,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Stop an instance"
       }
     },
     "/instances/{instanceId}/upgrade": {
@@ -1231,7 +1416,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Start an instance upgrade"
       }
     },
     "/instances/{instanceId}/upgrades/{jobId}": {
@@ -1280,7 +1466,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get an instance upgrade"
       }
     },
     "/agents": {
@@ -1371,7 +1558,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "agents",
         "x-sdk-method": "list",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List agents"
       }
     },
     "/agents/{agentId}": {
@@ -1416,7 +1604,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "agents",
         "x-sdk-method": "get",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Get an agent"
       },
       "patch": {
         "operationId": "updateAgent",
@@ -1478,7 +1667,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "agents",
         "x-sdk-method": "update",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Update agent exposure settings"
       }
     },
     "/agents/{agentId}/conversations": {
@@ -1554,7 +1744,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "conversations",
         "x-sdk-method": "create",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Create a conversation"
       },
       "get": {
         "operationId": "listAgentConversations",
@@ -1636,7 +1827,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "conversations",
         "x-sdk-method": "list",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List conversations"
       }
     },
     "/agents/{agentId}/conversations/{conversationId}": {
@@ -1700,7 +1892,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "conversations",
         "x-sdk-method": "get",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Get a conversation"
       },
       "patch": {
         "operationId": "updateConversation",
@@ -1781,7 +1974,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "conversations",
         "x-sdk-method": "update",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Rename a conversation"
       },
       "delete": {
         "operationId": "deleteConversation",
@@ -1846,7 +2040,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "conversations",
         "x-sdk-method": "delete",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Delete a conversation"
       }
     },
     "/agents/{agentId}/conversations/{conversationId}/messages": {
@@ -1926,7 +2121,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "messages",
         "x-sdk-method": "list",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List conversation messages"
       }
     },
     "/agents/{agentId}/conversations/{conversationId}/messages/{messageId}": {
@@ -1998,7 +2194,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "messages",
         "x-sdk-method": "get",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Get a conversation message"
       }
     },
     "/agents/{agentId}/conversations/{conversationId}/cancel": {
@@ -2082,7 +2279,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "conversations",
         "x-sdk-method": "cancel",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Cancel conversation execution"
       }
     },
     "/agents/{agentId}/conversations/{conversationId}/clear": {
@@ -2156,7 +2354,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "conversations",
         "x-sdk-method": "clear",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Clear conversation history"
       }
     },
     "/agents/{agentId}/conversations/{conversationId}/model": {
@@ -2239,7 +2438,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "conversations",
         "x-sdk-method": "setModel",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Set the conversation model override"
       }
     },
     "/agents/{agentId}/tasks": {
@@ -2316,7 +2516,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "tasks",
         "x-sdk-method": "create",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Create a task"
       },
       "get": {
         "operationId": "listAgentTasks",
@@ -2412,7 +2613,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "tasks",
         "x-sdk-method": "list",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List tasks"
       }
     },
     "/agents/{agentId}/tasks/{taskId}": {
@@ -2476,7 +2678,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "tasks",
         "x-sdk-method": "get",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Get a task"
       }
     },
     "/agents/{agentId}/tasks/{taskId}/messages": {
@@ -2563,7 +2766,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "tasks",
         "x-sdk-method": "listMessages",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "List task messages"
       }
     },
     "/agents/{agentId}/tasks/{taskId}/cancel": {
@@ -2647,7 +2851,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "tasks",
         "x-sdk-method": "cancel",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Cancel a task"
       }
     },
     "/agents/{agentId}/tasks/{taskId}/continue": {
@@ -2731,7 +2936,8 @@
         "x-sdk-provenance": "App vendored/t07-server.openapi.json",
         "x-sdk-resource": "tasks",
         "x-sdk-method": "continueTask",
-        "x-sdk-activation": "live"
+        "x-sdk-activation": "live",
+        "summary": "Continue a task"
       }
     },
     "/agents/{agentId}/invoke": {
@@ -2790,7 +2996,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Invoke an agent"
       }
     },
     "/usage/summary": {
@@ -2852,7 +3059,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get the usage summary"
       }
     },
     "/instances/{instanceId}/terminal-sessions": {
@@ -3160,7 +3368,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Run a command in an instance"
       }
     },
     "/files/presign-upload": {
@@ -3211,7 +3420,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Create a file upload URL"
       }
     },
     "/files/{fileId}/confirm": {
@@ -3270,7 +3480,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Confirm a file upload"
       }
     },
     "/files": {
@@ -3407,7 +3618,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "List files"
       }
     },
     "/files/{fileId}": {
@@ -3448,7 +3660,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get a file"
       },
       "patch": {
         "operationId": "renameFile",
@@ -3506,7 +3719,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Rename a file"
       },
       "delete": {
         "operationId": "deleteFile",
@@ -3546,7 +3760,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Delete a file"
       }
     },
     "/agent-templates/{id}": {
@@ -3587,7 +3802,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get an agent template"
       }
     },
     "/files/{fileId}/share": {
@@ -3636,7 +3852,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Create a file share link"
       },
       "get": {
         "operationId": "getShareFileShare",
@@ -3675,7 +3892,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get a file share link"
       },
       "delete": {
         "operationId": "revokeShareFileShare",
@@ -3707,7 +3925,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Revoke a file share link"
       }
     },
     "/file-shares/{slug}": {
@@ -3777,7 +3996,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Resolve a file share link"
       }
     },
     "/files/summary": {
@@ -3809,7 +4029,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get the file summary"
       }
     },
     "/agents/{agentId}/conversations/{conversationId}/messages/{messageId}/share": {
@@ -3888,7 +4109,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Create a reply share link"
       },
       "get": {
         "operationId": "getShareReply",
@@ -3965,7 +4187,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get a reply share link"
       },
       "delete": {
         "operationId": "revokeShareReply",
@@ -4013,7 +4236,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Revoke a reply share link"
       }
     },
     "/reply-shares/{slug}": {
@@ -4054,7 +4278,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Resolve a reply share link"
       }
     },
     "/instances/{instanceId}/connect-url": {
@@ -4127,7 +4352,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get an instance connect URL"
       }
     },
     "/instances/{instanceId}/stream-url": {
@@ -4201,7 +4427,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get an instance stream URL"
       }
     },
     "/agents/{agentId}/conversations/{conversationId}/resume": {
@@ -4280,7 +4507,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Resume a paused conversation"
       }
     },
     "/automations": {
@@ -4335,7 +4563,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Create an automation"
       },
       "get": {
         "operationId": "listAutomations",
@@ -4403,7 +4632,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "List automations"
       }
     },
     "/automations/{automationId}": {
@@ -4457,7 +4687,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get an automation"
       },
       "patch": {
         "operationId": "updateAutomation",
@@ -4519,7 +4750,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Update an automation"
       },
       "delete": {
         "operationId": "deleteAutomation",
@@ -4551,7 +4783,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Delete an automation"
       }
     },
     "/automations/{automationId}/pause": {
@@ -4605,7 +4838,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Pause an automation"
       }
     },
     "/automations/{automationId}/resume": {
@@ -4659,7 +4893,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Resume an automation"
       }
     },
     "/automations/{automationId}/runs": {
@@ -4731,7 +4966,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Start an automation run"
       },
       "get": {
         "operationId": "listAutomationRuns",
@@ -4807,7 +5043,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "List automation runs"
       }
     },
     "/automations/{automationId}/runs/{runId}": {
@@ -4869,7 +5106,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get an automation run"
       }
     },
     "/automations/webhooks": {
@@ -4924,7 +5162,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Create a webhook automation"
       }
     },
     "/audio/transcribe": {
@@ -5002,7 +5241,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Transcribe audio"
       }
     },
     "/instances/{instanceId}/canvases/{canvasId}/share": {
@@ -5087,7 +5327,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get a canvas share link"
       },
       "post": {
         "operationId": "createShareCanvas",
@@ -5195,7 +5436,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Create a canvas share link"
       },
       "delete": {
         "operationId": "deleteShareCanvas",
@@ -5251,7 +5493,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Revoke a canvas share link"
       }
     },
     "/instances/{instanceId}/canvases/{canvasId}/snapshots": {
@@ -5332,7 +5575,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "List canvas snapshots"
       }
     },
     "/instances/{instanceId}/canvases/{canvasId}/snapshots/{snapshotId}/restore": {
@@ -5439,7 +5683,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Restore a canvas snapshot"
       }
     },
     "/instances/{instanceId}/canvas-sessions/{conversationId}": {
@@ -5549,7 +5794,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Resolve a conversation canvas session"
       }
     },
     "/agent/bind/{id}/details": {
@@ -5604,7 +5850,8 @@
             }
           }
         },
-        "x-sdk-error-code-field": "error"
+        "x-sdk-error-code-field": "error",
+        "summary": "Get agent bind session details"
       }
     },
     "/agent/bind/{id}/confirm": {
@@ -5682,7 +5929,8 @@
             }
           }
         },
-        "x-sdk-error-code-field": "error"
+        "x-sdk-error-code-field": "error",
+        "summary": "Confirm an agent bind session"
       }
     },
     "/agent/portal/bind-sessions": {
@@ -5745,7 +5993,8 @@
             }
           }
         },
-        "x-sdk-error-code-field": "error"
+        "x-sdk-error-code-field": "error",
+        "summary": "Create a portal bind session"
       }
     },
     "/agent/portal/bind-sessions/{id}": {
@@ -5800,7 +6049,8 @@
             }
           }
         },
-        "x-sdk-error-code-field": "error"
+        "x-sdk-error-code-field": "error",
+        "summary": "Get a portal bind session"
       }
     },
     "/agent/portal/bind-sessions/{id}/revoke": {
@@ -5855,7 +6105,8 @@
             }
           }
         },
-        "x-sdk-error-code-field": "error"
+        "x-sdk-error-code-field": "error",
+        "summary": "Revoke a portal bind session"
       }
     },
     "/agent/portal/bind-sessions/{id}/resolve": {
@@ -5936,7 +6187,8 @@
             }
           }
         },
-        "x-sdk-error-code-field": "error"
+        "x-sdk-error-code-field": "error",
+        "summary": "Resolve a portal bind session"
       }
     },
     "/a2a/{agentId}": {
@@ -6009,7 +6261,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Send an A2A JSON-RPC request"
       }
     },
     "/a2a/{agentId}/.well-known/agent-card.json": {
@@ -6050,7 +6303,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get the A2A agent card"
       }
     },
     "/a2a/{agentId}/.well-known/agent.json": {
@@ -6091,7 +6345,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get the A2A agent card (legacy path)"
       }
     },
     "/a2a/{agentId}/tasks": {
@@ -6188,7 +6443,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "List A2A tasks"
       }
     },
     "/a2a/{agentId}/tasks/{taskId}": {
@@ -6245,7 +6501,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Get an A2A task"
       }
     },
     "/a2a/{agentId}/tasks/{taskId}/cancel": {
@@ -6294,7 +6551,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Cancel an A2A task"
       }
     },
     "/uhp": {
@@ -6406,8 +6664,8 @@
           "Harnesses"
         ],
         "operationId": "createHarness",
-        "summary": "Create a harness",
-        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. instance_id and name are required; default_model is honored only here. skills are rejected on create (422 beeos_field_not_supported); add them with PUT. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).",
+        "summary": "Create a configured harness",
+        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After (a create without an Idempotency-Key is not re-attached and would create a second harness); 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 409 beeos_idempotency_conflict means the Idempotency-Key was used with a different request; 503 harness_unavailable means the instance is not running or the operation journal is unavailable; 413 means the body exceeds 4 MiB (upload large skills as a Files blob). The optional Idempotency-Key header (1-128 visible ASCII characters) makes a create (POST, or PUT with template_id) safe to resend: the same key and request returns the same harness. instance_id and name are required and base must equal the instance runtime (422); template_id and template_version create the harness from an agent template; default_model is honored only here. a non-empty skills or mcp_servers is rejected on create (422 beeos_field_not_supported); add them with PUT. Not supported by BeeOS Cloud yet (422 beeos_field_not_supported): a non-empty system_prompt, disabled_tools, environment or plugins, or any max_step or timeout_seconds. An unchanged name and empty values are accepted, so a GET-modify-PUT round trip works.",
         "requestBody": {
           "required": true,
           "content": {
@@ -6420,11 +6678,34 @@
         },
         "responses": {
           "200": {
-            "description": "The harness",
+            "description": "The created harness",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UHPHarness"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
                 }
               }
             }
@@ -6439,7 +6720,7 @@
               }
             }
           },
-          "422": {
+          "413": {
             "description": "UHP protocol error envelope",
             "content": {
               "application/json": {
@@ -6495,7 +6776,16 @@
         "x-sdk-resource": "harnesses",
         "x-sdk-method": "create",
         "x-sdk-activation": "live",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "servers": [
           {
             "url": "https://api.cloud.beeos.ai/uhp/v1"
@@ -6561,8 +6851,8 @@
           "Harnesses"
         ],
         "operationId": "updateHarness",
-        "summary": "Replace a harness",
-        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. An absent field is unchanged. When skills is present it is diffed against the installed skills: listed skills with files, content or blob are installed; omitted catalog-origin skills are uninstalled; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).",
+        "summary": "Update a harness configuration",
+        "description": "Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After (a create without an Idempotency-Key is not re-attached and would create a second harness); 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 409 beeos_idempotency_conflict means the Idempotency-Key was used with a different request; 503 harness_unavailable means the instance is not running or the operation journal is unavailable; 413 means the body exceeds 4 MiB (upload large skills as a Files blob). The optional Idempotency-Key header (1-128 visible ASCII characters) makes a create (POST, or PUT with template_id) safe to resend: the same key and request returns the same harness. An absent field is unchanged; a present list replaces the whole list. When skills is present it is diffed against the installed skills: listed skills with files, content or blob (exactly one) are installed; an installed skill listed with a different enabled flag is updated; installed skills that are omitted are uninstalled unless bundled with the runtime; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. When mcp_servers is present it is diffed against the runtime MCP servers: a server sent with a credential (headers or auth plus expires_at, at most 24 hours ahead) is set, a connected server sent without one is kept, omitted servers are unset; the url must be https and transport is http or sse; GET never returns a url or credential. 422 beeos_mcp_not_supported is returned only when the instance runtime has no MCP methods. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported. Not supported by BeeOS Cloud yet (422 beeos_field_not_supported): a non-empty system_prompt, disabled_tools, environment or plugins, or any max_step or timeout_seconds. An unchanged name and empty values are accepted, so a GET-modify-PUT round trip works.",
         "requestBody": {
           "required": true,
           "content": {
@@ -6575,7 +6865,7 @@
         },
         "responses": {
           "200": {
-            "description": "The harness",
+            "description": "The updated harness",
             "content": {
               "application/json": {
                 "schema": {
@@ -6587,7 +6877,27 @@
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
+          "400": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
           "409": {
+            "description": "UHP protocol error envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UHPErrorEnvelope"
+                }
+              }
+            }
+          },
+          "413": {
             "description": "UHP protocol error envelope",
             "content": {
               "application/json": {
@@ -6661,6 +6971,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "servers": [
@@ -6683,10 +7001,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "id",
-                    "deleted"
-                  ],
                   "properties": {
                     "id": {
                       "type": "string"
@@ -6694,8 +7008,7 @@
                     "deleted": {
                       "type": "boolean"
                     }
-                  },
-                  "additionalProperties": false
+                  }
                 }
               }
             }
@@ -7029,7 +7342,7 @@
         ],
         "operationId": "deleteResponse",
         "summary": "Delete a stored response",
-        "description": "Must not cancel a running task — deletion and cancellation are different intentions.",
+        "description": "Must not cancel a running task \u2014 deletion and cancellation are different intentions.",
         "responses": {
           "200": {
             "description": "Deleted",
@@ -7163,7 +7476,7 @@
         ],
         "operationId": "cancelResponse",
         "summary": "Cancel a running task",
-        "description": "Idempotent. Cancelling an already-terminal task succeeds and changes nothing — a client\nretrying a cancel after a dropped connection must not be punished for having succeeded.\n",
+        "description": "Idempotent. Cancelling an already-terminal task succeeds and changes nothing \u2014 a client\nretrying a cancel after a dropped connection must not be punished for having succeeded.\n",
         "responses": {
           "200": {
             "description": "The Response, now cancelling or terminal",
@@ -7268,6 +7581,7 @@
         },
         "x-sdk-base-path": "/uhp/v1",
         "x-sdk-stream": true,
+        "summary": "Stream or resume the events of a response",
         "servers": [
           {
             "url": "https://api.cloud.beeos.ai/uhp/v1"
@@ -7541,7 +7855,7 @@
           "sort_order": {
             "type": "integer"
           },
-          "harness": {
+          "agent_framework": {
             "type": "string"
           },
           "provider_id": {
@@ -7619,12 +7933,13 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "has_ever_run",
           "id",
           "organization_id",
           "app_id",
           "developer_id",
           "name",
-          "harness",
+          "agent_framework",
           "provider_id",
           "region",
           "os_type",
@@ -7637,6 +7952,11 @@
           "resource_version"
         ],
         "properties": {
+          "has_ever_run": {
+            "type": "boolean",
+            "x-go-type": "*bool",
+            "description": "Whether authoritative instance state history has ever reached running."
+          },
           "id": {
             "type": "string"
           },
@@ -7652,7 +7972,7 @@
           "name": {
             "type": "string"
           },
-          "harness": {
+          "agent_framework": {
             "type": "string"
           },
           "provider_id": {
@@ -7686,6 +8006,42 @@
             "type": "integer",
             "format": "int64",
             "minimum": 1
+          },
+          "image_slot": {
+            "type": "string",
+            "description": "Variant trait. Key into the Runtime execution image map. Not a container repository name."
+          },
+          "worker_image_id": {
+            "type": "string",
+            "description": "Variant trait. AgentBay Wuying worker image. Never the platform `image_id`."
+          },
+          "model_catalog": {
+            "type": "string",
+            "description": "Variant trait. `served` when Cloud answers models/list and session/set_reasoning, `none` when it answers neither."
+          },
+          "billing_slot": {
+            "type": "string",
+            "description": "Variant trait. Key into the monthly fee table."
+          },
+          "icon_key": {
+            "type": "string",
+            "description": "Variant trait. UI icon selector. Replaces any `agent_framework` + `os_type` branch on the client."
+          },
+          "device_control": {
+            "type": "boolean",
+            "description": "Variant trait. Whether the instance accepts device control commands."
+          },
+          "runtime_profile": {
+            "type": "string",
+            "description": "Variant trait. cluster-proxy pod contract, or empty."
+          },
+          "free_plan": {
+            "type": "boolean",
+            "description": "Variant trait. Whether the free tier may run this variant."
+          },
+          "cloud_provider": {
+            "type": "string",
+            "description": "`agentbay`, `beeos`, or empty when self-hosted."
           }
         }
       },
@@ -8079,6 +8435,22 @@
           },
           "effective_model_id": {
             "type": "string"
+          },
+          "active_response": {
+            "$ref": "#/components/schemas/ActiveConversationResponse"
+          },
+          "reasoning": {
+            "$ref": "#/components/schemas/ReasoningSettings"
+          },
+          "approval_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
@@ -8612,6 +8984,142 @@
           }
         }
       },
+      "ActiveConversationResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "response_id",
+          "last_event_id"
+        ],
+        "properties": {
+          "response_id": {
+            "type": "string"
+          },
+          "last_event_id": {
+            "type": "string"
+          },
+          "user_message_id": {
+            "type": "string"
+          },
+          "reply_message_id": {
+            "type": "string"
+          }
+        }
+      },
+      "ReasoningSettings": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "modelId",
+          "reasoningOverrideId"
+        ],
+        "properties": {
+          "modelId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "x-go-name": "ModelID"
+          },
+          "reasoningOverrideId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "x-go-name": "ReasoningOverrideID"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ReasoningResult": {
+        "type": "object",
+        "properties": {
+          "metadata_version": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "metadata_version"
+        ],
+        "additionalProperties": false
+      },
+      "ReasoningResultResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReasoningResult"
+          }
+        }
+      },
+      "ApprovalModeSettings": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "approval_mode"
+        ],
+        "properties": {
+          "approval_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 32,
+                "pattern": "^[a-z][a-z0-9_]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "ApprovalModeResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "approval_mode",
+          "metadata_version",
+          "status"
+        ],
+        "properties": {
+          "approval_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "metadata_version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "ApprovalModeResultResponse": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ApprovalModeResult"
+          }
+        }
+      },
       "ErrorResponse": {
         "type": "object",
         "properties": {
@@ -8779,7 +9287,7 @@
           },
           "base": {
             "type": "string",
-            "description": "Opaque. Not enumerated by this specification — a client must treat it as a string, or the\nprotocol would need revising every time a harness is released.\n",
+            "description": "Opaque. Not enumerated by this specification \u2014 a client must treat it as a string, or the\nprotocol would need revising every time a harness is released.\n",
             "examples": [
               "codex",
               "claude-code",
@@ -8987,7 +9495,7 @@
         "required": [
           "name"
         ],
-        "description": "A skill is a FOLDER, not a file. A server must materialise the whole folder where the agent\ncan read it — materialising only SKILL.md breaks every skill carrying references, scripts or\ndata. Round-tripping a harness through GET and PUT must not lose skill contents.\n",
+        "description": "A skill is a FOLDER, not a file. A server must materialise the whole folder where the agent\ncan read it \u2014 materialising only SKILL.md breaks every skill carrying references, scripts or\ndata. Round-tripping a harness through GET and PUT must not lose skill contents.\n",
         "properties": {
           "name": {
             "type": "string"
@@ -9170,7 +9678,7 @@
           },
           "extensions": {
             "type": "object",
-            "description": "Client-specific data keyed by reverse-domain namespace, per Agent Plugins §8.",
+            "description": "Client-specific data keyed by reverse-domain namespace, per Agent Plugins \u00a78.",
             "additionalProperties": {
               "type": "object",
               "additionalProperties": {
@@ -9219,6 +9727,80 @@
           "reason": {
             "type": "string",
             "description": "One sentence."
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPHarnessCreate": {
+        "type": "object",
+        "required": [
+          "base"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "base": {
+            "type": "string"
+          },
+          "default_model": {
+            "type": "string",
+            "description": "BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent."
+          },
+          "system_prompt": {
+            "type": "string"
+          },
+          "mcp_servers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UHPMcpServer"
+            },
+            "description": "Rejected on create (422 beeos_field_not_supported). On PUT the list is diffed against the runtime MCP servers: listed servers are set, omitted ones are unset; 422 beeos_mcp_not_supported only when the instance runtime has no MCP methods."
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UHPSkill"
+            }
+          },
+          "plugins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UHPPlugin"
+            },
+            "description": "Requires the `plugins` capability. Each item needs `files` or `blob`."
+          },
+          "environment": {
+            "type": "string",
+            "description": "An environment id of the caller's scope, or empty. Requires the `environments` capability."
+          },
+          "disabled_tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "max_step": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "timeout_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "instance_id": {
+            "type": "string",
+            "description": "BeeOS extension. Instance that hosts a new harness (create only)."
+          },
+          "template_id": {
+            "type": "string",
+            "description": "BeeOS extension. Agent template applied to the harness."
           }
         },
         "additionalProperties": {
@@ -9395,14 +9977,14 @@
                 "$ref": "#/components/schemas/JSONValue"
               }
             },
-            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. A UHP harness invokes and executes tools\nitself and reports them in `output`; there is no input path for a tool result, so the\nclient-executed tool loop this field implies cannot be completed by a conformant server.\nConfigure tools on the harness instead — see Harnesses §4.1. Tasks §1.4.\n"
+            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. A UHP harness invokes and executes tools\nitself and reports them in `output`; there is no input path for a tool result, so the\nclient-executed tool loop this field implies cannot be completed by a conformant server.\nConfigure tools on the harness instead \u2014 see Harnesses \u00a74.1. Tasks \u00a71.4.\n"
           },
           "include": {
             "type": "array",
             "items": {
               "type": "string"
             },
-            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. No values are enumerated, so any string a\nserver recognised would be one it named itself. Tasks §1.4.\n"
+            "description": "Reserved and ignored. Accepted for wire compatibility, never acted on, and reported in\n`metadata.ignored_fields` on the response. No values are enumerated, so any string a\nserver recognised would be one it named itself. Tasks \u00a71.4.\n"
           },
           "background": {
             "type": "boolean",
@@ -9517,7 +10099,7 @@
                 "items": {
                   "type": "string"
                 },
-                "description": "Request fields the server did not act on, by name, in any order. Required when the\nrequest carried `tools` or `include`, which are reserved and ignored. A silently\nignored field is indistinguishable from an honoured one. Tasks §1.1 and §1.4.\n"
+                "description": "Request fields the server did not act on, by name, in any order. Required when the\nrequest carried `tools` or `include`, which are reserved and ignored. A silently\nignored field is indistinguishable from an honoured one. Tasks \u00a71.1 and \u00a71.4.\n"
               }
             },
             "additionalProperties": {
@@ -9931,7 +10513,7 @@
           "name": {
             "type": "string"
           },
-          "harness": {
+          "agent_framework": {
             "type": "string"
           },
           "provider_id": {
@@ -9995,8 +10577,35 @@
           "cloud_provider": {
             "type": "string"
           },
+          "image_slot": {
+            "type": "string"
+          },
+          "worker_image_id": {
+            "type": "string"
+          },
+          "model_catalog": {
+            "type": "string"
+          },
+          "billing_slot": {
+            "type": "string"
+          },
+          "icon_key": {
+            "type": "string"
+          },
+          "device_control": {
+            "type": "boolean"
+          },
+          "runtime_profile": {
+            "type": "string"
+          },
+          "free_plan": {
+            "type": "boolean"
+          },
           "resource_version": {
             "type": "integer"
+          },
+          "has_ever_run": {
+            "type": "boolean"
           },
           "created_at": {
             "type": "string"
@@ -10030,7 +10639,7 @@
           "app_id",
           "developer_id",
           "name",
-          "harness",
+          "agent_framework",
           "provider_id",
           "region",
           "os_type",
@@ -10038,58 +10647,76 @@
           "desired_status",
           "connectivity",
           "ms_connection_status",
+          "device_control",
+          "free_plan",
           "resource_version",
+          "has_ever_run",
           "created_at",
           "updated_at",
           "capabilities"
         ],
         "additionalProperties": false
       },
-      "RuntimeUpgradeJob": {
+      "RuntimeOperationSummary": {
         "type": "object",
         "properties": {
-          "job_id": {
+          "id": {
             "type": "string"
           },
-          "instance_id": {
+          "kind": {
             "type": "string"
           },
-          "status": {
+          "phase": {
             "type": "string"
           },
-          "target": {
+          "error_code": {
             "type": "string"
-          },
-          "created_at": {
-            "type": "string"
-          },
-          "completed_at": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "error": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
           }
         },
         "required": [
-          "job_id",
-          "instance_id",
-          "status",
-          "target",
-          "created_at"
+          "id",
+          "kind",
+          "phase"
+        ],
+        "additionalProperties": false
+      },
+      "RuntimeInstanceResult": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/RuntimeInstanceSummary"
+          },
+          "operation": {
+            "$ref": "#/components/schemas/RuntimeOperationSummary"
+          }
+        },
+        "required": [
+          "data",
+          "operation"
+        ],
+        "additionalProperties": false
+      },
+      "RuntimeExecResult": {
+        "type": "object",
+        "properties": {
+          "exit_code": {
+            "type": "integer"
+          },
+          "stdout": {
+            "type": "string"
+          },
+          "stderr": {
+            "type": "string"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "exit_code",
+          "stdout",
+          "stderr",
+          "truncated"
         ],
         "additionalProperties": false
       },
@@ -10209,66 +10836,51 @@
         ],
         "additionalProperties": false
       },
-      "RuntimeOperationSummary": {
+      "RuntimeUpgradeJob": {
         "type": "object",
         "properties": {
-          "id": {
+          "job_id": {
             "type": "string"
           },
-          "kind": {
+          "instance_id": {
             "type": "string"
           },
-          "phase": {
+          "status": {
             "type": "string"
           },
-          "error_code": {
+          "target": {
             "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
-          "id",
-          "kind",
-          "phase"
-        ],
-        "additionalProperties": false
-      },
-      "RuntimeInstanceResult": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/RuntimeInstanceSummary"
-          },
-          "operation": {
-            "$ref": "#/components/schemas/RuntimeOperationSummary"
-          }
-        },
-        "required": [
-          "data",
-          "operation"
-        ],
-        "additionalProperties": false
-      },
-      "RuntimeExecResult": {
-        "type": "object",
-        "properties": {
-          "exit_code": {
-            "type": "integer"
-          },
-          "stdout": {
-            "type": "string"
-          },
-          "stderr": {
-            "type": "string"
-          },
-          "truncated": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "exit_code",
-          "stdout",
-          "stderr",
-          "truncated"
+          "job_id",
+          "instance_id",
+          "status",
+          "target",
+          "created_at"
         ],
         "additionalProperties": false
       },
@@ -10369,7 +10981,7 @@
           "avatar_url": {
             "type": "string"
           },
-          "harness": {
+          "agent_framework": {
             "type": "string"
           },
           "destroyed": {
@@ -10571,7 +11183,7 @@
                 "avatar_url": {
                   "type": "string"
                 },
-                "harness": {
+                "agent_framework": {
                   "type": "string"
                 },
                 "destroyed": {
@@ -10904,213 +11516,6 @@
         ],
         "additionalProperties": false
       },
-      "agentBindWire": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string"
-          },
-          "bind_id": {
-            "type": "string"
-          },
-          "instance_id": {
-            "type": "string"
-          },
-          "public_key": {
-            "type": "string"
-          },
-          "hostname": {
-            "type": "string"
-          },
-          "expires_at": {
-            "type": "integer"
-          },
-          "runtime_binding": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/bindRuntimeWire"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "required": [
-          "status"
-        ],
-        "additionalProperties": false
-      },
-      "bindRuntimeWire": {
-        "type": "object",
-        "properties": {
-          "instance_id": {
-            "type": "string"
-          },
-          "agent_gateway_url": {
-            "type": "string"
-          },
-          "message_service_url": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "instance_id",
-          "agent_gateway_url",
-          "message_service_url"
-        ],
-        "additionalProperties": false
-      },
-      "agentBindDetailsWire": {
-        "type": "object",
-        "properties": {
-          "bind_id": {
-            "type": "string"
-          },
-          "hostname": {
-            "type": "string"
-          },
-          "fingerprint_short": {
-            "type": "string"
-          },
-          "harness": {
-            "type": "string"
-          },
-          "os_type": {
-            "type": "string"
-          },
-          "expires_at": {
-            "type": "integer"
-          },
-          "status": {
-            "type": "string"
-          },
-          "server_time": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "bind_id",
-          "hostname",
-          "fingerprint_short",
-          "harness",
-          "expires_at",
-          "status",
-          "server_time"
-        ],
-        "additionalProperties": false
-      },
-      "portalBindWire": {
-        "type": "object",
-        "properties": {
-          "provider_id": {
-            "type": "string"
-          },
-          "bind_id": {
-            "type": "string"
-          },
-          "short_code": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "instance_id": {
-            "type": "string"
-          },
-          "expires_at": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "qr_payload": {
-            "type": "string"
-          },
-          "api_base_url": {
-            "type": "string"
-          },
-          "relay_url": {
-            "type": "string"
-          },
-          "desired_status": {
-            "type": "string"
-          },
-          "connectivity": {
-            "type": "string"
-          },
-          "resource_version": {
-            "type": "integer"
-          }
-        },
-        "required": [
-          "bind_id",
-          "short_code",
-          "status",
-          "expires_at",
-          "name"
-        ],
-        "additionalProperties": false
-      },
-      "agentTemplateCatalogView": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "display_name": {
-            "type": "string"
-          },
-          "summary": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
-          "vibe": {
-            "type": "string"
-          },
-          "icon_url": {
-            "type": "string"
-          },
-          "banner_url": {
-            "type": "string"
-          },
-          "default_model": {
-            "type": "string"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "harness": {
-            "type": "string"
-          },
-          "template_version": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "display_name",
-          "summary",
-          "description",
-          "category",
-          "vibe",
-          "icon_url",
-          "banner_url",
-          "default_model",
-          "tags",
-          "harness",
-          "template_version"
-        ],
-        "additionalProperties": false
-      },
       "a2aTaskView": {
         "type": "object",
         "properties": {
@@ -11185,6 +11590,213 @@
         ],
         "additionalProperties": false
       },
+      "agentTemplateCatalogView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "vibe": {
+            "type": "string"
+          },
+          "icon_url": {
+            "type": "string"
+          },
+          "banner_url": {
+            "type": "string"
+          },
+          "default_model": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "agent_framework": {
+            "type": "string"
+          },
+          "template_version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "summary",
+          "description",
+          "category",
+          "vibe",
+          "icon_url",
+          "banner_url",
+          "default_model",
+          "tags",
+          "agent_framework",
+          "template_version"
+        ],
+        "additionalProperties": false
+      },
+      "agentBindWire": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "bind_id": {
+            "type": "string"
+          },
+          "instance_id": {
+            "type": "string"
+          },
+          "public_key": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "runtime_binding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/bindRuntimeWire"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "bindRuntimeWire": {
+        "type": "object",
+        "properties": {
+          "instance_id": {
+            "type": "string"
+          },
+          "agent_gateway_url": {
+            "type": "string"
+          },
+          "message_service_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "instance_id",
+          "agent_gateway_url",
+          "message_service_url"
+        ],
+        "additionalProperties": false
+      },
+      "agentBindDetailsWire": {
+        "type": "object",
+        "properties": {
+          "bind_id": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "fingerprint_short": {
+            "type": "string"
+          },
+          "agent_framework": {
+            "type": "string"
+          },
+          "os_type": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "server_time": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "bind_id",
+          "hostname",
+          "fingerprint_short",
+          "agent_framework",
+          "expires_at",
+          "status",
+          "server_time"
+        ],
+        "additionalProperties": false
+      },
+      "portalBindWire": {
+        "type": "object",
+        "properties": {
+          "provider_id": {
+            "type": "string"
+          },
+          "bind_id": {
+            "type": "string"
+          },
+          "short_code": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "instance_id": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "qr_payload": {
+            "type": "string"
+          },
+          "api_base_url": {
+            "type": "string"
+          },
+          "relay_url": {
+            "type": "string"
+          },
+          "desired_status": {
+            "type": "string"
+          },
+          "connectivity": {
+            "type": "string"
+          },
+          "resource_version": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "bind_id",
+          "short_code",
+          "status",
+          "expires_at",
+          "name"
+        ],
+        "additionalProperties": false
+      },
       "CreateServerInstanceInput": {
         "type": "object",
         "properties": {
@@ -11194,7 +11806,7 @@
           "variant_id": {
             "type": "string"
           },
-          "harness": {
+          "agent_framework": {
             "type": "string",
             "enum": [
               "openclaw"
@@ -12295,80 +12907,6 @@
           "message"
         ],
         "additionalProperties": false
-      },
-      "UHPHarnessCreate": {
-        "type": "object",
-        "required": [
-          "base"
-        ],
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "base": {
-            "type": "string"
-          },
-          "default_model": {
-            "type": "string",
-            "description": "BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent."
-          },
-          "system_prompt": {
-            "type": "string"
-          },
-          "mcp_servers": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UHPMcpServer"
-            },
-            "description": "Not accepted by BeeOS Cloud yet: a non-empty list returns 422 beeos_mcp_not_supported."
-          },
-          "skills": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UHPSkill"
-            }
-          },
-          "plugins": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/UHPPlugin"
-            },
-            "description": "Requires the `plugins` capability. Each item needs `files` or `blob`."
-          },
-          "environment": {
-            "type": "string",
-            "description": "An environment id of the caller's scope, or empty. Requires the `environments` capability."
-          },
-          "disabled_tools": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "max_step": {
-            "type": [
-              "integer",
-              "null"
-            ]
-          },
-          "timeout_seconds": {
-            "type": [
-              "integer",
-              "null"
-            ]
-          },
-          "instance_id": {
-            "type": "string",
-            "description": "BeeOS extension. Instance that hosts a new harness (create only)."
-          },
-          "template_id": {
-            "type": "string",
-            "description": "BeeOS extension. Agent template applied to the harness."
-          }
-        },
-        "additionalProperties": {
-          "$ref": "#/components/schemas/JSONValue"
-        }
       }
     },
     "responses": {
@@ -12451,5 +12989,5 @@
     }
   },
   "x-producer-repository": "beeos-ai/beeos-cloud-backend",
-  "x-producer-revision": "984c28f37862eea66ad154f3f8ebd108d48e5065"
+  "x-producer-revision": "4b71da3bfe2e43f3a6ed38e6cf3639f44c8a815f"
 }

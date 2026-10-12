@@ -68,11 +68,12 @@ class ClientTests(unittest.TestCase):
     def test_harness_update_sends_uhp_body_with_extensions(self):
         client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime")
         with patch("beeos_cloud_sdk.urlopen", return_value=io.BytesIO(b'{"id":"chrn_1","name":"a","base":"openclaw"}')) as send:
-            client.harnesses.update("chrn_1", {"base": "openclaw", "template_id": "tpl_1"})
+            client.harnesses.update("chrn_1", {"base": "openclaw", "template_id": "tpl_1"}, {"Idempotency-Key": "retry-1"})
             request = send.call_args.args[0]
             self.assertEqual(request.get_method(), "PUT")
             self.assertTrue(request.full_url.endswith("/uhp/v1/harnesses/chrn_1"))
             self.assertEqual(json.loads(request.data)["template_id"], "tpl_1")
+            self.assertEqual(request.get_header("Idempotency-key"), "retry-1")
             self.assertEqual(send.call_args.kwargs["timeout"], 60.0)
 
     def test_optional_task_cancel_body_can_be_omitted(self):

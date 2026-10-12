@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { resolve } from './common.mjs';
+import { resolve, requestBodyType } from './common.mjs';
 const pascal = value => value.replace(/(^|[^a-zA-Z0-9])([a-z])/g, (_, a, b) => b.toUpperCase()).replace(/[^a-zA-Z0-9]/g, '');
 const operationBasePath = operation => operation.servers?.[0] ? new URL(operation.servers[0].url).pathname : '';
 const refName = value => value.split('/').pop();
@@ -69,7 +69,8 @@ export function generateGo(spec) {
     const optionalBody = !!op.requestBody && resolve(spec, op.requestBody)?.required !== true;
     const body = resolve(spec, op.requestBody)?.content;
     const media = body && Object.keys(body)[0];
-    const input = op.operationId === 'createResponse' ? 'UHPCreateResponseJSONRequest' : body && type(body[media].schema, `${name}Request`);
+    const input = requestBodyType(spec, op);
+    if (input && !schemas[input]) schemas[input] = body[media].schema;
     const success = Object.entries(op.responses).find(([status]) => /^2/.test(status))?.[1];
     const content = resolve(spec, success)?.content;
     const responseMedia = content && (content['application/json'] ? 'application/json' : Object.keys(content)[0]);

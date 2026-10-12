@@ -70,7 +70,7 @@ func typedRuntimeDocuments(ctx context.Context, client *sdk.BeeOSClient) (string
 		return "", err
 	}
 	var relayURL string = canvas.RelayURL
-	harness, err := client.Harnesses.Update(ctx, "chrn_1", sdk.UHPHarnessCreate{Base: "openclaw"})
+	harness, err := client.Harnesses.Update(ctx, "chrn_1", sdk.UHPHarnessCreate{Base: "openclaw"}, sdk.UpdateHarnessOptions{})
 	if err != nil {
 		return "", err
 	}

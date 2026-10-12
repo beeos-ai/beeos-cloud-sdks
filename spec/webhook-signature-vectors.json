@@ -1,0 +1,25 @@
+{
+  "source": "beeos-ai/beeos-cloud-backend openapi/beeos-cloud/webhooks/cloud-webhooks-v1.schema.json @ 4b71da3b (merge of PR #243)",
+  "x-signature-test-vector": {
+    "description": "Fixed test vector for the Cloud developer webhook signature. Asserted against `cloudwebhook.Sign` in Go tests; reuse it to test a verifier. The secret is a made-up test value.",
+    "secret": "docs-test-secret-DO-NOT-USE-0123456789abcdef",
+    "timestamp": "1700000000",
+    "body": "{\"app_id\":\"app_test\",\"event\":{\"eventId\":\"webhook-ping:whep_test:ping-1\",\"type\":\"webhook.ping\"},\"organization_id\":\"org_test\"}",
+    "signedPayload": "1700000000.{\"app_id\":\"app_test\",\"event\":{\"eventId\":\"webhook-ping:whep_test:ping-1\",\"type\":\"webhook.ping\"},\"organization_id\":\"org_test\"}",
+    "signature": "f2f2e948cff9a14213babbba7c9e93d72a27bc7694e80429eb0986d80680b95d",
+    "headers": {
+      "X-BeeOS-Webhook-Timestamp": "1700000000",
+      "X-BeeOS-Webhook-Signature": "f2f2e948cff9a14213babbba7c9e93d72a27bc7694e80429eb0986d80680b95d",
+      "Idempotency-Key": "webhook-ping:whep_test:ping-1"
+    }
+  },
+  "x-a2a-signature-test-vector": {
+    "description": "Fixed test vector for the A2A task push `X-BeeOS-Signature` header (`t=<timestamp>,v1=<hex>`). Same MAC as the developer webhook, different header framing.",
+    "secret": "docs-test-secret-DO-NOT-USE-0123456789abcdef",
+    "timestamp": "1700000000",
+    "body": "{\"context_id\":\"ctx_test\",\"final\":true,\"state\":\"completed\",\"stop_reason\":\"end_turn\",\"task_id\":\"task_test\",\"timestamp\":\"2026-10-12T08:30:15.123Z\"}",
+    "signedPayload": "1700000000.{\"context_id\":\"ctx_test\",\"final\":true,\"state\":\"completed\",\"stop_reason\":\"end_turn\",\"task_id\":\"task_test\",\"timestamp\":\"2026-10-12T08:30:15.123Z\"}",
+    "signature": "ecbad4e542ee5433807234704157512a9e9340c4278315505b31be84cefca265",
+    "header": "t=1700000000,v1=ecbad4e542ee5433807234704157512a9e9340c4278315505b31be84cefca265"
+  }
+}

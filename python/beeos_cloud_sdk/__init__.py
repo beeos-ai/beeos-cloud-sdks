@@ -10,6 +10,11 @@ from urllib.parse import quote, urlencode, urlsplit, urlunsplit
 from urllib.request import Request as URLRequest, urlopen
 from uuid import uuid4
 
+from .webhooks import WebhookVerificationError as WebhookVerificationError
+from .webhooks import WebhookVerificationReason as WebhookVerificationReason
+from .webhooks import verify_task_push_signature as verify_task_push_signature
+from .webhooks import verify_webhook_signature as verify_webhook_signature
+
 JSONValue: TypeAlias = None | bool | int | float | str | list["JSONValue"] | dict[str, "JSONValue"]
 
 ExternalUserID: TypeAlias = "str"
@@ -78,7 +83,7 @@ InstanceTemplate = TypedDict("InstanceTemplate", {
     "description": "NotRequired[str]",
     "logo_url": "NotRequired[str]",
     "sort_order": "NotRequired[int]",
-    "harness": "NotRequired[str]",
+    "agent_framework": "NotRequired[str]",
     "provider_id": "NotRequired[str]",
     "specs": "NotRequired[list[CatalogSpec]]",
     "variants": "NotRequired[list[CatalogVariant]]",
@@ -100,12 +105,13 @@ ModelPage = TypedDict("ModelPage", {
 })
 
 InstanceSummary = TypedDict("InstanceSummary", {
+    "has_ever_run": "Required[bool]",
     "id": "Required[str]",
     "organization_id": "Required[str]",
     "app_id": "Required[str]",
     "developer_id": "Required[str]",
     "name": "Required[str]",
-    "harness": "Required[str]",
+    "agent_framework": "Required[str]",
     "provider_id": "Required[str]",
     "region": "Required[str]",
     "os_type": "Required[str]",
@@ -116,6 +122,15 @@ InstanceSummary = TypedDict("InstanceSummary", {
     "created_at": "Required[str]",
     "updated_at": "Required[str]",
     "resource_version": "Required[int]",
+    "image_slot": "NotRequired[str]",
+    "worker_image_id": "NotRequired[str]",
+    "model_catalog": "NotRequired[str]",
+    "billing_slot": "NotRequired[str]",
+    "icon_key": "NotRequired[str]",
+    "device_control": "NotRequired[bool]",
+    "runtime_profile": "NotRequired[str]",
+    "free_plan": "NotRequired[bool]",
+    "cloud_provider": "NotRequired[str]",
 })
 
 InstancePage = TypedDict("InstancePage", {
@@ -218,6 +233,9 @@ Conversation = TypedDict("Conversation", {
     "resource_version": "Required[int]",
     "model_override_id": "NotRequired[str]",
     "effective_model_id": "NotRequired[str]",
+    "active_response": "NotRequired[ActiveConversationResponse]",
+    "reasoning": "NotRequired[ReasoningSettings]",
+    "approval_mode": "NotRequired[str | None]",
 })
 
 ConversationResponse = TypedDict("ConversationResponse", {
@@ -369,6 +387,40 @@ ContinueTaskInput = TypedDict("ContinueTaskInput", {
     "auth_grant": "NotRequired[bool]",
 })
 
+ActiveConversationResponse = TypedDict("ActiveConversationResponse", {
+    "response_id": "Required[str]",
+    "last_event_id": "Required[str]",
+    "user_message_id": "NotRequired[str]",
+    "reply_message_id": "NotRequired[str]",
+})
+
+ReasoningSettings = TypedDict("ReasoningSettings", {
+    "modelId": "Required[str]",
+    "reasoningOverrideId": "Required[str | None]",
+})
+
+ReasoningResult = TypedDict("ReasoningResult", {
+    "metadata_version": "Required[int]",
+})
+
+ReasoningResultResponse = TypedDict("ReasoningResultResponse", {
+    "data": "Required[ReasoningResult]",
+})
+
+ApprovalModeSettings = TypedDict("ApprovalModeSettings", {
+    "approval_mode": "Required[str | None]",
+})
+
+ApprovalModeResult = TypedDict("ApprovalModeResult", {
+    "approval_mode": "Required[str | None]",
+    "metadata_version": "Required[int]",
+    "status": "Required[str]",
+})
+
+ApprovalModeResultResponse = TypedDict("ApprovalModeResultResponse", {
+    "data": "Required[ApprovalModeResult]",
+})
+
 ErrorResponse = TypedDict("ErrorResponse", {
     "code": "Required[str]",
     "message": "Required[str]",
@@ -489,6 +541,22 @@ UHPPluginSkill = TypedDict("UHPPluginSkill", {
 UHPPluginSkipped = TypedDict("UHPPluginSkipped", {
     "path": "Required[str]",
     "reason": "Required[str]",
+})
+
+UHPHarnessCreate = TypedDict("UHPHarnessCreate", {
+    "name": "NotRequired[str]",
+    "base": "Required[str]",
+    "default_model": "NotRequired[str]",
+    "system_prompt": "NotRequired[str]",
+    "mcp_servers": "NotRequired[list[UHPMcpServer]]",
+    "skills": "NotRequired[list[UHPSkill]]",
+    "plugins": "NotRequired[list[UHPPlugin]]",
+    "environment": "NotRequired[str]",
+    "disabled_tools": "NotRequired[list[str]]",
+    "max_step": "NotRequired[int | None]",
+    "timeout_seconds": "NotRequired[int | None]",
+    "instance_id": "NotRequired[str]",
+    "template_id": "NotRequired[str]",
 })
 
 UHPModelCatalog = TypedDict("UHPModelCatalog", {
@@ -620,7 +688,7 @@ RuntimeInstanceSummary = TypedDict("RuntimeInstanceSummary", {
     "app_id": "Required[str]",
     "developer_id": "Required[str]",
     "name": "Required[str]",
-    "harness": "Required[str]",
+    "agent_framework": "Required[str]",
     "provider_id": "Required[str]",
     "region": "Required[str]",
     "os_type": "Required[str]",
@@ -638,20 +706,38 @@ RuntimeInstanceSummary = TypedDict("RuntimeInstanceSummary", {
     "llm": "NotRequired[RuntimeLLMView | None]",
     "hosting_type": "NotRequired[str]",
     "cloud_provider": "NotRequired[str]",
+    "image_slot": "NotRequired[str]",
+    "worker_image_id": "NotRequired[str]",
+    "model_catalog": "NotRequired[str]",
+    "billing_slot": "NotRequired[str]",
+    "icon_key": "NotRequired[str]",
+    "device_control": "Required[bool]",
+    "runtime_profile": "NotRequired[str]",
+    "free_plan": "Required[bool]",
     "resource_version": "Required[int]",
+    "has_ever_run": "Required[bool]",
     "created_at": "Required[str]",
     "updated_at": "Required[str]",
     "capabilities": "Required[RuntimeInstanceSummaryCapabilities]",
 })
 
-RuntimeUpgradeJob = TypedDict("RuntimeUpgradeJob", {
-    "job_id": "Required[str]",
-    "instance_id": "Required[str]",
-    "status": "Required[str]",
-    "target": "Required[str]",
-    "created_at": "Required[str]",
-    "completed_at": "NotRequired[str | None]",
-    "error": "NotRequired[str | None]",
+RuntimeOperationSummary = TypedDict("RuntimeOperationSummary", {
+    "id": "Required[str]",
+    "kind": "Required[str]",
+    "phase": "Required[str]",
+    "error_code": "NotRequired[str]",
+})
+
+RuntimeInstanceResult = TypedDict("RuntimeInstanceResult", {
+    "data": "Required[RuntimeInstanceSummary]",
+    "operation": "Required[RuntimeOperationSummary]",
+})
+
+RuntimeExecResult = TypedDict("RuntimeExecResult", {
+    "exit_code": "Required[int]",
+    "stdout": "Required[str]",
+    "stderr": "Required[str]",
+    "truncated": "Required[bool]",
 })
 
 RuntimeLLM = TypedDict("RuntimeLLM", {
@@ -684,23 +770,14 @@ RuntimeLLMModel = TypedDict("RuntimeLLMModel", {
     "order": "Required[int]",
 })
 
-RuntimeOperationSummary = TypedDict("RuntimeOperationSummary", {
-    "id": "Required[str]",
-    "kind": "Required[str]",
-    "phase": "Required[str]",
-    "error_code": "NotRequired[str]",
-})
-
-RuntimeInstanceResult = TypedDict("RuntimeInstanceResult", {
-    "data": "Required[RuntimeInstanceSummary]",
-    "operation": "Required[RuntimeOperationSummary]",
-})
-
-RuntimeExecResult = TypedDict("RuntimeExecResult", {
-    "exit_code": "Required[int]",
-    "stdout": "Required[str]",
-    "stderr": "Required[str]",
-    "truncated": "Required[bool]",
+RuntimeUpgradeJob = TypedDict("RuntimeUpgradeJob", {
+    "job_id": "Required[str]",
+    "instance_id": "Required[str]",
+    "status": "Required[str]",
+    "target": "Required[str]",
+    "created_at": "Required[str]",
+    "completed_at": "NotRequired[str | None]",
+    "error": "NotRequired[str | None]",
 })
 
 FileFile = TypedDict("FileFile", {
@@ -727,7 +804,7 @@ FileOrigin = TypedDict("FileOrigin", {
     "instance_name": "NotRequired[str]",
     "agent_name": "NotRequired[str]",
     "avatar_url": "NotRequired[str]",
-    "harness": "NotRequired[str]",
+    "agent_framework": "NotRequired[str]",
     "destroyed": "NotRequired[bool]",
 })
 
@@ -861,6 +938,40 @@ A2ADataPartOut = TypedDict("A2ADataPartOut", {
     "metadata": "NotRequired[dict[str, JSONValue]]",
 })
 
+a2aTaskView = TypedDict("a2aTaskView", {
+    "id": "Required[str]",
+    "contextId": "Required[str]",
+    "status": "Required[A2ATaskStatus]",
+    "artifacts": "NotRequired[list[A2AArtifact]]",
+    "history": "NotRequired[list[A2AMessage]]",
+    "metadata": "NotRequired[dict[str, JSONValue]]",
+    "caller_principal_id": "Required[str]",
+    "caller_agent_id": "Required[str]",
+    "caller_owner_id": "Required[str]",
+    "target_principal_id": "Required[str]",
+    "target_agent_id": "Required[str]",
+    "target_owner_id": "Required[str]",
+    "channel_id": "NotRequired[str]",
+    "created_at": "NotRequired[str]",
+    "updated_at": "NotRequired[str]",
+    "completed_at": "NotRequired[str]",
+})
+
+agentTemplateCatalogView = TypedDict("agentTemplateCatalogView", {
+    "id": "Required[str]",
+    "display_name": "Required[str]",
+    "summary": "Required[str]",
+    "description": "Required[str]",
+    "category": "Required[str]",
+    "vibe": "Required[str]",
+    "icon_url": "Required[str]",
+    "banner_url": "Required[str]",
+    "default_model": "Required[str]",
+    "tags": "Required[list[str]]",
+    "agent_framework": "Required[str]",
+    "template_version": "Required[str]",
+})
+
 agentBindWire = TypedDict("agentBindWire", {
     "status": "Required[str]",
     "bind_id": "NotRequired[str]",
@@ -881,7 +992,7 @@ agentBindDetailsWire = TypedDict("agentBindDetailsWire", {
     "bind_id": "Required[str]",
     "hostname": "Required[str]",
     "fingerprint_short": "Required[str]",
-    "harness": "Required[str]",
+    "agent_framework": "Required[str]",
     "os_type": "NotRequired[str]",
     "expires_at": "Required[int]",
     "status": "Required[str]",
@@ -904,44 +1015,10 @@ portalBindWire = TypedDict("portalBindWire", {
     "resource_version": "NotRequired[int]",
 })
 
-agentTemplateCatalogView = TypedDict("agentTemplateCatalogView", {
-    "id": "Required[str]",
-    "display_name": "Required[str]",
-    "summary": "Required[str]",
-    "description": "Required[str]",
-    "category": "Required[str]",
-    "vibe": "Required[str]",
-    "icon_url": "Required[str]",
-    "banner_url": "Required[str]",
-    "default_model": "Required[str]",
-    "tags": "Required[list[str]]",
-    "harness": "Required[str]",
-    "template_version": "Required[str]",
-})
-
-a2aTaskView = TypedDict("a2aTaskView", {
-    "id": "Required[str]",
-    "contextId": "Required[str]",
-    "status": "Required[A2ATaskStatus]",
-    "artifacts": "NotRequired[list[A2AArtifact]]",
-    "history": "NotRequired[list[A2AMessage]]",
-    "metadata": "NotRequired[dict[str, JSONValue]]",
-    "caller_principal_id": "Required[str]",
-    "caller_agent_id": "Required[str]",
-    "caller_owner_id": "Required[str]",
-    "target_principal_id": "Required[str]",
-    "target_agent_id": "Required[str]",
-    "target_owner_id": "Required[str]",
-    "channel_id": "NotRequired[str]",
-    "created_at": "NotRequired[str]",
-    "updated_at": "NotRequired[str]",
-    "completed_at": "NotRequired[str]",
-})
-
 CreateServerInstanceInput = TypedDict("CreateServerInstanceInput", {
     "name": "Required[str]",
     "variant_id": "NotRequired[str]",
-    "harness": "NotRequired[Literal[\"openclaw\"]]",
+    "agent_framework": "NotRequired[Literal[\"openclaw\"]]",
     "llm": "NotRequired[RuntimeLLM | None]",
 })
 
@@ -1196,22 +1273,6 @@ DeviceBindingErrorResponse = TypedDict("DeviceBindingErrorResponse", {
     "message": "Required[str]",
 })
 
-UHPHarnessCreate = TypedDict("UHPHarnessCreate", {
-    "name": "NotRequired[str]",
-    "base": "Required[str]",
-    "default_model": "NotRequired[str]",
-    "system_prompt": "NotRequired[str]",
-    "mcp_servers": "NotRequired[list[UHPMcpServer]]",
-    "skills": "NotRequired[list[UHPSkill]]",
-    "plugins": "NotRequired[list[UHPPlugin]]",
-    "environment": "NotRequired[str]",
-    "disabled_tools": "NotRequired[list[str]]",
-    "max_step": "NotRequired[int | None]",
-    "timeout_seconds": "NotRequired[int | None]",
-    "instance_id": "NotRequired[str]",
-    "template_id": "NotRequired[str]",
-})
-
 UHPCreateResponseJSONRequest = TypedDict("UHPCreateResponseJSONRequest", {
     "input": "Required[str | list[dict[str, JSONValue]]]",
     "model": "NotRequired[str]",
@@ -1226,6 +1287,14 @@ UHPCreateResponseJSONRequest = TypedDict("UHPCreateResponseJSONRequest", {
     "tools": "NotRequired[list[dict[str, JSONValue]]]",
     "include": "NotRequired[list[str]]",
     "background": "NotRequired[bool]",
+})
+
+SetConversationApprovalModeOptions = TypedDict("SetConversationApprovalModeOptions", {
+    "If-Match": "Required[str]",
+})
+
+SetConversationReasoningOptions = TypedDict("SetConversationReasoningOptions", {
+    "If-Match": "Required[str]",
 })
 
 CreateClientSessionOptions = TypedDict("CreateClientSessionOptions", {
@@ -1259,14 +1328,14 @@ ListDeployRegionsOptions = TypedDict("ListDeployRegionsOptions", {
 })
 
 ListDeployModelsOptions = TypedDict("ListDeployModelsOptions", {
-    "harness": "NotRequired[str]",
+    "agent_framework": "NotRequired[str]",
     "search": "NotRequired[str]",
 })
 
 ListInstanceTemplatesOptions = TypedDict("ListInstanceTemplatesOptions", {
     "page": "NotRequired[int]",
     "page_size": "NotRequired[int]",
-    "harness": "NotRequired[str]",
+    "agent_framework": "NotRequired[str]",
     "provider_id": "NotRequired[str]",
     "search": "NotRequired[str]",
 })
@@ -1288,7 +1357,7 @@ ListInstancesOptions = TypedDict("ListInstancesOptions", {
     "page_size": "NotRequired[int]",
     "status": "NotRequired[str]",
     "provider_id": "NotRequired[str]",
-    "harness": "NotRequired[str]",
+    "agent_framework": "NotRequired[str]",
     "cluster_id": "NotRequired[str]",
     "search": "NotRequired[str]",
 })
@@ -1718,9 +1787,17 @@ ListHarnessesResponse = TypedDict("ListHarnessesResponse", {
     "harnesses": "Required[list[UHPHarness]]",
 })
 
+CreateHarnessOptions = TypedDict("CreateHarnessOptions", {
+    "Idempotency-Key": "NotRequired[str]",
+})
+
+UpdateHarnessOptions = TypedDict("UpdateHarnessOptions", {
+    "Idempotency-Key": "NotRequired[str]",
+})
+
 DeleteHarnessResponse = TypedDict("DeleteHarnessResponse", {
-    "id": "Required[str]",
-    "deleted": "Required[bool]",
+    "id": "NotRequired[str]",
+    "deleted": "NotRequired[bool]",
 })
 
 CreateResponseOptions = TypedDict("CreateResponseOptions", {
@@ -1792,7 +1869,7 @@ FileSummaryInstancesItem = TypedDict("FileSummaryInstancesItem", {
     "instance_name": "NotRequired[str]",
     "agent_name": "NotRequired[str]",
     "avatar_url": "NotRequired[str]",
-    "harness": "NotRequired[str]",
+    "agent_framework": "NotRequired[str]",
     "destroyed": "NotRequired[bool]",
     "count": "Required[int]",
 })
@@ -1927,7 +2004,7 @@ class InvalidResponseBody(TypedDict):
     raw_body: bytes
     reason: str
 
-_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"createAgentTask":{"default":"ErrorResponse"},"listAgentTasks":{"default":"ErrorResponse"},"getAgentTask":{"default":"ErrorResponse"},"listAgentTaskMessages":{"default":"ErrorResponse"},"cancelAgentTask":{"default":"ErrorResponse"},"continueAgentTask":{"default":"ErrorResponse"},"invokeAgent":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createHarness":{"409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"updateHarness":{"404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteHarness":{"404":"UHPErrorEnvelope","422":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
+_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"setConversationApprovalMode":{"default":"ErrorResponse"},"setConversationReasoning":{"default":"ErrorResponse"},"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"createAgentTask":{"default":"ErrorResponse"},"listAgentTasks":{"default":"ErrorResponse"},"getAgentTask":{"default":"ErrorResponse"},"listAgentTaskMessages":{"default":"ErrorResponse"},"cancelAgentTask":{"default":"ErrorResponse"},"continueAgentTask":{"default":"ErrorResponse"},"invokeAgent":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createHarness":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"updateHarness":{"400":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteHarness":{"404":"UHPErrorEnvelope","422":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
 
 def _matches_error_body(schema: str | None, value: JSONValue) -> bool:
     if not isinstance(value, dict):
@@ -1954,11 +2031,11 @@ class BeeOSClient:
         self.api_key = api_key
         self.external_user_id = external_user_id
         self.timeout = timeout
+        self.conversations = ConversationsResource(self)
         self.identity = IdentityResource(self)
         self.catalog = CatalogResource(self)
         self.instances = InstancesResource(self)
         self.agents = AgentsResource(self)
-        self.conversations = ConversationsResource(self)
         self.messages = MessagesResource(self)
         self.tasks = TasksResource(self)
         self.usage = UsageResource(self)
@@ -2047,6 +2124,122 @@ class BeeOSClient:
             if data:
                 yield cast(JSONValue, json.loads("\n".join(data)))
 
+class ConversationsResource:
+    def __init__(self, client: BeeOSClient) -> None:
+        self._client = client
+
+    def set_approval_mode(self, agent_id: str, conversation_id: str, input: ApprovalModeSettings, options: SetConversationApprovalModeOptions) -> ApprovalModeResultResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/approval-mode"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "If-Match" in opts:
+            headers["If-Match"] = str(opts["If-Match"])
+        payload = self._client._request("setConversationApprovalMode", "PUT", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("ApprovalModeResultResponse", json.loads(payload))
+
+    def set_reasoning(self, agent_id: str, conversation_id: str, input: ReasoningSettings, options: SetConversationReasoningOptions) -> ReasoningResultResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/reasoning"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "If-Match" in opts:
+            headers["If-Match"] = str(opts["If-Match"])
+        payload = self._client._request("setConversationReasoning", "PUT", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("ReasoningResultResponse", json.loads(payload))
+
+    def create(self, agent_id: str, input: CreateConversationInput, options: CreateAgentConversationOptions) -> ConversationResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
+        payload = self._client._request("createAgentConversation", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("ConversationResponse", json.loads(payload))
+
+    def list(self, agent_id: str, options: ListAgentConversationsOptions | None = None) -> ConversationPage:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options if options is not None else {}
+        if "cursor" in opts:
+            query["cursor"] = str(opts["cursor"])
+        if "limit" in opts:
+            query["limit"] = str(opts["limit"])
+        if "state" in opts:
+            query["state"] = str(opts["state"])
+        payload = self._client._request("listAgentConversations", "GET", path, "", query, headers, None, "")
+        return cast("ConversationPage", json.loads(payload))
+
+    def get(self, agent_id: str, conversation_id: str) -> ConversationResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        payload = self._client._request("getConversation", "GET", path, "", query, headers, None, "")
+        return cast("ConversationResponse", json.loads(payload))
+
+    def update(self, agent_id: str, conversation_id: str, input: UpdateConversationInput, options: UpdateConversationOptions) -> ConversationResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "If-Match" in opts:
+            headers["If-Match"] = str(opts["If-Match"])
+        payload = self._client._request("updateConversation", "PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("ConversationResponse", json.loads(payload))
+
+    def delete(self, agent_id: str, conversation_id: str, options: DeleteConversationOptions) -> None:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
+        payload = self._client._request("deleteConversation", "DELETE", path, "", query, headers, None, "")
+        return None
+
+    def cancel(self, agent_id: str, conversation_id: str, input: CancelConversationInput, options: CancelConversationOptions) -> CommandReceiptResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/cancel"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
+        payload = self._client._request("cancelConversation", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("CommandReceiptResponse", json.loads(payload))
+
+    def clear(self, agent_id: str, conversation_id: str, options: ClearConversationOptions) -> ClearConversationReceiptResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/clear"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
+        payload = self._client._request("clearConversation", "POST", path, "", query, headers, None, "")
+        return cast("ClearConversationReceiptResponse", json.loads(payload))
+
+    def set_model(self, agent_id: str, conversation_id: str, input: SetConversationModelInput, options: SetConversationModelOptions) -> CommandReceiptResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/model"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "If-Match" in opts:
+            headers["If-Match"] = str(opts["If-Match"])
+        payload = self._client._request("setConversationModel", "PUT", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("CommandReceiptResponse", json.loads(payload))
+
+    def resume(self, agent_id: str, conversation_id: str, options: ResumeConversationOptions) -> ResumeConversationResponse:
+        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/resume"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
+        payload = self._client._request("resumeConversation", "POST", path, "", query, headers, None, "")
+        return cast("ResumeConversationResponse", json.loads(payload))
+
+
 class IdentityResource:
     def __init__(self, client: BeeOSClient) -> None:
         self._client = client
@@ -2130,8 +2323,8 @@ class CatalogResource:
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
         opts = options if options is not None else {}
-        if "harness" in opts:
-            query["harness"] = str(opts["harness"])
+        if "agent_framework" in opts:
+            query["agent_framework"] = str(opts["agent_framework"])
         if "search" in opts:
             query["search"] = str(opts["search"])
         payload = self._client._request("listDeployModels", "GET", path, "", query, headers, None, "")
@@ -2146,8 +2339,8 @@ class CatalogResource:
             query["page"] = str(opts["page"])
         if "page_size" in opts:
             query["page_size"] = str(opts["page_size"])
-        if "harness" in opts:
-            query["harness"] = str(opts["harness"])
+        if "agent_framework" in opts:
+            query["agent_framework"] = str(opts["agent_framework"])
         if "provider_id" in opts:
             query["provider_id"] = str(opts["provider_id"])
         if "search" in opts:
@@ -2210,8 +2403,8 @@ class InstancesResource:
             query["status"] = str(opts["status"])
         if "provider_id" in opts:
             query["provider_id"] = str(opts["provider_id"])
-        if "harness" in opts:
-            query["harness"] = str(opts["harness"])
+        if "agent_framework" in opts:
+            query["agent_framework"] = str(opts["agent_framework"])
         if "cluster_id" in opts:
             query["cluster_id"] = str(opts["cluster_id"])
         if "search" in opts:
@@ -2408,102 +2601,6 @@ class AgentsResource:
             headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
         payload = self._client._request("invokeAgent", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("AgentInvokeResult", json.loads(payload))
-
-
-class ConversationsResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def create(self, agent_id: str, input: CreateConversationInput, options: CreateAgentConversationOptions) -> ConversationResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("createAgentConversation", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("ConversationResponse", json.loads(payload))
-
-    def list(self, agent_id: str, options: ListAgentConversationsOptions | None = None) -> ConversationPage:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "cursor" in opts:
-            query["cursor"] = str(opts["cursor"])
-        if "limit" in opts:
-            query["limit"] = str(opts["limit"])
-        if "state" in opts:
-            query["state"] = str(opts["state"])
-        payload = self._client._request("listAgentConversations", "GET", path, "", query, headers, None, "")
-        return cast("ConversationPage", json.loads(payload))
-
-    def get(self, agent_id: str, conversation_id: str) -> ConversationResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("getConversation", "GET", path, "", query, headers, None, "")
-        return cast("ConversationResponse", json.loads(payload))
-
-    def update(self, agent_id: str, conversation_id: str, input: UpdateConversationInput, options: UpdateConversationOptions) -> ConversationResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "If-Match" in opts:
-            headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("updateConversation", "PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("ConversationResponse", json.loads(payload))
-
-    def delete(self, agent_id: str, conversation_id: str, options: DeleteConversationOptions) -> None:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("deleteConversation", "DELETE", path, "", query, headers, None, "")
-        return None
-
-    def cancel(self, agent_id: str, conversation_id: str, input: CancelConversationInput, options: CancelConversationOptions) -> CommandReceiptResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/cancel"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("cancelConversation", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("CommandReceiptResponse", json.loads(payload))
-
-    def clear(self, agent_id: str, conversation_id: str, options: ClearConversationOptions) -> ClearConversationReceiptResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/clear"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("clearConversation", "POST", path, "", query, headers, None, "")
-        return cast("ClearConversationReceiptResponse", json.loads(payload))
-
-    def set_model(self, agent_id: str, conversation_id: str, input: SetConversationModelInput, options: SetConversationModelOptions) -> CommandReceiptResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/model"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "If-Match" in opts:
-            headers["If-Match"] = str(opts["If-Match"])
-        payload = self._client._request("setConversationModel", "PUT", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("CommandReceiptResponse", json.loads(payload))
-
-    def resume(self, agent_id: str, conversation_id: str, options: ResumeConversationOptions) -> ResumeConversationResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/conversations/{quote(str(conversation_id), safe='')}/resume"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("resumeConversation", "POST", path, "", query, headers, None, "")
-        return cast("ResumeConversationResponse", json.loads(payload))
 
 
 class MessagesResource:
@@ -3076,10 +3173,13 @@ class HarnessesResource:
         payload = self._client._request("listHarnesses", "GET", path, "/uhp/v1", query, headers, None, "")
         return cast("ListHarnessesResponse", json.loads(payload))
 
-    def create(self, input: UHPHarnessCreate) -> UHPHarness:
+    def create(self, input: UHPHarnessCreate, options: CreateHarnessOptions | None = None) -> UHPHarness:
         path = f"/harnesses"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
+        opts = options if options is not None else {}
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
         payload = self._client._request("createHarness", "POST", path, "/uhp/v1", query, headers, json.dumps(input).encode(), "application/json")
         return cast("UHPHarness", json.loads(payload))
 
@@ -3090,10 +3190,13 @@ class HarnessesResource:
         payload = self._client._request("getHarness", "GET", path, "/uhp/v1", query, headers, None, "")
         return cast("UHPHarness", json.loads(payload))
 
-    def update(self, harness_id: str, input: UHPHarnessCreate) -> UHPHarness:
+    def update(self, harness_id: str, input: UHPHarnessCreate, options: UpdateHarnessOptions | None = None) -> UHPHarness:
         path = f"/harnesses/{quote(str(harness_id), safe='')}"
         query: dict[str, str] = {}
         headers: dict[str, str] = {}
+        opts = options if options is not None else {}
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
         payload = self._client._request("updateHarness", "PUT", path, "/uhp/v1", query, headers, json.dumps(input).encode(), "application/json")
         return cast("UHPHarness", json.loads(payload))
 
