@@ -1,29 +1,40 @@
 #!/usr/bin/env python3
 """Refresh the ONE Server OpenAPI input from pinned producer contracts.
 Requires PyYAML 6.0.3 (spec/requirements-refresh.txt).
-No API calls, credentials, publishing, or producer writes.
+Every producer and app-sdk input is listed and read with git at an explicit ref;
+the working trees are never read. No API calls, credentials, publishing, or producer writes.
 """
 import argparse, hashlib, subprocess
 parser=argparse.ArgumentParser()
 parser.add_argument('--producer-root',required=True)
-parser.add_argument('--producer-ref',default='984c28f37862eea66ad154f3f8ebd108d48e5065')
+parser.add_argument('--producer-ref',required=True,help='beeos-cloud-backend commit (any rev git resolves; the full SHA is recorded)')
 parser.add_argument('--app-sdk-root',required=True,help='App backend third_party/beeos-cloud-sdk-go directory')
+parser.add_argument('--app-sdk-ref',required=True,help='beeos-app-backend commit (any rev git resolves; the full SHA is recorded)')
 parser.add_argument('--output',default=str(__import__('pathlib').Path(__file__).resolve().parents[1]/'spec/server.openapi.json'))
 args=parser.parse_args()
 inputs={}
+def git(top,*a):return subprocess.check_output(['git','-C',str(top),*a],text=True)
+def pin(root,ref):
+ top=Path(git(root,'rev-parse','--show-toplevel').strip()).resolve()
+ return top,git(top,'rev-parse','--verify',ref+'^{commit}').strip()
+def locate(path):
+ for root,(top,sha),label in ((B,PB,'producer'),(V,PV,'app-sdk')):
+  if path.is_relative_to(root):return top,sha,label+'/'+str(path.relative_to(root)),str(path.relative_to(top))
+ raise Exception('not a pinned input: '+str(path))
 def read(path):
- if path.is_relative_to(B):
-  relative=str(path.relative_to(B))
-  value=subprocess.check_output(['git','-C',str(B),'show',args.producer_ref+':'+relative],text=True)
-  inputs['producer/'+relative]=hashlib.sha256(value.encode()).hexdigest()
- else:
-  value=path.read_text()
-  if path.is_relative_to(V):inputs['app-sdk/'+str(path.relative_to(V))]=hashlib.sha256(value.encode()).hexdigest()
+ top,sha,key,relative=locate(path)
+ value=git(top,'show',sha+':'+relative)
+ inputs[key]=hashlib.sha256(value.encode()).hexdigest()
  return value
+def listdir(folder,suffix):
+ top,sha,_,relative=locate(folder)
+ entries=[line.split('\t',1) for line in git(top,'ls-tree',sha,relative+'/').splitlines()]
+ return sorted(folder/e[1].rsplit('/',1)[-1] for e in entries if e[0].split()[1]=='blob' and e[1].endswith(suffix))
 import json,yaml,re,copy
 from pathlib import Path
 B=Path(args.producer_root).resolve(); V=Path(args.app_sdk_root).resolve(); OUT=Path(args.output).resolve()
-spec={'openapi':'3.1.0','info':{'title':'BeeOS Cloud Server API','version':'3.0.0'},'servers':[{'url':'https://api.cloud.beeos.ai/v1'}],'security':[{'ServerAPIKey':[]}],'paths':{},'components':{'schemas':{},'parameters':{},'responses':{},'securitySchemes':{'ServerAPIKey':{'type':'http','scheme':'bearer','description':'BeeOS Server API key (bsk_).'}}},'x-producer-repository':'beeos-ai/beeos-cloud-backend','x-producer-revision':args.producer_ref}
+PB=pin(B,args.producer_ref); PV=pin(V,args.app_sdk_ref)
+spec={'openapi':'3.1.0','info':{'title':'BeeOS Cloud Server API','version':'3.0.0'},'servers':[{'url':'https://api.cloud.beeos.ai/v1'}],'security':[{'ServerAPIKey':[]}],'paths':{},'components':{'schemas':{},'parameters':{},'responses':{},'securitySchemes':{'ServerAPIKey':{'type':'http','scheme':'bearer','description':'BeeOS Server API key (bsk_).'}}},'x-producer-repository':'beeos-ai/beeos-cloud-backend','x-producer-revision':PB[1]}
 S=spec['components']['schemas']
 def load(p): return yaml.safe_load(read(p))
 def ref(n):return {'$ref':'#/components/schemas/'+n}
@@ -75,7 +86,7 @@ for path,ops in d['paths'].items():
 S['JSONValue']={'description':'A genuinely open JSON value (provider/plugin parameters or arbitrary metadata).','oneOf':[{'type':'null'},{'type':'boolean'},{'type':'number'},{'type':'string'},arr(ref('JSONValue')),{'type':'object','additionalProperties':ref('JSONValue')}]}
 models={}
 for folder,prefix in [(B/'pkg/beeoscloudruntime','Runtime'),(B/'pkg/beeoscloudfiles','File'),(B/'pkg/beeoscloudagent','Agent'),(B/'pkg/a2a','A2A'),(B/'services/openapi-gateway/internal/beeoscloud',''),(V,'')]:
- for p in folder.glob('*.go'):
+ for p in listdir(folder,'.go'):
   if p.name.endswith('_test.go') or p.name.endswith('.gen.go'):continue
   t=read(p)
   for m in re.finditer(r'type (\w+) struct \{',t):
@@ -110,7 +121,7 @@ for n,(fields,prefix,body) in models.items():
  S[n]=obj(props,req)
 # Embedded File request base (untagged embed is flattened on JSON wire).
 S['FilePrepareUploadInput']['properties'].update(S['FilePrepareInput']['properties']);S['FilePrepareUploadInput']['required']+=S['FilePrepareInput']['required']
-S['CreateServerInstanceInput']=obj({'name':strs,'variant_id':strs,'harness':{'type':'string','enum':['openclaw']},'llm':{'anyOf':[ref('RuntimeLLM'),{'type':'null'}]}},['name'])
+S['CreateServerInstanceInput']=obj({'name':strs,'variant_id':strs,'agent_framework':{'type':'string','enum':['openclaw']},'llm':{'anyOf':[ref('RuntimeLLM'),{'type':'null'}]}},['name'])
 S['RuntimeInstanceSummary']['properties']['capabilities']=obj({'computer':{'type':'boolean'},'mobile':{'type':'boolean'},'device':{'type':'boolean'},'terminal':{'type':'boolean'}},[])
 S['RuntimeLLMProvider']['properties']['api_key']['writeOnly']=True
 S['RuntimeLLMProvider']['properties']['protocol']={'type':'string','enum':['openai','anthropic']}
@@ -120,6 +131,8 @@ idem=param('Idempotency-Key','header',required=True); version=param('If-Match','
 def op(path,method,oid,resource,name,response,request=None,query=None,headers=None,status='200',activation='live'):
  o={'operationId':oid,'x-sdk-resource':resource,'x-sdk-method':name,'x-sdk-activation':activation,'x-sdk-provenance':'services/openapi-gateway/internal/beeoscloud','parameters':[param(n,'path',required=True) for n in re.findall(r'{(.*?)}',path)]+(query or [])+(headers or []),'responses':{status:{'description':'Success',**({'content':{'application/json':{'schema':ref(response) if isinstance(response,str) else response}}} if response else {})},'default':{'$ref':'#/components/responses/Error'}}}
  if request:o['requestBody']={'required':True,'content':{'application/json':{'schema':ref(request) if isinstance(request,str) else request}}}
+ previous=spec['paths'].get(path,{}).get(method,{})
+ if previous.get('summary'):o['summary']=previous['summary']
  spec['paths'].setdefault(path,{})[method]=o
 # Overwrite stale lifecycle schemas with producer results and accepted fields.
 op('/instances','post','instanceCreate','instances','create','RuntimeInstanceResult','CreateServerInstanceInput',headers=[idem],status='202')
@@ -133,10 +146,10 @@ op('/usage/summary','get','getUsageSummary','usage','getSummary','ServerUsageSum
 # Files are not enveloped: exact service projections.
 for path,method,oid,name,res,body,query,headers,status in [('/files/presign-upload','post','presignFileUpload','prepareUpload','FileTransferDescriptor','FilePrepareUploadInput',None,[idem],'201'),('/files/{fileId}/confirm','post','confirmFileUpload','confirmUpload','FileFile','FileConfirmInput',None,[idem],'200'),('/files','get','listFiles','list','FilePage',None,[param(n) for n in ['content_type','since','status','file_type','category','source','q','instance_id','agent_id','sort','sort_dir']]+[param(n,typ=ints) for n in ['limit','offset']],None,'200'),('/files/{fileId}','get','getFile','get','FileResolution',None,None,None,'200'),('/files/{fileId}','patch','renameFile','rename','FileFile',obj({'title':strs}),None,None,'200'),('/files/{fileId}','delete','deleteFile','delete',None,None,None,[idem],'204')]:op(path,method,oid,'files',name,res,body,query,headers,status)
 # Existing resource mapping.
-mapping={'createClientSession':('identity','createClientSession'),'refreshClientSession':('identity','refreshClientSession'),'revokeClientSession':('identity','revokeClientSession'),'deleteExternalUser':('identity','deleteExternalUser'),'getExternalUserDeletion':('identity','getExternalUserDeletion'),'listProviders':('catalog','listProviders'),'listRegions':('catalog','listRegions'),'listDeployRegions':('catalog','listRegions'),'listModels':('catalog','listModels'),'listDeployModels':('catalog','listModels'),'listInstanceTemplates':('catalog','listInstanceTemplates'),'getInstanceTemplate':('catalog','getInstanceTemplate'),'listAgentTemplates':('catalog','listAgentTemplates'),'getAgentTemplate':('catalog','getAgentTemplate'),'listInstances':('instances','list'),'updateInstanceMetadata':('instances','update'),'listAgents':('agents','list'),'getAgent':('agents','get'),'updateAgent':('agents','update'),'createConversation':('conversations','create'),'listConversations':('conversations','list'),'getConversation':('conversations','get'),'updateConversation':('conversations','update'),'renameConversation':('conversations','update'),'deleteConversation':('conversations','delete'),'cancelConversation':('conversations','cancel'),'clearConversation':('conversations','clear'),'setConversationModel':('conversations','setModel'),'sendMessage':('messages','send'),'sendConversationMessage':('messages','send'),'listMessages':('messages','list'),'listConversationMessages':('messages','list'),'getMessage':('messages','get'),'createTask':('tasks','create'),'listTasks':('tasks','list'),'listAgentTasks':('tasks','list'),'getTask':('tasks','get'),'listTaskMessages':('tasks','listMessages'),'cancelTask':('tasks','cancel'),'continueTask':('tasks','continueTask'),'registerTaskWebhook':('taskWebhooks','create'),'listTaskWebhooks':('taskWebhooks','list'),'deleteTaskWebhook':('taskWebhooks','delete'),'listWebhookDeliveries':('taskWebhooks','listDeliveries'),'redeliverWebhook':('taskWebhooks','redeliver'),'getUsageHistory':('usage','getHistory'),'getUsageLimits':('usage','getLimits'),'getDiscovery':('catalog','getDiscovery'),'listHarnesses':('harnesses','list'),'getHarness':('harnesses','get'),'listHarnessModels':('harnesses','listModels'),'createResponse':('responses','create'),'getResponse':('responses','get'),'listResponseInputItems':('responses','getInputItems'),'getResponseInputItems':('responses','getInputItems'),'cancelResponse':('responses','cancel'),'deleteResponse':('responses','delete'),'streamResponseEvents':('responses','getEvents')}
+mapping={'createClientSession':('identity','createClientSession'),'refreshClientSession':('identity','refreshClientSession'),'revokeClientSession':('identity','revokeClientSession'),'deleteExternalUser':('identity','deleteExternalUser'),'getExternalUserDeletion':('identity','getExternalUserDeletion'),'listProviders':('catalog','listProviders'),'listRegions':('catalog','listRegions'),'listDeployRegions':('catalog','listRegions'),'listModels':('catalog','listModels'),'listDeployModels':('catalog','listModels'),'listInstanceTemplates':('catalog','listInstanceTemplates'),'getInstanceTemplate':('catalog','getInstanceTemplate'),'listAgentTemplates':('catalog','listAgentTemplates'),'getAgentTemplate':('catalog','getAgentTemplate'),'listInstances':('instances','list'),'updateInstanceMetadata':('instances','update'),'listAgents':('agents','list'),'getAgent':('agents','get'),'updateAgent':('agents','update'),'createConversation':('conversations','create'),'listConversations':('conversations','list'),'getConversation':('conversations','get'),'updateConversation':('conversations','update'),'renameConversation':('conversations','update'),'deleteConversation':('conversations','delete'),'cancelConversation':('conversations','cancel'),'clearConversation':('conversations','clear'),'setConversationModel':('conversations','setModel'),'setConversationReasoning':('conversations','setReasoning'),'setConversationApprovalMode':('conversations','setApprovalMode'),'sendMessage':('messages','send'),'sendConversationMessage':('messages','send'),'listMessages':('messages','list'),'listConversationMessages':('messages','list'),'getMessage':('messages','get'),'createTask':('tasks','create'),'listTasks':('tasks','list'),'listAgentTasks':('tasks','list'),'getTask':('tasks','get'),'listTaskMessages':('tasks','listMessages'),'cancelTask':('tasks','cancel'),'continueTask':('tasks','continueTask'),'registerTaskWebhook':('taskWebhooks','create'),'listTaskWebhooks':('taskWebhooks','list'),'deleteTaskWebhook':('taskWebhooks','delete'),'listWebhookDeliveries':('taskWebhooks','listDeliveries'),'redeliverWebhook':('taskWebhooks','redeliver'),'getUsageHistory':('usage','getHistory'),'getUsageLimits':('usage','getLimits'),'getDiscovery':('catalog','getDiscovery'),'listHarnesses':('harnesses','list'),'getHarness':('harnesses','get'),'listHarnessModels':('harnesses','listModels'),'createResponse':('responses','create'),'getResponse':('responses','get'),'listResponseInputItems':('responses','getInputItems'),'getResponseInputItems':('responses','getInputItems'),'cancelResponse':('responses','cancel'),'deleteResponse':('responses','delete'),'streamResponseEvents':('responses','getEvents')}
 # Classify exact producer routes.
 live=set()
-for p in (B/'services/openapi-gateway/internal/beeoscloud').glob('*.go'):
+for p in listdir(B/'services/openapi-gateway/internal/beeoscloud','.go'):
  if p.name.endswith('_test.go'):continue
  for method,path in re.findall(r'(?:mux|surface)\.HandleFunc\("(GET|POST|PUT|PATCH|DELETE) (/v1/[^\"]+)"',read(p)):
   if p.name.startswith('uhp'):path='/uhp'+path
@@ -184,21 +197,23 @@ S['UHPHarnessCreate']['properties']['template_id']={'type':'string','description
 S['UHPSkill']['properties']['sha256']={'type':'string','description':'BeeOS extension. SHA-256 of the Files bundle referenced by blob.'}
 S['UHPSkill']['properties']['size_bytes']={'type':'string','description':'BeeOS extension. Decimal byte size of the Files bundle referenced by blob.'}
 S['UHPMcpServer']['properties']['expires_at']={'type':'string','format':'date-time','description':'BeeOS extension. Expiry of the supplied short-lived credential; the caller refreshes it with another PUT.'}
-harness_sync='Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable.'
-harness_unsupported=' Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).'
+harness_sync='Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After (a create without an Idempotency-Key is not re-attached and would create a second harness); 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 409 beeos_idempotency_conflict means the Idempotency-Key was used with a different request; 503 harness_unavailable means the instance is not running or the operation journal is unavailable; 413 means the body exceeds 4 MiB (upload large skills as a Files blob).'
+harness_idempotency=' The optional Idempotency-Key header (1-128 visible ASCII characters) makes a create (POST, or PUT with template_id) safe to resend: the same key and request returns the same harness.'
+harness_unsupported=' Not supported by BeeOS Cloud yet (422 beeos_field_not_supported): a non-empty system_prompt, disabled_tools, environment or plugins, or any max_step or timeout_seconds; a value equal to what GET reports is accepted.'
 harness_descriptions={
- 'createHarness':harness_sync+' instance_id and name are required; default_model is honored only here. skills are rejected on create (422 beeos_field_not_supported); add them with PUT.'+harness_unsupported,
- 'updateHarness':harness_sync+' An absent field is unchanged. When skills is present it is diffed against the installed skills: listed skills with files, content or blob are installed; omitted catalog-origin skills are uninstalled; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported.'+harness_unsupported,
+ 'createHarness':harness_sync+harness_idempotency+' instance_id and name are required and base must equal the instance runtime (422); template_id and template_version create the harness from an agent template; default_model is honored only here. a non-empty skills or mcp_servers is rejected on create (422 beeos_field_not_supported); add them with PUT.'+harness_unsupported,
+ 'updateHarness':harness_sync+harness_idempotency+' An absent field is unchanged; a present list replaces the whole list. When skills is present it is diffed against the installed skills: listed skills with files, content or blob (exactly one) are installed; an installed skill listed with a different enabled flag is updated; installed skills that are omitted are uninstalled unless bundled with the runtime; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. When mcp_servers is present it is diffed against the runtime MCP servers: a server sent with a credential (headers or auth plus expires_at, at most 24 hours ahead) is set, a connected server sent without one is kept, omitted servers are unset; the url must be https and transport is http or sse; GET never returns a url or credential. 422 beeos_mcp_not_supported is returned only when the instance runtime has no MCP methods. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported.'+harness_unsupported,
  'deleteHarness':'Not supported by BeeOS Cloud yet: returns 422 beeos_harness_delete_not_supported once the harness is found.',
 }
-harness_error_statuses={'createHarness':['409','422','502','503','504'],'updateHarness':['409','422','502','503','504'],'deleteHarness':['422']}
+harness_error_statuses={'createHarness':['400','409','413','422','502','503','504'],'updateHarness':['400','409','413','422','502','503','504'],'deleteHarness':['422']}
 property_notes={
  ('UHPHarnessCreate','default_model'):'BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent.',
- ('UHPHarnessCreate','mcp_servers'):'Not accepted by BeeOS Cloud yet: a non-empty list returns 422 beeos_mcp_not_supported.',
+ ('UHPHarnessCreate','mcp_servers'):'Rejected on create (422 beeos_field_not_supported). On PUT the list is diffed against the runtime MCP servers: listed servers are set, omitted ones are unset; 422 beeos_mcp_not_supported only when the instance runtime has no MCP methods.',
 }
 for (schema,field),note in property_notes.items():S[schema]['properties'][field]['description']=note
 for path,method,oid in [('/uhp/v1/harnesses','post','createHarness'),('/uhp/v1/harnesses/{harness_id}','put','updateHarness'),('/uhp/v1/harnesses/{harness_id}','delete','deleteHarness')]:
  o=spec['paths'][path][method];o['description']=harness_descriptions[oid]
+ if oid!='deleteHarness':o['parameters'].append(param('Idempotency-Key','header'))
  for status in harness_error_statuses[oid]:o['responses'][status]={'description':'UHP protocol error envelope','content':{'application/json':{'schema':ref('UHPErrorEnvelope')}}}
 mapping_harness={'createHarness':'create','updateHarness':'update','deleteHarness':'delete'}
 for path in ['/uhp/v1/harnesses','/uhp/v1/harnesses/{harness_id}']:
@@ -236,8 +251,8 @@ op('/instances/{instanceId}/stream-url','get','getInstanceStreamURL','instances'
 op('/agents/{agentId}/conversations/{conversationId}/resume','post','resumeConversation','conversations','resume',obj({'data':obj({'request_id':strs,'status':strs})}),headers=[idem])
 # ProtoJSON contracts. lowerCamel names and string-encoded int64 are required by protojson.
 proto={}; enums={}
-for p in (B/'proto/beeos/v1').glob('*.proto'):
- t=re.sub(r'//[^\n]*','',p.read_text())
+for p in listdir(B/'proto/beeos/v1','.proto'):
+ t=re.sub(r'//[^\n]*','',read(p))
  for m in re.finditer(r'(message|enum) (\w+)\s*\{',t):
   i=m.end();start=i;depth=1
   while i<len(t) and depth:depth+=(t[i]=='{')-(t[i]=='}');i+=1
@@ -268,7 +283,7 @@ for path in [p for p in spec['paths'] if re.match(r'/(skills|featured|skillhub|m
 # UHP events is an SSE stream.
 S['UHPStreamEvent']=obj({'event':strs,'data':ref('JSONValue'),'id':strs},['event','data'])
 op('/uhp/v1/responses/{response_id}/events','get','getResponseEvents','responses','getEvents',None,headers=[param('Last-Event-ID','header'),param('UHP-Version','header')])
-o=spec['paths']['/uhp/v1/responses/{response_id}/events']['get'];o['x-sdk-base-path']='/uhp/v1';o['x-sdk-stream']=True;o['responses']['200']={'description':'Server-sent protocol events','content':{'text/event-stream':{'schema':ref('UHPStreamEvent')}}}
+o=spec['paths']['/uhp/v1/responses/{response_id}/events']['get'];o['summary']='Stream the events of a response';o['x-sdk-base-path']='/uhp/v1';o['x-sdk-stream']=True;o['responses']['200']={'description':'Server-sent protocol events','content':{'text/event-stream':{'schema':ref('UHPStreamEvent')}}}
 # Multipart transcribe response is typed; generators must send multipart.
 op('/audio/transcribe','post','transcribeAudio','audio','transcribe',obj({'text':strs}),obj({'file':{'type':'string','format':'binary'}}))
 o=spec['paths']['/audio/transcribe']['post'];o['requestBody']['content']['multipart/form-data']=o['requestBody']['content'].pop('application/json')
@@ -334,6 +349,26 @@ for path,ops in spec['paths'].items():
    if status=='default' or status.startswith(('4','5')):o['responses'][status]=response
   o['responses'].setdefault('default',response)
   if o['x-sdk-resource']=='deviceBindings':o['x-sdk-error-code-field']='error'
+# Every live operation needs a resource mapping and a summary; neither may fall back silently.
+unmapped=sorted(o['operationId'] for ops in spec['paths'].values() for method,o in ops.items() if o['x-sdk-activation']=='live' and o['x-sdk-resource']=='runtime')
+if unmapped:raise SystemExit('live operations without an SDK resource mapping (extend mapping/extra_mapping): '+', '.join(unmapped))
+def route_key(method,path):return (method.lower(),re.sub(r'{[^}]+}','{}',path))
+overlay={}
+SUMMARIES=B/'openapi/beeos-cloud/rest/server-operation-summaries.json'
+try:summaries=json.loads(read(SUMMARIES))['operations']
+except subprocess.CalledProcessError:raise SystemExit('producer revision '+PB[1]+' has no '+str(SUMMARIES.relative_to(B)))
+for key,summary in summaries.items():
+ method,path=key.split(' ',1)
+ overlay[route_key(method,path[3:])]=summary
+live_ops=[(path,method,o) for path,ops in spec['paths'].items() for method,o in ops.items() if o['x-sdk-activation']=='live']
+used=set()
+for path,method,o in live_ops:
+ if not path.startswith('/uhp') and route_key(method,path) in overlay:o['summary']=overlay[route_key(method,path)];used.add(route_key(method,path))
+missing=sorted(method.upper()+' '+path for path,method,o in live_ops if not o.get('summary'))
+if missing:raise SystemExit('live operations without a summary: '+', '.join(missing))
+stale=sorted(k for k in overlay if k not in used and k not in live)
+if stale:raise SystemExit('summary overlay keys that match no registered producer route: '+', '.join(m.upper()+' '+p for m,p in stale))
+print('summaries',sum(1 for _,_,o in live_ops if o.get('summary')),'of',len(live_ops),'live operations; overlay routes outside the SDK surface',len(overlay)-len(used))
 # Version 2 exports exactly the live Server producer surface.
 for path in list(spec['paths']):
  spec['paths'][path]={method:operation for method,operation in spec['paths'][path].items() if operation['x-sdk-activation']=='live'}
@@ -377,10 +412,10 @@ print('paths',len(spec['paths']),'operations',sum(len(v) for v in spec['paths'].
 
 manifest={
  'spec':'server.openapi.json',
- 'producer':{'repository':'beeos-ai/beeos-cloud-backend','revision':args.producer_ref,'read_method':'git show <revision>:<path> (producer checkout never modified)'},
- 'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':subprocess.check_output(['git','-C',str(V),'rev-parse','HEAD'],text=True).strip(),'directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'reference wire types for live Server operations; producer implementations override the public shapes'},
+ 'producer':{'repository':'beeos-ai/beeos-cloud-backend','revision':PB[1],'read_method':'git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)'},
+ 'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':PV[1],'read_method':'git ls-tree / git show at <revision> for every input','directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'reference wire types for live Server operations; producer implementations override the public shapes'},
  'canvas':{'repository':'beeos-ai/beeos-cloud-canvas','revision':'55a9822c96958bb1b70b04751cef3c39e1abb6ce','files':['pkg/infrastructure/server/http/handler.go','pkg/domain/canvas.go','pkg/domain/share.go'],'role':'persisted Canvas public response projections forwarded verbatim by backend runtime_canvas_rest.go'},
- 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go','dependency':'PyYAML==6.0.3','procedure':'Fetch the split producer remote, review changes in public route registrations and schema producers, update --producer-ref to the reviewed full commit SHA; refresh; npm run generate; run all language strict checks and tests. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes.'},
+ 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes.'},
  'version':'3.0.0',
  'activation':{'live':'Registered Server-key producer route; all non-live operations are excluded'},
  'input_sha256':dict(sorted(inputs.items()))}
