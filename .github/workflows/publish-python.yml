@@ -1,5 +1,6 @@
 name: Publish beeos-cloud-sdk to PyPI
 
+# Release tags must point to a commit on main.
 on:
   push:
     tags:
@@ -13,6 +14,17 @@ jobs:
     name: Validate, test, and build
     runs-on: ubuntu-latest
     steps:
+      - name: Require a commit on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != refs/heads/main ]]; then
+            [[ "$GITHUB_REF" == refs/tags/* ]] || { echo "::error::Releases run only from main or a tag on main, not $GITHUB_REF"; exit 1; }
+            status=$(gh api "repos/$GITHUB_REPOSITORY/compare/main...$GITHUB_SHA" --jq .status)
+            [[ "$status" == identical || "$status" == behind ]] || { echo "::error::$GITHUB_REF_NAME ($GITHUB_SHA) is not on main"; exit 1; }
+          fi
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
