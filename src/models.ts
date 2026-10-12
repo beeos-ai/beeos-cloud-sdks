@@ -1603,7 +1603,7 @@ export interface components {
             description?: string;
             logo_url?: string;
             sort_order?: number;
-            agent_framework?: string;
+            harness?: string;
             provider_id?: string;
             specs?: components["schemas"]["CatalogSpec"][];
             variants?: components["schemas"]["CatalogVariant"][];
@@ -1628,7 +1628,8 @@ export interface components {
             app_id: string;
             developer_id: string;
             name: string;
-            agent_framework: string;
+            /** @description Product harness name (for example `openclaw`), not a UHP `harness_id` (`chrn_*`). */
+            harness: string;
             provider_id: string;
             region: string;
             os_type: string;
@@ -1648,7 +1649,7 @@ export interface components {
             model_catalog?: string;
             /** @description Variant trait. Key into the monthly fee table. */
             billing_slot?: string;
-            /** @description Variant trait. UI icon selector. Replaces any `agent_framework` + `os_type` branch on the client. */
+            /** @description Variant trait. UI icon selector. Replaces any `harness` + `os_type` branch on the client. */
             icon_key?: string;
             /** @description Variant trait. Whether the instance accepts device control commands. */
             device_control?: boolean;
@@ -2596,7 +2597,7 @@ export interface components {
             app_id: string;
             developer_id: string;
             name: string;
-            agent_framework: string;
+            harness: string;
             provider_id: string;
             region: string;
             os_type: string;
@@ -2709,7 +2710,7 @@ export interface components {
             instance_name?: string;
             agent_name?: string;
             avatar_url?: string;
-            agent_framework?: string;
+            harness?: string;
             destroyed?: boolean;
         };
         FileTransferDescriptor: {
@@ -2764,7 +2765,7 @@ export interface components {
                 instance_name?: string;
                 agent_name?: string;
                 avatar_url?: string;
-                agent_framework?: string;
+                harness?: string;
                 destroyed?: boolean;
                 count: number;
             }[];
@@ -2886,7 +2887,7 @@ export interface components {
             banner_url: string;
             default_model: string;
             tags: string[];
-            agent_framework: string;
+            harness: string;
             template_version: string;
         };
         agentBindWire: {
@@ -2907,7 +2908,7 @@ export interface components {
             bind_id: string;
             hostname: string;
             fingerprint_short: string;
-            agent_framework: string;
+            harness: string;
             os_type?: string;
             expires_at: number;
             status: string;
@@ -2932,7 +2933,7 @@ export interface components {
             name: string;
             variant_id?: string;
             /** @enum {string} */
-            agent_framework?: "openclaw";
+            harness?: "openclaw";
             llm?: components["schemas"]["RuntimeLLM"] | null;
         };
         ServerUsageSummary: {
@@ -3723,7 +3724,7 @@ export interface operations {
     listDeployModels: {
         parameters: {
             query?: {
-                agent_framework?: string;
+                harness?: string;
                 search?: string;
             };
             header?: never;
@@ -3757,7 +3758,7 @@ export interface operations {
             query?: {
                 page?: number;
                 page_size?: number;
-                agent_framework?: string;
+                harness?: string;
                 provider_id?: string;
                 search?: string;
             };
@@ -3862,7 +3863,7 @@ export interface operations {
                 page_size?: number;
                 status?: string;
                 provider_id?: string;
-                agent_framework?: string;
+                harness?: string;
                 cluster_id?: string;
                 search?: string;
             };

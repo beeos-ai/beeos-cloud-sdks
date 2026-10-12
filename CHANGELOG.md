@@ -47,6 +47,6 @@ Not yet published.
   `update` (rejected on `create`), `base` must match the instance runtime, omitted
   skills are uninstalled unless bundled with the runtime, and the unsupported
   fields are only rejected when non-empty or different.
-- The framework field stays `agent_framework`, the name the producer serves on
-  main. The `harness` rename drafted for this release is not on the producer
-  (beeos-cloud-backend PRs #89 and #90 are open), so 3.0.0 does not rename it.
+- The runtime-name field is `harness` (`agent_framework` is gone), matching the
+  producer since beeos-cloud-backend #89; the producer revision recorded in
+  `spec/sources.json` is the Staging release that serves it.

@@ -28,7 +28,7 @@ examples are in `examples/typescript.ts`, `python/examples/typed_smoke.py`, and
 `go/examples/typed_smoke/main.go`.
 
 Instance creation preserves the complete variant and LLM/BYOK request. The
-`agent_framework` field and query parameter on instances, templates, and the
+`harness` field and query parameter on instances, templates, and the
 catalog carry the product runtime name (for example `openclaw`), not a UHP
 harness id (`chrn_*`). Responses, harnesses, and discovery use the producer's `/uhp/v1` surface on the same host;
 other server operations use the configured `/v1` base. Non-streaming Responses
