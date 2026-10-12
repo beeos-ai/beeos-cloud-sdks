@@ -1,6 +1,7 @@
 /** Production BeeOS Cloud SDK. One install: @beeos-ai/cloud-sdk. Credential is bsk_ only. */
 
-import { createHmac, timingSafeEqual } from "node:crypto";
+export { WebhookVerificationError, verifyTaskPushSignature, verifyWebhookSignature } from "./webhooks.js";
+export type { WebhookHeaders, WebhookVerificationOptions, WebhookVerificationReason } from "./webhooks.js";
 
 export type JSONValue = null | boolean | number | string | JSONValue[] | { [key: string]: JSONValue };
 
@@ -38,7 +39,6 @@ export class BeeOSClient {
   readonly messages: MessagesModule;
   readonly tasks: TasksModule;
   readonly files: FilesModule;
-  readonly appWebhooks: AppWebhooksModule;
 
   constructor(private readonly options: BeeOSClientOptions) {
     if (!options.baseURL || !options.apiKey) throw new Error("Server baseURL and bsk_ apiKey are required");
@@ -51,7 +51,6 @@ export class BeeOSClient {
     this.messages = new MessagesModule(this);
     this.tasks = new TasksModule(this);
     this.files = new FilesModule(this);
-    this.appWebhooks = new AppWebhooksModule(this);
   }
 
   withExternalUser(id: string): BeeOSClient {
@@ -288,74 +287,4 @@ class FilesModule {
   delete(fileId: string, idempotencyKey: string) {
     return this.client.request("DELETE", `files/${fileId}`, { idempotencyKey });
   }
-}
-
-class AppWebhooksModule {
-  constructor(private readonly client: BeeOSClient) {}
-  verifySvixSignature(rawBody: Uint8Array, headers: Record<string, string>, secret: string, now = Date.now()) {
-    return verifySvixWebhookSignature(rawBody, headers, secret, now);
-  }
-}
-
-function header(headers: Record<string, string>, name: string): string {
-  const wanted = name.toLowerCase();
-  for (const [key, value] of Object.entries(headers)) {
-    if (key.toLowerCase() === wanted) return value;
-  }
-  return "";
-}
-
-function timestampAccepted(timestamp: number, now: number): boolean {
-  const skew = Math.abs(now / 1000 - timestamp);
-  return Number.isFinite(timestamp) && skew <= 300;
-}
-
-export function verifyTaskWebhookSignature(rawBody: Uint8Array, headers: Record<string, string>, secret: string, now = Date.now()): boolean {
-  if (secret.length < 32 || !header(headers, "X-BeeOS-Event-Id")) {
-    throw new BeeOSAPIError(401, "invalid_webhook_signature", "invalid Task Webhook signature input");
-  }
-  const parsed = parseVersionedSignature(header(headers, "X-BeeOS-Signature"));
-  if (!parsed || !timestampAccepted(parsed.timestamp, now)) {
-    throw new BeeOSAPIError(401, "invalid_webhook_signature", "invalid Task Webhook signature");
-  }
-  const expected = createHmac("sha256", secret).update(`${parsed.timestamp}.`).update(rawBody).digest();
-  for (const signature of parsed.signatures) {
-    const actual = Buffer.from(signature, "hex");
-    if (actual.length === expected.length && timingSafeEqual(actual, expected)) return true;
-  }
-  throw new BeeOSAPIError(401, "invalid_webhook_signature", "invalid Task Webhook signature");
-}
-
-export function verifySvixWebhookSignature(rawBody: Uint8Array, headers: Record<string, string>, secret: string, now = Date.now()): boolean {
-  const messageId = header(headers, "svix-id");
-  const timestampValue = header(headers, "svix-timestamp");
-  const signatureValue = header(headers, "svix-signature");
-  if (!secret.startsWith("whsec_") || !messageId) {
-    throw new BeeOSAPIError(401, "invalid_webhook_signature", "invalid Svix signature input");
-  }
-  const timestamp = Number(timestampValue);
-  const key = Buffer.from(secret.slice("whsec_".length), "base64");
-  if (!timestampAccepted(timestamp, now) || key.length < 16) {
-    throw new BeeOSAPIError(401, "invalid_webhook_signature", "invalid Svix signature");
-  }
-  const expected = createHmac("sha256", key).update(`${messageId}.${timestampValue}.`).update(rawBody).digest();
-  for (const candidate of signatureValue.split(/\s+/)) {
-    const [version, value] = candidate.split(",", 2);
-    if (version !== "v1" || !value) continue;
-    const actual = Buffer.from(value, "base64");
-    if (actual.length === expected.length && timingSafeEqual(actual, expected)) return true;
-  }
-  throw new BeeOSAPIError(401, "invalid_webhook_signature", "invalid Svix signature");
-}
-
-function parseVersionedSignature(value: string): { timestamp: number; signatures: string[] } | null {
-  let timestamp = 0;
-  const signatures: string[] = [];
-  for (const part of value.split(",")) {
-    const [key, raw] = part.trim().split("=", 2);
-    if (!raw) return null;
-    if (key === "t") timestamp = Number(raw);
-    if (key === "v1") signatures.push(raw);
-  }
-  return timestamp && signatures.length ? { timestamp, signatures } : null;
 }

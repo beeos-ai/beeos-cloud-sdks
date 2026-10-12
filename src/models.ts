@@ -2,6 +2,40 @@ export type JSONValue = null | boolean | number | string | JSONValue[] | {
     [key: string]: JSONValue;
 };
 export interface paths {
+    "/agents/{agentId}/conversations/{conversationId}/approval-mode": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set the conversation approval mode */
+        put: operations["setConversationApprovalMode"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/agents/{agentId}/conversations/{conversationId}/reasoning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set the conversation reasoning effort */
+        put: operations["setConversationReasoning"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client-sessions": {
         parameters: {
             query?: never;
@@ -11,7 +45,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Issue a client token with request-scoped ttl_seconds. The omitted value normalizes to 600 before idempotency comparison; reusing an Idempotency-Key with a different normalized TTL returns 409 idempotency_conflict. */
+        /**
+         * Create a client session
+         * @description Issue a client token with request-scoped ttl_seconds. The omitted value normalizes to 600 before idempotency comparison; reusing an Idempotency-Key with a different normalized TTL returns 409 idempotency_conflict.
+         */
         post: operations["createClientSession"];
         delete?: never;
         options?: never;
@@ -28,7 +65,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Rotate the client token with request-scoped ttl_seconds. The omitted value normalizes to 600 before idempotency comparison; reusing an Idempotency-Key with a different normalized TTL returns 409 idempotency_conflict. */
+        /**
+         * Refresh a client session
+         * @description Rotate the client token with request-scoped ttl_seconds. The omitted value normalizes to 600 before idempotency comparison; reusing an Idempotency-Key with a different normalized TTL returns 409 idempotency_conflict.
+         */
         post: operations["refreshClientSession"];
         delete?: never;
         options?: never;
@@ -46,6 +86,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /** Revoke a client session */
         delete: operations["revokeClientSession"];
         options?: never;
         head?: never;
@@ -62,6 +103,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        /** Start external user data deletion */
         delete: operations["deleteExternalUser"];
         options?: never;
         head?: never;
@@ -75,6 +117,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an external user data deletion */
         get: operations["getExternalUserDeletion"];
         put?: never;
         post?: never;
@@ -91,6 +134,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List providers */
         get: operations["listProviders"];
         put?: never;
         post?: never;
@@ -107,6 +151,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List deploy regions */
         get: operations["listDeployRegions"];
         put?: never;
         post?: never;
@@ -123,6 +168,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List deploy models */
         get: operations["listDeployModels"];
         put?: never;
         post?: never;
@@ -139,6 +185,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List instance templates */
         get: operations["listInstanceTemplates"];
         put?: never;
         post?: never;
@@ -155,6 +202,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an instance template */
         get: operations["getInstanceTemplate"];
         put?: never;
         post?: never;
@@ -171,6 +219,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List agent templates */
         get: operations["listAgentTemplates"];
         put?: never;
         post?: never;
@@ -187,8 +236,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List instances */
         get: operations["listInstances"];
         put?: never;
+        /** Create an instance */
         post: operations["instanceCreate"];
         delete?: never;
         options?: never;
@@ -203,12 +254,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an instance */
         get: operations["getInstance"];
         put?: never;
         post?: never;
+        /** Delete an instance */
         delete: operations["deleteInstance"];
         options?: never;
         head?: never;
+        /** Update an instance */
         patch: operations["updateInstanceMetadata"];
         trace?: never;
     };
@@ -219,6 +273,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an instance status */
         get: operations["getInstanceStatus"];
         put?: never;
         post?: never;
@@ -237,6 +292,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Start an instance */
         post: operations["startInstance"];
         delete?: never;
         options?: never;
@@ -253,6 +309,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Stop an instance */
         post: operations["stopInstance"];
         delete?: never;
         options?: never;
@@ -269,6 +326,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Start an instance upgrade */
         post: operations["upgradeInstance"];
         delete?: never;
         options?: never;
@@ -283,6 +341,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an instance upgrade */
         get: operations["getInstanceUpgrade"];
         put?: never;
         post?: never;
@@ -299,6 +358,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List agents */
         get: operations["listAgents"];
         put?: never;
         post?: never;
@@ -315,12 +375,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an agent */
         get: operations["getAgent"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
+        /** Update agent exposure settings */
         patch: operations["updateAgent"];
         trace?: never;
     };
@@ -331,8 +393,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List conversations */
         get: operations["listAgentConversations"];
         put?: never;
+        /** Create a conversation */
         post: operations["createAgentConversation"];
         delete?: never;
         options?: never;
@@ -347,12 +411,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get a conversation */
         get: operations["getConversation"];
         put?: never;
         post?: never;
+        /** Delete a conversation */
         delete: operations["deleteConversation"];
         options?: never;
         head?: never;
+        /** Rename a conversation */
         patch: operations["updateConversation"];
         trace?: never;
     };
@@ -363,6 +430,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List conversation messages */
         get: operations["listConversationMessages"];
         put?: never;
         post?: never;
@@ -379,6 +447,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get a conversation message */
         get: operations["getConversationMessage"];
         put?: never;
         post?: never;
@@ -397,6 +466,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Cancel conversation execution */
         post: operations["cancelConversation"];
         delete?: never;
         options?: never;
@@ -413,6 +483,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Clear conversation history */
         post: operations["clearConversation"];
         delete?: never;
         options?: never;
@@ -428,6 +499,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /** Set the conversation model override */
         put: operations["setConversationModel"];
         post?: never;
         delete?: never;
@@ -443,8 +515,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List tasks */
         get: operations["listAgentTasks"];
         put?: never;
+        /** Create a task */
         post: operations["createAgentTask"];
         delete?: never;
         options?: never;
@@ -459,6 +533,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get a task */
         get: operations["getAgentTask"];
         put?: never;
         post?: never;
@@ -475,6 +550,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List task messages */
         get: operations["listAgentTaskMessages"];
         put?: never;
         post?: never;
@@ -493,6 +569,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Cancel a task */
         post: operations["cancelAgentTask"];
         delete?: never;
         options?: never;
@@ -509,6 +586,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Continue a task */
         post: operations["continueAgentTask"];
         delete?: never;
         options?: never;
@@ -525,6 +603,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Invoke an agent */
         post: operations["invokeAgent"];
         delete?: never;
         options?: never;
@@ -539,6 +618,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get the usage summary */
         get: operations["getUsageSummary"];
         put?: never;
         post?: never;
@@ -591,6 +671,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Run a command in an instance */
         post: operations["execInstance"];
         delete?: never;
         options?: never;
@@ -607,6 +688,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Create a file upload URL */
         post: operations["presignFileUpload"];
         delete?: never;
         options?: never;
@@ -623,6 +705,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Confirm a file upload */
         post: operations["confirmFileUpload"];
         delete?: never;
         options?: never;
@@ -637,6 +720,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List files */
         get: operations["listFiles"];
         put?: never;
         post?: never;
@@ -653,12 +737,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get a file */
         get: operations["getFile"];
         put?: never;
         post?: never;
+        /** Delete a file */
         delete: operations["deleteFile"];
         options?: never;
         head?: never;
+        /** Rename a file */
         patch: operations["renameFile"];
         trace?: never;
     };
@@ -669,6 +756,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an agent template */
         get: operations["getAgentTemplate"];
         put?: never;
         post?: never;
@@ -685,9 +773,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get a file share link */
         get: operations["getShareFileShare"];
         put?: never;
+        /** Create a file share link */
         post: operations["createShareFileShare"];
+        /** Revoke a file share link */
         delete: operations["revokeShareFileShare"];
         options?: never;
         head?: never;
@@ -701,6 +792,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Resolve a file share link */
         get: operations["resolveFileShare"];
         put?: never;
         post?: never;
@@ -717,6 +809,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get the file summary */
         get: operations["getFilesSummary"];
         put?: never;
         post?: never;
@@ -733,9 +826,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get a reply share link */
         get: operations["getShareReply"];
         put?: never;
+        /** Create a reply share link */
         post: operations["createShareReply"];
+        /** Revoke a reply share link */
         delete: operations["revokeShareReply"];
         options?: never;
         head?: never;
@@ -749,6 +845,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Resolve a reply share link */
         get: operations["resolveReplyShare"];
         put?: never;
         post?: never;
@@ -765,6 +862,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an instance connect URL */
         get: operations["getInstanceConnectURL"];
         put?: never;
         post?: never;
@@ -781,6 +879,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an instance stream URL */
         get: operations["getInstanceStreamURL"];
         put?: never;
         post?: never;
@@ -799,6 +898,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Resume a paused conversation */
         post: operations["resumeConversation"];
         delete?: never;
         options?: never;
@@ -813,8 +913,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List automations */
         get: operations["listAutomations"];
         put?: never;
+        /** Create an automation */
         post: operations["createAutomation"];
         delete?: never;
         options?: never;
@@ -829,12 +931,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an automation */
         get: operations["getAutomation"];
         put?: never;
         post?: never;
+        /** Delete an automation */
         delete: operations["deleteAutomation"];
         options?: never;
         head?: never;
+        /** Update an automation */
         patch: operations["updateAutomation"];
         trace?: never;
     };
@@ -847,6 +952,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Pause an automation */
         post: operations["pauseAutomation"];
         delete?: never;
         options?: never;
@@ -863,6 +969,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Resume an automation */
         post: operations["resumeAutomation"];
         delete?: never;
         options?: never;
@@ -877,8 +984,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List automation runs */
         get: operations["listAutomationRuns"];
         put?: never;
+        /** Start an automation run */
         post: operations["createAutomationRun"];
         delete?: never;
         options?: never;
@@ -893,6 +1002,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an automation run */
         get: operations["getAutomationRun"];
         put?: never;
         post?: never;
@@ -911,6 +1021,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Create a webhook automation */
         post: operations["createWebhookAutomation"];
         delete?: never;
         options?: never;
@@ -927,6 +1038,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Transcribe audio */
         post: operations["transcribeAudio"];
         delete?: never;
         options?: never;
@@ -941,9 +1053,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get a canvas share link */
         get: operations["getShareCanvas"];
         put?: never;
+        /** Create a canvas share link */
         post: operations["createShareCanvas"];
+        /** Revoke a canvas share link */
         delete: operations["deleteShareCanvas"];
         options?: never;
         head?: never;
@@ -957,6 +1072,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List canvas snapshots */
         get: operations["listCanvasSnapshots"];
         put?: never;
         post?: never;
@@ -975,6 +1091,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Restore a canvas snapshot */
         post: operations["restoreCanvasSnapshot"];
         delete?: never;
         options?: never;
@@ -989,6 +1106,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Resolve a conversation canvas session */
         get: operations["getCanvasSession"];
         put?: never;
         post?: never;
@@ -1005,6 +1123,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get agent bind details */
         get: operations["getAgentBindDetails"];
         put?: never;
         post?: never;
@@ -1023,6 +1142,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Confirm an agent bind */
         post: operations["confirmAgentBind"];
         delete?: never;
         options?: never;
@@ -1039,6 +1159,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Create a portal bind session */
         post: operations["createPortalBind"];
         delete?: never;
         options?: never;
@@ -1053,6 +1174,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get a portal bind session */
         get: operations["getPortalBind"];
         put?: never;
         post?: never;
@@ -1071,6 +1193,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Revoke a portal bind session */
         post: operations["revokePortalBind"];
         delete?: never;
         options?: never;
@@ -1087,6 +1210,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Resolve a portal bind session */
         post: operations["resolvePortalBind"];
         delete?: never;
         options?: never;
@@ -1103,6 +1227,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Send an A2A JSON-RPC request */
         post: operations["invokeA2A"];
         delete?: never;
         options?: never;
@@ -1117,6 +1242,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get the A2A agent card */
         get: operations["getA2AAgentCard"];
         put?: never;
         post?: never;
@@ -1133,6 +1259,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get the A2A agent card (legacy path) */
         get: operations["getA2AAgentCardLegacy"];
         put?: never;
         post?: never;
@@ -1149,6 +1276,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** List A2A tasks */
         get: operations["listA2ATasks"];
         put?: never;
         post?: never;
@@ -1165,6 +1293,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Get an A2A task */
         get: operations["getA2ATask"];
         put?: never;
         post?: never;
@@ -1183,6 +1312,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Cancel an A2A task */
         post: operations["cancelA2ATask"];
         delete?: never;
         options?: never;
@@ -1223,8 +1353,8 @@ export interface paths {
         get: operations["listHarnesses"];
         put?: never;
         /**
-         * Create a harness
-         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. instance_id and name are required; default_model is honored only here. skills are rejected on create (422 beeos_field_not_supported); add them with PUT. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).
+         * Create a configured harness
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After (a create without an Idempotency-Key is not re-attached and would create a second harness); 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 409 beeos_idempotency_conflict means the Idempotency-Key was used with a different request; 503 harness_unavailable means the instance is not running or the operation journal is unavailable; 413 means the body exceeds 4 MiB (upload large skills as a Files blob). The optional Idempotency-Key header (1-128 visible ASCII characters) makes a create (POST, or PUT with template_id) safe to resend: the same key and request returns the same harness. instance_id and name are required and base must equal the instance runtime (422); template_id and template_version create the harness from an agent template; default_model is honored only here. a non-empty skills or mcp_servers is rejected on create (422 beeos_field_not_supported); add them with PUT. Not supported by BeeOS Cloud yet (422 beeos_field_not_supported): a non-empty system_prompt, disabled_tools, environment or plugins, or any max_step or timeout_seconds; a value equal to what GET reports is accepted.
          */
         post: operations["createHarness"];
         delete?: never;
@@ -1243,8 +1373,8 @@ export interface paths {
         /** Get one harness */
         get: operations["getHarness"];
         /**
-         * Replace a harness
-         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After; 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 503 harness_unavailable means the instance is not running or the operation journal is unavailable. An absent field is unchanged. When skills is present it is diffed against the installed skills: listed skills with files, content or blob are installed; omitted catalog-origin skills are uninstalled; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported. Not supported by BeeOS Cloud yet (422): a non-empty mcp_servers (beeos_mcp_not_supported); system_prompt, disabled_tools, environment, max_step, timeout_seconds, plugins (beeos_field_not_supported).
+         * Update a harness configuration
+         * @description Synchronous: Cloud submits every runtime operation and waits (up to 45s, so use a client timeout of at least 60s) before responding. 502 harness_error lists per-item results in error.detail.operations[]; 504 beeos_harness_update_in_progress means work continues, retry the identical request after Retry-After (a create without an Idempotency-Key is not re-attached and would create a second harness); 409 beeos_harness_busy means a different write is in flight, retry after Retry-After; 409 beeos_idempotency_conflict means the Idempotency-Key was used with a different request; 503 harness_unavailable means the instance is not running or the operation journal is unavailable; 413 means the body exceeds 4 MiB (upload large skills as a Files blob). The optional Idempotency-Key header (1-128 visible ASCII characters) makes a create (POST, or PUT with template_id) safe to resend: the same key and request returns the same harness. An absent field is unchanged; a present list replaces the whole list. When skills is present it is diffed against the installed skills: listed skills with files, content or blob (exactly one) are installed; an installed skill listed with a different enabled flag is updated; installed skills that are omitted are uninstalled unless bundled with the runtime; a listed skill that is not installed and has no files, content or blob returns 422; enabled:false on a fresh install returns 422. When mcp_servers is present it is diffed against the runtime MCP servers: a server sent with a credential (headers or auth plus expires_at, at most 24 hours ahead) is set, a connected server sent without one is kept, omitted servers are unset; the url must be https and transport is http or sse; GET never returns a url or credential. 422 beeos_mcp_not_supported is returned only when the instance runtime has no MCP methods. base is immutable; a name change or a default_model different from the current one (without template_id) returns 422 beeos_field_not_supported. Not supported by BeeOS Cloud yet (422 beeos_field_not_supported): a non-empty system_prompt, disabled_tools, environment or plugins, or any max_step or timeout_seconds; a value equal to what GET reports is accepted.
          */
         put: operations["updateHarness"];
         post?: never;
@@ -1383,6 +1513,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Stream the events of a response */
         get: operations["getResponseEvents"];
         put?: never;
         post?: never;
@@ -1472,7 +1603,7 @@ export interface components {
             description?: string;
             logo_url?: string;
             sort_order?: number;
-            harness?: string;
+            agent_framework?: string;
             provider_id?: string;
             specs?: components["schemas"]["CatalogSpec"][];
             variants?: components["schemas"]["CatalogVariant"][];
@@ -1490,12 +1621,14 @@ export interface components {
             total: number;
         };
         InstanceSummary: {
+            /** @description Whether authoritative instance state history has ever reached running. */
+            has_ever_run: boolean;
             id: string;
             organization_id: string;
             app_id: string;
             developer_id: string;
             name: string;
-            harness: string;
+            agent_framework: string;
             provider_id: string;
             region: string;
             os_type: string;
@@ -1507,6 +1640,24 @@ export interface components {
             updated_at: string;
             /** Format: int64 */
             resource_version: number;
+            /** @description Variant trait. Key into the Runtime execution image map. Not a container repository name. */
+            image_slot?: string;
+            /** @description Variant trait. AgentBay Wuying worker image. Never the platform `image_id`. */
+            worker_image_id?: string;
+            /** @description Variant trait. `served` when Cloud answers models/list and session/set_reasoning, `none` when it answers neither. */
+            model_catalog?: string;
+            /** @description Variant trait. Key into the monthly fee table. */
+            billing_slot?: string;
+            /** @description Variant trait. UI icon selector. Replaces any `agent_framework` + `os_type` branch on the client. */
+            icon_key?: string;
+            /** @description Variant trait. Whether the instance accepts device control commands. */
+            device_control?: boolean;
+            /** @description Variant trait. cluster-proxy pod contract, or empty. */
+            runtime_profile?: string;
+            /** @description Variant trait. Whether the free tier may run this variant. */
+            free_plan?: boolean;
+            /** @description `agentbay`, `beeos`, or empty when self-hosted. */
+            cloud_provider?: string;
         };
         InstancePage: {
             data: components["schemas"]["InstanceSummary"][];
@@ -1609,6 +1760,9 @@ export interface components {
             resource_version: number;
             model_override_id?: string;
             effective_model_id?: string;
+            active_response?: components["schemas"]["ActiveConversationResponse"];
+            reasoning?: components["schemas"]["ReasoningSettings"];
+            approval_mode?: string | null;
         };
         ConversationResponse: {
             data: components["schemas"]["Conversation"];
@@ -1761,6 +1915,34 @@ export interface components {
         ContinueTaskInput: {
             input?: JSONValue;
             auth_grant?: boolean;
+        };
+        ActiveConversationResponse: {
+            response_id: string;
+            last_event_id: string;
+            user_message_id?: string;
+            reply_message_id?: string;
+        };
+        ReasoningSettings: {
+            modelId: string;
+            reasoningOverrideId: string | null;
+        };
+        ReasoningResult: {
+            metadata_version: number;
+        };
+        ReasoningResultResponse: {
+            data: components["schemas"]["ReasoningResult"];
+        };
+        ApprovalModeSettings: {
+            approval_mode: string | null;
+        };
+        ApprovalModeResult: {
+            approval_mode: string | null;
+            /** Format: int64 */
+            metadata_version: number;
+            status: string;
+        };
+        ApprovalModeResultResponse: {
+            data: components["schemas"]["ApprovalModeResult"];
         };
         ErrorResponse: {
             code: string;
@@ -2079,6 +2261,29 @@ export interface components {
         } & {
             [key: string]: JSONValue;
         };
+        UHPHarnessCreate: {
+            name?: string;
+            base: string;
+            /** @description BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent. */
+            default_model?: string;
+            system_prompt?: string;
+            /** @description Rejected on create (422 beeos_field_not_supported). On PUT the list is diffed against the runtime MCP servers: listed servers are set, omitted ones are unset; 422 beeos_mcp_not_supported only when the instance runtime has no MCP methods. */
+            mcp_servers?: components["schemas"]["UHPMcpServer"][];
+            skills?: components["schemas"]["UHPSkill"][];
+            /** @description Requires the `plugins` capability. Each item needs `files` or `blob`. */
+            plugins?: components["schemas"]["UHPPlugin"][];
+            /** @description An environment id of the caller's scope, or empty. Requires the `environments` capability. */
+            environment?: string;
+            disabled_tools?: string[];
+            max_step?: number | null;
+            timeout_seconds?: number | null;
+            /** @description BeeOS extension. Instance that hosts a new harness (create only). */
+            instance_id?: string;
+            /** @description BeeOS extension. Agent template applied to the harness. */
+            template_id?: string;
+        } & {
+            [key: string]: JSONValue;
+        };
         UHPModelCatalog: {
             backends: {
                 [key: string]: {
@@ -2391,7 +2596,7 @@ export interface components {
             app_id: string;
             developer_id: string;
             name: string;
-            harness: string;
+            agent_framework: string;
             provider_id: string;
             region: string;
             os_type: string;
@@ -2409,7 +2614,16 @@ export interface components {
             llm?: components["schemas"]["RuntimeLLMView"] | null;
             hosting_type?: string;
             cloud_provider?: string;
+            image_slot?: string;
+            worker_image_id?: string;
+            model_catalog?: string;
+            billing_slot?: string;
+            icon_key?: string;
+            device_control: boolean;
+            runtime_profile?: string;
+            free_plan: boolean;
             resource_version: number;
+            has_ever_run: boolean;
             created_at: string;
             updated_at: string;
             capabilities: {
@@ -2419,14 +2633,21 @@ export interface components {
                 terminal?: boolean;
             };
         };
-        RuntimeUpgradeJob: {
-            job_id: string;
-            instance_id: string;
-            status: string;
-            target: string;
-            created_at: string;
-            completed_at?: string | null;
-            error?: string | null;
+        RuntimeOperationSummary: {
+            id: string;
+            kind: string;
+            phase: string;
+            error_code?: string;
+        };
+        RuntimeInstanceResult: {
+            data: components["schemas"]["RuntimeInstanceSummary"];
+            operation: components["schemas"]["RuntimeOperationSummary"];
+        };
+        RuntimeExecResult: {
+            exit_code: number;
+            stdout: string;
+            stderr: string;
+            truncated: boolean;
         };
         RuntimeLLM: {
             providers: components["schemas"]["RuntimeLLMProvider"][];
@@ -2454,21 +2675,14 @@ export interface components {
             role: string;
             order: number;
         };
-        RuntimeOperationSummary: {
-            id: string;
-            kind: string;
-            phase: string;
-            error_code?: string;
-        };
-        RuntimeInstanceResult: {
-            data: components["schemas"]["RuntimeInstanceSummary"];
-            operation: components["schemas"]["RuntimeOperationSummary"];
-        };
-        RuntimeExecResult: {
-            exit_code: number;
-            stdout: string;
-            stderr: string;
-            truncated: boolean;
+        RuntimeUpgradeJob: {
+            job_id: string;
+            instance_id: string;
+            status: string;
+            target: string;
+            created_at: string;
+            completed_at?: string | null;
+            error?: string | null;
         };
         FileFile: {
             file_id: string;
@@ -2495,7 +2709,7 @@ export interface components {
             instance_name?: string;
             agent_name?: string;
             avatar_url?: string;
-            harness?: string;
+            agent_framework?: string;
             destroyed?: boolean;
         };
         FileTransferDescriptor: {
@@ -2550,7 +2764,7 @@ export interface components {
                 instance_name?: string;
                 agent_name?: string;
                 avatar_url?: string;
-                harness?: string;
+                agent_framework?: string;
                 destroyed?: boolean;
                 count: number;
             }[];
@@ -2641,59 +2855,6 @@ export interface components {
                 [key: string]: JSONValue;
             };
         };
-        agentBindWire: {
-            status: string;
-            bind_id?: string;
-            instance_id?: string;
-            public_key?: string;
-            hostname?: string;
-            expires_at?: number;
-            runtime_binding?: components["schemas"]["bindRuntimeWire"] | null;
-        };
-        bindRuntimeWire: {
-            instance_id: string;
-            agent_gateway_url: string;
-            message_service_url: string;
-        };
-        agentBindDetailsWire: {
-            bind_id: string;
-            hostname: string;
-            fingerprint_short: string;
-            harness: string;
-            os_type?: string;
-            expires_at: number;
-            status: string;
-            server_time: number;
-        };
-        portalBindWire: {
-            provider_id?: string;
-            bind_id: string;
-            short_code: string;
-            status: string;
-            instance_id?: string;
-            expires_at: number;
-            name: string;
-            qr_payload?: string;
-            api_base_url?: string;
-            relay_url?: string;
-            desired_status?: string;
-            connectivity?: string;
-            resource_version?: number;
-        };
-        agentTemplateCatalogView: {
-            id: string;
-            display_name: string;
-            summary: string;
-            description: string;
-            category: string;
-            vibe: string;
-            icon_url: string;
-            banner_url: string;
-            default_model: string;
-            tags: string[];
-            harness: string;
-            template_version: string;
-        };
         a2aTaskView: {
             id: string;
             contextId: string;
@@ -2714,11 +2875,64 @@ export interface components {
             updated_at?: string;
             completed_at?: string;
         };
+        agentTemplateCatalogView: {
+            id: string;
+            display_name: string;
+            summary: string;
+            description: string;
+            category: string;
+            vibe: string;
+            icon_url: string;
+            banner_url: string;
+            default_model: string;
+            tags: string[];
+            agent_framework: string;
+            template_version: string;
+        };
+        agentBindWire: {
+            status: string;
+            bind_id?: string;
+            instance_id?: string;
+            public_key?: string;
+            hostname?: string;
+            expires_at?: number;
+            runtime_binding?: components["schemas"]["bindRuntimeWire"] | null;
+        };
+        bindRuntimeWire: {
+            instance_id: string;
+            agent_gateway_url: string;
+            message_service_url: string;
+        };
+        agentBindDetailsWire: {
+            bind_id: string;
+            hostname: string;
+            fingerprint_short: string;
+            agent_framework: string;
+            os_type?: string;
+            expires_at: number;
+            status: string;
+            server_time: number;
+        };
+        portalBindWire: {
+            provider_id?: string;
+            bind_id: string;
+            short_code: string;
+            status: string;
+            instance_id?: string;
+            expires_at: number;
+            name: string;
+            qr_payload?: string;
+            api_base_url?: string;
+            relay_url?: string;
+            desired_status?: string;
+            connectivity?: string;
+            resource_version?: number;
+        };
         CreateServerInstanceInput: {
             name: string;
             variant_id?: string;
             /** @enum {string} */
-            harness?: "openclaw";
+            agent_framework?: "openclaw";
             llm?: components["schemas"]["RuntimeLLM"] | null;
         };
         ServerUsageSummary: {
@@ -3023,29 +3237,6 @@ export interface components {
             error: string;
             message: string;
         };
-        UHPHarnessCreate: {
-            name?: string;
-            base: string;
-            /** @description BeeOS Cloud honors this only on create; a different value on PUT returns 422 beeos_field_not_supported unless template_id is sent. */
-            default_model?: string;
-            system_prompt?: string;
-            /** @description Not accepted by BeeOS Cloud yet: a non-empty list returns 422 beeos_mcp_not_supported. */
-            mcp_servers?: components["schemas"]["UHPMcpServer"][];
-            skills?: components["schemas"]["UHPSkill"][];
-            /** @description Requires the `plugins` capability. Each item needs `files` or `blob`. */
-            plugins?: components["schemas"]["UHPPlugin"][];
-            /** @description An environment id of the caller's scope, or empty. Requires the `environments` capability. */
-            environment?: string;
-            disabled_tools?: string[];
-            max_step?: number | null;
-            timeout_seconds?: number | null;
-            /** @description BeeOS extension. Instance that hosts a new harness (create only). */
-            instance_id?: string;
-            /** @description BeeOS extension. Agent template applied to the harness. */
-            template_id?: string;
-        } & {
-            [key: string]: JSONValue;
-        };
         UHPCreateResponseJSONRequest: {
             /** @description A bare string is shorthand for one user message. */
             input: string | {
@@ -3210,6 +3401,84 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    setConversationApprovalMode: {
+        parameters: {
+            query?: never;
+            header: {
+                "If-Match": string;
+                "X-BeeOS-External-User-ID": string;
+            };
+            path: {
+                agentId: string;
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApprovalModeSettings"];
+            };
+        };
+        responses: {
+            /** @description Approval mode desired state confirmed */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalModeResultResponse"];
+                };
+            };
+            /** @description Cloud Server error */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    setConversationReasoning: {
+        parameters: {
+            query?: never;
+            header: {
+                "If-Match": string;
+                "X-BeeOS-External-User-ID": string;
+            };
+            path: {
+                agentId: string;
+                conversationId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasoningSettings"];
+            };
+        };
+        responses: {
+            /** @description Reasoning desired state confirmed */
+            200: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReasoningResultResponse"];
+                };
+            };
+            /** @description Cloud Server error */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     createClientSession: {
         parameters: {
             query?: never;
@@ -3454,7 +3723,7 @@ export interface operations {
     listDeployModels: {
         parameters: {
             query?: {
-                harness?: string;
+                agent_framework?: string;
                 search?: string;
             };
             header?: never;
@@ -3488,7 +3757,7 @@ export interface operations {
             query?: {
                 page?: number;
                 page_size?: number;
-                harness?: string;
+                agent_framework?: string;
                 provider_id?: string;
                 search?: string;
             };
@@ -3593,7 +3862,7 @@ export interface operations {
                 page_size?: number;
                 status?: string;
                 provider_id?: string;
-                harness?: string;
+                agent_framework?: string;
                 cluster_id?: string;
                 search?: string;
             };
@@ -6741,7 +7010,9 @@ export interface operations {
     createHarness: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -6751,7 +7022,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The harness */
+            /** @description The created harness */
             200: {
                 headers: {
                     [name: string]: JSONValue | undefined;
@@ -6761,7 +7032,26 @@ export interface operations {
                 };
             };
             /** @description UHP protocol error envelope */
+            400: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            /** @description UHP protocol error envelope */
             409: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            413: {
                 headers: {
                     [name: string]: JSONValue | undefined;
                 };
@@ -6851,7 +7141,9 @@ export interface operations {
     updateHarness: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
             path: {
                 harness_id: string;
             };
@@ -6863,7 +7155,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The harness */
+            /** @description The updated harness */
             200: {
                 headers: {
                     [name: string]: JSONValue | undefined;
@@ -6872,9 +7164,27 @@ export interface operations {
                     "application/json": components["schemas"]["UHPHarness"];
                 };
             };
+            /** @description UHP protocol error envelope */
+            400: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
             404: components["responses"]["NotFound"];
             /** @description UHP protocol error envelope */
             409: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["UHPErrorEnvelope"];
+                };
+            };
+            /** @description UHP protocol error envelope */
+            413: {
                 headers: {
                     [name: string]: JSONValue | undefined;
                 };
@@ -6947,8 +7257,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        id: string;
-                        deleted: boolean;
+                        id?: string;
+                        deleted?: boolean;
                     };
                 };
             };
@@ -7303,6 +7613,9 @@ export type Message = components["schemas"]["Message"];
 export type MessagePage = components["schemas"]["MessagePage"];
 export type MessageEnvelope = components["schemas"]["MessageEnvelope"];
 export type MessageEnvelopeResponse = components["schemas"]["MessageEnvelopeResponse"];
+export type UpdateConversationInput = components["schemas"]["UpdateConversationInput"];
+export type CancelConversationInput = components["schemas"]["CancelConversationInput"];
+export type SetConversationModelInput = components["schemas"]["SetConversationModelInput"];
 export type CommandReceipt = components["schemas"]["CommandReceipt"];
 export type CommandReceiptResponse = components["schemas"]["CommandReceiptResponse"];
 export type ClearConversationReceipt = components["schemas"]["ClearConversationReceipt"];
@@ -7315,6 +7628,13 @@ export type TaskResponse = components["schemas"]["TaskResponse"];
 export type TaskPage = components["schemas"]["TaskPage"];
 export type CancelTaskInput = components["schemas"]["CancelTaskInput"];
 export type ContinueTaskInput = components["schemas"]["ContinueTaskInput"];
+export type ActiveConversationResponse = components["schemas"]["ActiveConversationResponse"];
+export type ReasoningSettings = components["schemas"]["ReasoningSettings"];
+export type ReasoningResult = components["schemas"]["ReasoningResult"];
+export type ReasoningResultResponse = components["schemas"]["ReasoningResultResponse"];
+export type ApprovalModeSettings = components["schemas"]["ApprovalModeSettings"];
+export type ApprovalModeResult = components["schemas"]["ApprovalModeResult"];
+export type ApprovalModeResultResponse = components["schemas"]["ApprovalModeResultResponse"];
 export type ErrorResponse = components["schemas"]["ErrorResponse"];
 export type UHPDiscovery = components["schemas"]["UHPDiscovery"];
 export type UHPCapabilities = components["schemas"]["UHPCapabilities"];
@@ -7327,6 +7647,7 @@ export type UHPPlugin = components["schemas"]["UHPPlugin"];
 export type UHPPluginManifest = components["schemas"]["UHPPluginManifest"];
 export type UHPPluginSkill = components["schemas"]["UHPPluginSkill"];
 export type UHPPluginSkipped = components["schemas"]["UHPPluginSkipped"];
+export type UHPHarnessCreate = components["schemas"]["UHPHarnessCreate"];
 export type UHPModelCatalog = components["schemas"]["UHPModelCatalog"];
 export type UHPHarnessModels = components["schemas"]["UHPHarnessModels"];
 export type UHPModel = components["schemas"]["UHPModel"];
@@ -7341,15 +7662,15 @@ export type UHPErrorEnvelope = components["schemas"]["UHPErrorEnvelope"];
 export type UHPError = components["schemas"]["UHPError"];
 export type UHPEvent = components["schemas"]["UHPEvent"];
 export type RuntimeInstanceSummary = components["schemas"]["RuntimeInstanceSummary"];
-export type RuntimeUpgradeJob = components["schemas"]["RuntimeUpgradeJob"];
+export type RuntimeOperationSummary = components["schemas"]["RuntimeOperationSummary"];
+export type RuntimeInstanceResult = components["schemas"]["RuntimeInstanceResult"];
+export type RuntimeExecResult = components["schemas"]["RuntimeExecResult"];
 export type RuntimeLLM = components["schemas"]["RuntimeLLM"];
 export type RuntimeLLMView = components["schemas"]["RuntimeLLMView"];
 export type RuntimeLLMProvider = components["schemas"]["RuntimeLLMProvider"];
 export type RuntimeLLMProviderView = components["schemas"]["RuntimeLLMProviderView"];
 export type RuntimeLLMModel = components["schemas"]["RuntimeLLMModel"];
-export type RuntimeOperationSummary = components["schemas"]["RuntimeOperationSummary"];
-export type RuntimeInstanceResult = components["schemas"]["RuntimeInstanceResult"];
-export type RuntimeExecResult = components["schemas"]["RuntimeExecResult"];
+export type RuntimeUpgradeJob = components["schemas"]["RuntimeUpgradeJob"];
 export type FileFile = components["schemas"]["FileFile"];
 export type FileOrigin = components["schemas"]["FileOrigin"];
 export type FileTransferDescriptor = components["schemas"]["FileTransferDescriptor"];
@@ -7369,12 +7690,12 @@ export type A2AArtifact = components["schemas"]["A2AArtifact"];
 export type A2ATextPartOut = components["schemas"]["A2ATextPartOut"];
 export type A2AFilePartOut = components["schemas"]["A2AFilePartOut"];
 export type A2ADataPartOut = components["schemas"]["A2ADataPartOut"];
+export type a2aTaskView = components["schemas"]["a2aTaskView"];
+export type agentTemplateCatalogView = components["schemas"]["agentTemplateCatalogView"];
 export type agentBindWire = components["schemas"]["agentBindWire"];
 export type bindRuntimeWire = components["schemas"]["bindRuntimeWire"];
 export type agentBindDetailsWire = components["schemas"]["agentBindDetailsWire"];
 export type portalBindWire = components["schemas"]["portalBindWire"];
-export type agentTemplateCatalogView = components["schemas"]["agentTemplateCatalogView"];
-export type a2aTaskView = components["schemas"]["a2aTaskView"];
 export type CreateServerInstanceInput = components["schemas"]["CreateServerInstanceInput"];
 export type ServerUsageSummary = components["schemas"]["ServerUsageSummary"];
 export type RuntimeInstanceStatusResult = components["schemas"]["RuntimeInstanceStatusResult"];
@@ -7404,13 +7725,13 @@ export type CanvasTicketClaims = components["schemas"]["CanvasTicketClaims"];
 export type TerminalSessionDocument = components["schemas"]["TerminalSessionDocument"];
 export type CanvasSessionDocument = components["schemas"]["CanvasSessionDocument"];
 export type DeviceBindingErrorResponse = components["schemas"]["DeviceBindingErrorResponse"];
-export type UHPHarnessCreate = components["schemas"]["UHPHarnessCreate"];
 export type UHPCreateResponseJSONRequest = components["schemas"]["UHPCreateResponseJSONRequest"];
 export type UHPCreateResponseStreamRequest = components["schemas"]["UHPCreateResponseStreamRequest"];
+export type SetConversationApprovalModeResponse = operations["setConversationApprovalMode"]["responses"][200]["content"]["application/json"];
+export type SetConversationReasoningResponse = operations["setConversationReasoning"]["responses"][200]["content"]["application/json"];
 export type CreateClientSessionResponse = operations["createClientSession"]["responses"][200]["content"]["application/json"];
-export type CreateClientSessionInput = NonNullable<operations["createClientSession"]["requestBody"]>["content"]["application/json"];
 export type RefreshClientSessionResponse = operations["refreshClientSession"]["responses"][200]["content"]["application/json"];
-export type RefreshClientSessionInput = NonNullable<operations["refreshClientSession"]["requestBody"]>["content"]["application/json"];
+export type RefreshClientSessionRequest = NonNullable<operations["refreshClientSession"]["requestBody"]>["content"]["application/json"];
 export type RevokeClientSessionResponse = void;
 export type DeleteExternalUserResponse = operations["deleteExternalUser"]["responses"][202]["content"]["application/json"];
 export type GetExternalUserDeletionResponse = operations["getExternalUserDeletion"]["responses"][200]["content"]["application/json"];
@@ -7428,68 +7749,55 @@ export type ListAgentTemplatesQuery = NonNullable<operations["listAgentTemplates
 export type ListInstancesResponse = operations["listInstances"]["responses"][200]["content"]["application/json"];
 export type ListInstancesQuery = NonNullable<operations["listInstances"]["parameters"]["query"]>;
 export type InstanceCreateResponse = operations["instanceCreate"]["responses"][202]["content"]["application/json"];
-export type InstanceCreateInput = NonNullable<operations["instanceCreate"]["requestBody"]>["content"]["application/json"];
 export type GetInstanceResponse = operations["getInstance"]["responses"][200]["content"]["application/json"];
 export type UpdateInstanceMetadataResponse = operations["updateInstanceMetadata"]["responses"][200]["content"]["application/json"];
-export type UpdateInstanceMetadataInput = NonNullable<operations["updateInstanceMetadata"]["requestBody"]>["content"]["application/json"];
 export type DeleteInstanceResponse = operations["deleteInstance"]["responses"][202]["content"]["application/json"];
 export type GetInstanceStatusResponse = operations["getInstanceStatus"]["responses"][200]["content"]["application/json"];
 export type StartInstanceResponse = operations["startInstance"]["responses"][202]["content"]["application/json"];
 export type StopInstanceResponse = operations["stopInstance"]["responses"][202]["content"]["application/json"];
 export type UpgradeInstanceResponse = operations["upgradeInstance"]["responses"][202]["content"]["application/json"];
-export type UpgradeInstanceInput = NonNullable<operations["upgradeInstance"]["requestBody"]>["content"]["application/json"];
+export type UpgradeInstanceRequest = NonNullable<operations["upgradeInstance"]["requestBody"]>["content"]["application/json"];
 export type GetInstanceUpgradeResponse = operations["getInstanceUpgrade"]["responses"][200]["content"]["application/json"];
 export type ListAgentsResponse = operations["listAgents"]["responses"][200]["content"]["application/json"];
 export type ListAgentsQuery = NonNullable<operations["listAgents"]["parameters"]["query"]>;
 export type GetAgentResponse = operations["getAgent"]["responses"][200]["content"]["application/json"];
 export type UpdateAgentResponse = operations["updateAgent"]["responses"][200]["content"]["application/json"];
-export type UpdateAgentInput = NonNullable<operations["updateAgent"]["requestBody"]>["content"]["application/json"];
 export type CreateAgentConversationResponse = operations["createAgentConversation"]["responses"][201]["content"]["application/json"];
-export type CreateAgentConversationInput = NonNullable<operations["createAgentConversation"]["requestBody"]>["content"]["application/json"];
 export type ListAgentConversationsResponse = operations["listAgentConversations"]["responses"][200]["content"]["application/json"];
 export type ListAgentConversationsQuery = NonNullable<operations["listAgentConversations"]["parameters"]["query"]>;
 export type GetConversationResponse = operations["getConversation"]["responses"][200]["content"]["application/json"];
 export type UpdateConversationResponse = operations["updateConversation"]["responses"][200]["content"]["application/json"];
-export type UpdateConversationInput = NonNullable<operations["updateConversation"]["requestBody"]>["content"]["application/json"];
 export type DeleteConversationResponse = void;
 export type ListConversationMessagesResponse = operations["listConversationMessages"]["responses"][200]["content"]["application/json"];
 export type ListConversationMessagesQuery = NonNullable<operations["listConversationMessages"]["parameters"]["query"]>;
 export type GetConversationMessageResponse = operations["getConversationMessage"]["responses"][200]["content"]["application/json"];
 export type CancelConversationResponse = operations["cancelConversation"]["responses"][202]["content"]["application/json"];
-export type CancelConversationInput = NonNullable<operations["cancelConversation"]["requestBody"]>["content"]["application/json"];
 export type ClearConversationResponse = operations["clearConversation"]["responses"][202]["content"]["application/json"];
 export type SetConversationModelResponse = operations["setConversationModel"]["responses"][202]["content"]["application/json"];
-export type SetConversationModelInput = NonNullable<operations["setConversationModel"]["requestBody"]>["content"]["application/json"];
 export type CreateAgentTaskResponse = operations["createAgentTask"]["responses"][202]["content"]["application/json"];
-export type CreateAgentTaskInput = NonNullable<operations["createAgentTask"]["requestBody"]>["content"]["application/json"];
 export type ListAgentTasksResponse = operations["listAgentTasks"]["responses"][200]["content"]["application/json"];
 export type ListAgentTasksQuery = NonNullable<operations["listAgentTasks"]["parameters"]["query"]>;
 export type GetAgentTaskResponse = operations["getAgentTask"]["responses"][200]["content"]["application/json"];
 export type ListAgentTaskMessagesResponse = operations["listAgentTaskMessages"]["responses"][200]["content"]["application/json"];
 export type ListAgentTaskMessagesQuery = NonNullable<operations["listAgentTaskMessages"]["parameters"]["query"]>;
 export type CancelAgentTaskResponse = operations["cancelAgentTask"]["responses"][202]["content"]["application/json"];
-export type CancelAgentTaskInput = NonNullable<operations["cancelAgentTask"]["requestBody"]>["content"]["application/json"];
 export type ContinueAgentTaskResponse = operations["continueAgentTask"]["responses"][202]["content"]["application/json"];
-export type ContinueAgentTaskInput = NonNullable<operations["continueAgentTask"]["requestBody"]>["content"]["application/json"];
 export type InvokeAgentResponse = operations["invokeAgent"]["responses"][200]["content"]["application/json"];
-export type InvokeAgentInput = NonNullable<operations["invokeAgent"]["requestBody"]>["content"]["application/json"];
 export type GetUsageSummaryResponse = operations["getUsageSummary"]["responses"][200]["content"]["application/json"];
 export type GetUsageSummaryQuery = NonNullable<operations["getUsageSummary"]["parameters"]["query"]>;
 export type CreateTerminalSessionResponse = operations["createTerminalSession"]["responses"][201]["content"]["application/json"];
-export type CreateTerminalSessionInput = NonNullable<operations["createTerminalSession"]["requestBody"]>["content"]["application/json"];
+export type CreateTerminalSessionRequest = NonNullable<operations["createTerminalSession"]["requestBody"]>["content"]["application/json"];
 export type CreateCanvasSessionResponse = operations["createCanvasSession"]["responses"][201]["content"]["application/json"];
-export type CreateCanvasSessionInput = NonNullable<operations["createCanvasSession"]["requestBody"]>["content"]["application/json"];
+export type CreateCanvasSessionRequest = NonNullable<operations["createCanvasSession"]["requestBody"]>["content"]["application/json"];
 export type ExecInstanceResponse = operations["execInstance"]["responses"][200]["content"]["application/json"];
-export type ExecInstanceInput = NonNullable<operations["execInstance"]["requestBody"]>["content"]["application/json"];
+export type ExecInstanceRequest = NonNullable<operations["execInstance"]["requestBody"]>["content"]["application/json"];
 export type PresignFileUploadResponse = operations["presignFileUpload"]["responses"][201]["content"]["application/json"];
-export type PresignFileUploadInput = NonNullable<operations["presignFileUpload"]["requestBody"]>["content"]["application/json"];
 export type ConfirmFileUploadResponse = operations["confirmFileUpload"]["responses"][200]["content"]["application/json"];
-export type ConfirmFileUploadInput = NonNullable<operations["confirmFileUpload"]["requestBody"]>["content"]["application/json"];
 export type ListFilesResponse = operations["listFiles"]["responses"][200]["content"]["application/json"];
 export type ListFilesQuery = NonNullable<operations["listFiles"]["parameters"]["query"]>;
 export type GetFileResponse = operations["getFile"]["responses"][200]["content"]["application/json"];
 export type RenameFileResponse = operations["renameFile"]["responses"][200]["content"]["application/json"];
-export type RenameFileInput = NonNullable<operations["renameFile"]["requestBody"]>["content"]["application/json"];
+export type RenameFileRequest = NonNullable<operations["renameFile"]["requestBody"]>["content"]["application/json"];
 export type DeleteFileResponse = void;
 export type GetAgentTemplateResponse = operations["getAgentTemplate"]["responses"][200]["content"]["application/json"];
 export type CreateShareFileShareResponse = operations["createShareFileShare"]["responses"][200]["content"]["application/json"];
@@ -7507,42 +7815,38 @@ export type GetInstanceStreamURLResponse = operations["getInstanceStreamURL"]["r
 export type GetInstanceStreamURLQuery = NonNullable<operations["getInstanceStreamURL"]["parameters"]["query"]>;
 export type ResumeConversationResponse = operations["resumeConversation"]["responses"][200]["content"]["application/json"];
 export type CreateAutomationResponse = operations["createAutomation"]["responses"][201]["content"]["application/json"];
-export type CreateAutomationInput = NonNullable<operations["createAutomation"]["requestBody"]>["content"]["application/json"];
 export type ListAutomationsResponse = operations["listAutomations"]["responses"][200]["content"]["application/json"];
 export type ListAutomationsQuery = NonNullable<operations["listAutomations"]["parameters"]["query"]>;
 export type GetAutomationResponse = operations["getAutomation"]["responses"][200]["content"]["application/json"];
 export type UpdateAutomationResponse = operations["updateAutomation"]["responses"][200]["content"]["application/json"];
-export type UpdateAutomationInput = NonNullable<operations["updateAutomation"]["requestBody"]>["content"]["application/json"];
 export type DeleteAutomationResponse = void;
 export type PauseAutomationResponse = operations["pauseAutomation"]["responses"][200]["content"]["application/json"];
 export type ResumeAutomationResponse = operations["resumeAutomation"]["responses"][200]["content"]["application/json"];
 export type CreateAutomationRunResponse = operations["createAutomationRun"]["responses"][202]["content"]["application/json"];
-export type CreateAutomationRunInput = NonNullable<operations["createAutomationRun"]["requestBody"]>["content"]["application/json"];
 export type ListAutomationRunsResponse = operations["listAutomationRuns"]["responses"][200]["content"]["application/json"];
 export type ListAutomationRunsQuery = NonNullable<operations["listAutomationRuns"]["parameters"]["query"]>;
 export type GetAutomationRunResponse = operations["getAutomationRun"]["responses"][200]["content"]["application/json"];
 export type CreateWebhookAutomationResponse = operations["createWebhookAutomation"]["responses"][201]["content"]["application/json"];
-export type CreateWebhookAutomationInput = NonNullable<operations["createWebhookAutomation"]["requestBody"]>["content"]["application/json"];
 export type TranscribeAudioResponse = operations["transcribeAudio"]["responses"][200]["content"]["application/json"];
-export type TranscribeAudioInput = NonNullable<operations["transcribeAudio"]["requestBody"]>["content"]["multipart/form-data"];
+export type TranscribeAudioRequest = NonNullable<operations["transcribeAudio"]["requestBody"]>["content"]["multipart/form-data"];
 export type GetShareCanvasResponse = operations["getShareCanvas"]["responses"][200]["content"]["application/json"];
 export type CreateShareCanvasResponse = operations["createShareCanvas"]["responses"][200]["content"]["application/json"];
-export type CreateShareCanvasInput = NonNullable<operations["createShareCanvas"]["requestBody"]>["content"]["application/json"];
+export type CreateShareCanvasRequest = NonNullable<operations["createShareCanvas"]["requestBody"]>["content"]["application/json"];
 export type DeleteShareCanvasResponse = void;
 export type ListCanvasSnapshotsResponse = operations["listCanvasSnapshots"]["responses"][200]["content"]["application/json"];
 export type RestoreCanvasSnapshotResponse = operations["restoreCanvasSnapshot"]["responses"][200]["content"]["application/json"];
 export type GetCanvasSessionResponse = operations["getCanvasSession"]["responses"][200]["content"]["application/json"];
 export type GetAgentBindDetailsResponse = operations["getAgentBindDetails"]["responses"][200]["content"]["application/json"];
 export type ConfirmAgentBindResponse = operations["confirmAgentBind"]["responses"][200]["content"]["application/json"];
-export type ConfirmAgentBindInput = NonNullable<operations["confirmAgentBind"]["requestBody"]>["content"]["application/json"];
+export type ConfirmAgentBindRequest = NonNullable<operations["confirmAgentBind"]["requestBody"]>["content"]["application/json"];
 export type CreatePortalBindResponse = operations["createPortalBind"]["responses"][200]["content"]["application/json"];
-export type CreatePortalBindInput = NonNullable<operations["createPortalBind"]["requestBody"]>["content"]["application/json"];
+export type CreatePortalBindRequest = NonNullable<operations["createPortalBind"]["requestBody"]>["content"]["application/json"];
 export type GetPortalBindResponse = operations["getPortalBind"]["responses"][200]["content"]["application/json"];
 export type RevokePortalBindResponse = operations["revokePortalBind"]["responses"][200]["content"]["application/json"];
 export type ResolvePortalBindResponse = operations["resolvePortalBind"]["responses"][200]["content"]["application/json"];
-export type ResolvePortalBindInput = NonNullable<operations["resolvePortalBind"]["requestBody"]>["content"]["application/json"];
+export type ResolvePortalBindRequest = NonNullable<operations["resolvePortalBind"]["requestBody"]>["content"]["application/json"];
 export type InvokeA2AResponse = operations["invokeA2A"]["responses"][200]["content"]["application/json"];
-export type InvokeA2AInput = NonNullable<operations["invokeA2A"]["requestBody"]>["content"]["application/json"];
+export type InvokeA2ARequest = NonNullable<operations["invokeA2A"]["requestBody"]>["content"]["application/json"];
 export type GetA2AAgentCardResponse = operations["getA2AAgentCard"]["responses"][200]["content"]["application/json"];
 export type GetA2AAgentCardLegacyResponse = operations["getA2AAgentCardLegacy"]["responses"][200]["content"]["application/json"];
 export type ListA2ATasksResponse = operations["listA2ATasks"]["responses"][200]["content"]["application/json"];
@@ -7553,15 +7857,12 @@ export type CancelA2ATaskResponse = operations["cancelA2ATask"]["responses"][200
 export type GetDiscoveryResponse = operations["getDiscovery"]["responses"][200]["content"]["application/json"];
 export type ListHarnessesResponse = operations["listHarnesses"]["responses"][200]["content"]["application/json"];
 export type CreateHarnessResponse = operations["createHarness"]["responses"][200]["content"]["application/json"];
-export type CreateHarnessInput = NonNullable<operations["createHarness"]["requestBody"]>["content"]["application/json"];
 export type GetHarnessResponse = operations["getHarness"]["responses"][200]["content"]["application/json"];
 export type UpdateHarnessResponse = operations["updateHarness"]["responses"][200]["content"]["application/json"];
-export type UpdateHarnessInput = NonNullable<operations["updateHarness"]["requestBody"]>["content"]["application/json"];
 export type DeleteHarnessResponse = operations["deleteHarness"]["responses"][200]["content"]["application/json"];
 export type ListModelsResponse = operations["listModels"]["responses"][200]["content"]["application/json"];
 export type ListHarnessModelsResponse = operations["listHarnessModels"]["responses"][200]["content"]["application/json"];
 export type CreateResponseResponse = operations["createResponse"]["responses"][200]["content"]["application/json"];
-export type CreateResponseInput = NonNullable<operations["createResponse"]["requestBody"]>["content"]["application/json"];
 export type GetResponseResponse = operations["getResponse"]["responses"][200]["content"]["application/json"];
 export type DeleteResponseResponse = operations["deleteResponse"]["responses"][200]["content"]["application/json"];
 export type GetResponseInputItemsResponse = operations["getResponseInputItems"]["responses"][200]["content"]["application/json"];

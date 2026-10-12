@@ -75,15 +75,15 @@ type DeployModel struct {
 }
 
 type InstanceTemplate struct {
-	ID          string           `json:"id"`
-	Name        string           `json:"name"`
-	Description *string          `json:"description,omitempty"`
-	LogoURL     *string          `json:"logo_url,omitempty"`
-	SortOrder   *int64           `json:"sort_order,omitempty"`
-	Harness     *string          `json:"harness,omitempty"`
-	ProviderID  *string          `json:"provider_id,omitempty"`
-	Specs       []CatalogSpec    `json:"specs,omitempty"`
-	Variants    []CatalogVariant `json:"variants,omitempty"`
+	ID             string           `json:"id"`
+	Name           string           `json:"name"`
+	Description    *string          `json:"description,omitempty"`
+	LogoURL        *string          `json:"logo_url,omitempty"`
+	SortOrder      *int64           `json:"sort_order,omitempty"`
+	AgentFramework *string          `json:"agent_framework,omitempty"`
+	ProviderID     *string          `json:"provider_id,omitempty"`
+	Specs          []CatalogSpec    `json:"specs,omitempty"`
+	Variants       []CatalogVariant `json:"variants,omitempty"`
 }
 
 type ProviderPage struct {
@@ -102,22 +102,32 @@ type ModelPage struct {
 }
 
 type InstanceSummary struct {
-	ID                 string `json:"id"`
-	OrganizationID     string `json:"organization_id"`
-	AppID              string `json:"app_id"`
-	DeveloperID        string `json:"developer_id"`
-	Name               string `json:"name"`
-	Harness            string `json:"harness"`
-	ProviderID         string `json:"provider_id"`
-	Region             string `json:"region"`
-	OsType             string `json:"os_type"`
-	Status             string `json:"status"`
-	DesiredStatus      string `json:"desired_status"`
-	Connectivity       string `json:"connectivity"`
-	MsConnectionStatus string `json:"ms_connection_status"`
-	CreatedAt          string `json:"created_at"`
-	UpdatedAt          string `json:"updated_at"`
-	ResourceVersion    int64  `json:"resource_version"`
+	HasEverRun         bool    `json:"has_ever_run"`
+	ID                 string  `json:"id"`
+	OrganizationID     string  `json:"organization_id"`
+	AppID              string  `json:"app_id"`
+	DeveloperID        string  `json:"developer_id"`
+	Name               string  `json:"name"`
+	AgentFramework     string  `json:"agent_framework"`
+	ProviderID         string  `json:"provider_id"`
+	Region             string  `json:"region"`
+	OsType             string  `json:"os_type"`
+	Status             string  `json:"status"`
+	DesiredStatus      string  `json:"desired_status"`
+	Connectivity       string  `json:"connectivity"`
+	MsConnectionStatus string  `json:"ms_connection_status"`
+	CreatedAt          string  `json:"created_at"`
+	UpdatedAt          string  `json:"updated_at"`
+	ResourceVersion    int64   `json:"resource_version"`
+	ImageSlot          *string `json:"image_slot,omitempty"`
+	WorkerImageID      *string `json:"worker_image_id,omitempty"`
+	ModelCatalog       *string `json:"model_catalog,omitempty"`
+	BillingSlot        *string `json:"billing_slot,omitempty"`
+	IconKey            *string `json:"icon_key,omitempty"`
+	DeviceControl      *bool   `json:"device_control,omitempty"`
+	RuntimeProfile     *string `json:"runtime_profile,omitempty"`
+	FreePlan           *bool   `json:"free_plan,omitempty"`
+	CloudProvider      *string `json:"cloud_provider,omitempty"`
 }
 
 type InstancePage struct {
@@ -207,19 +217,22 @@ type CreateConversationInput struct {
 }
 
 type Conversation struct {
-	ID                string            `json:"id"`
-	AgentID           string            `json:"agent_id"`
-	InstanceID        string            `json:"instance_id"`
-	Title             string            `json:"title"`
-	State             ConversationState `json:"state"`
-	MetadataVersion   int64             `json:"metadata_version"`
-	HistoryGeneration int64             `json:"history_generation"`
-	CreatedAt         string            `json:"created_at"`
-	LastActivityAt    *string           `json:"last_activity_at,omitempty"`
-	ClosedAt          *string           `json:"closed_at,omitempty"`
-	ResourceVersion   int64             `json:"resource_version"`
-	ModelOverrideID   *string           `json:"model_override_id,omitempty"`
-	EffectiveModelID  *string           `json:"effective_model_id,omitempty"`
+	ID                string                      `json:"id"`
+	AgentID           string                      `json:"agent_id"`
+	InstanceID        string                      `json:"instance_id"`
+	Title             string                      `json:"title"`
+	State             ConversationState           `json:"state"`
+	MetadataVersion   int64                       `json:"metadata_version"`
+	HistoryGeneration int64                       `json:"history_generation"`
+	CreatedAt         string                      `json:"created_at"`
+	LastActivityAt    *string                     `json:"last_activity_at,omitempty"`
+	ClosedAt          *string                     `json:"closed_at,omitempty"`
+	ResourceVersion   int64                       `json:"resource_version"`
+	ModelOverrideID   *string                     `json:"model_override_id,omitempty"`
+	EffectiveModelID  *string                     `json:"effective_model_id,omitempty"`
+	ActiveResponse    *ActiveConversationResponse `json:"active_response,omitempty"`
+	Reasoning         *ReasoningSettings          `json:"reasoning,omitempty"`
+	ApprovalMode      *string                     `json:"approval_mode,omitempty"`
 }
 
 type ConversationResponse struct {
@@ -369,6 +382,40 @@ type CancelTaskInput struct {
 type ContinueTaskInput struct {
 	Input     json.RawMessage `json:"input,omitempty"`
 	AuthGrant *bool           `json:"auth_grant,omitempty"`
+}
+
+type ActiveConversationResponse struct {
+	ResponseID     string  `json:"response_id"`
+	LastEventID    string  `json:"last_event_id"`
+	UserMessageID  *string `json:"user_message_id,omitempty"`
+	ReplyMessageID *string `json:"reply_message_id,omitempty"`
+}
+
+type ReasoningSettings struct {
+	ModelID             string  `json:"modelId"`
+	ReasoningOverrideID *string `json:"reasoningOverrideId"`
+}
+
+type ReasoningResult struct {
+	MetadataVersion int64 `json:"metadata_version"`
+}
+
+type ReasoningResultResponse struct {
+	Data ReasoningResult `json:"data"`
+}
+
+type ApprovalModeSettings struct {
+	ApprovalMode *string `json:"approval_mode"`
+}
+
+type ApprovalModeResult struct {
+	ApprovalMode    *string `json:"approval_mode"`
+	MetadataVersion int64   `json:"metadata_version"`
+	Status          string  `json:"status"`
+}
+
+type ApprovalModeResultResponse struct {
+	Data ApprovalModeResult `json:"data"`
 }
 
 type ErrorResponse struct {
@@ -1082,6 +1129,81 @@ func (v *UHPPluginSkipped) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type UHPHarnessCreate struct {
+	Name                 *string              `json:"name,omitempty"`
+	Base                 string               `json:"base"`
+	DefaultModel         *string              `json:"default_model,omitempty"`
+	SystemPrompt         *string              `json:"system_prompt,omitempty"`
+	McpServers           []UHPMcpServer       `json:"mcp_servers,omitempty"`
+	Skills               []UHPSkill           `json:"skills,omitempty"`
+	Plugins              []UHPPlugin          `json:"plugins,omitempty"`
+	Environment          *string              `json:"environment,omitempty"`
+	DisabledTools        []string             `json:"disabled_tools,omitempty"`
+	MaxStep              *int64               `json:"max_step,omitempty"`
+	TimeoutSeconds       *int64               `json:"timeout_seconds,omitempty"`
+	InstanceID           *string              `json:"instance_id,omitempty"`
+	TemplateID           *string              `json:"template_id,omitempty"`
+	AdditionalProperties map[string]JSONValue `json:"-"`
+}
+
+func (v UHPHarnessCreate) MarshalJSON() ([]byte, error) {
+	type plain UHPHarnessCreate
+	encoded, err := json.Marshal(plain(v))
+	if err != nil {
+		return nil, err
+	}
+	values := map[string]json.RawMessage{}
+	for key, value := range v.AdditionalProperties {
+		raw, err := json.Marshal(value)
+		if err != nil {
+			return nil, err
+		}
+		values[key] = raw
+	}
+	var known map[string]json.RawMessage
+	if err := json.Unmarshal(encoded, &known); err != nil {
+		return nil, err
+	}
+	for key, value := range known {
+		values[key] = value
+	}
+	return json.Marshal(values)
+}
+func (v *UHPHarnessCreate) UnmarshalJSON(data []byte) error {
+	type plain UHPHarnessCreate
+	var decoded plain
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		return err
+	}
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	delete(fields, "name")
+	delete(fields, "base")
+	delete(fields, "default_model")
+	delete(fields, "system_prompt")
+	delete(fields, "mcp_servers")
+	delete(fields, "skills")
+	delete(fields, "plugins")
+	delete(fields, "environment")
+	delete(fields, "disabled_tools")
+	delete(fields, "max_step")
+	delete(fields, "timeout_seconds")
+	delete(fields, "instance_id")
+	delete(fields, "template_id")
+	decoded.AdditionalProperties = map[string]JSONValue{}
+	for key, raw := range fields {
+		var value JSONValue
+		if err := json.Unmarshal(raw, &value); err != nil {
+			return err
+		}
+		decoded.AdditionalProperties[key] = value
+	}
+	*v = UHPHarnessCreate(decoded)
+	return nil
+}
+
 type UHPModelCatalog struct {
 	Backends map[string]UHPModelCatalogBackendsValue `json:"backends"`
 }
@@ -1760,7 +1882,7 @@ type RuntimeInstanceSummary struct {
 	AppID              string                             `json:"app_id"`
 	DeveloperID        string                             `json:"developer_id"`
 	Name               string                             `json:"name"`
-	Harness            string                             `json:"harness"`
+	AgentFramework     string                             `json:"agent_framework"`
 	ProviderID         string                             `json:"provider_id"`
 	Region             string                             `json:"region"`
 	OsType             string                             `json:"os_type"`
@@ -1778,20 +1900,38 @@ type RuntimeInstanceSummary struct {
 	LLM                *RuntimeLLMView                    `json:"llm,omitempty"`
 	HostingType        *string                            `json:"hosting_type,omitempty"`
 	CloudProvider      *string                            `json:"cloud_provider,omitempty"`
+	ImageSlot          *string                            `json:"image_slot,omitempty"`
+	WorkerImageID      *string                            `json:"worker_image_id,omitempty"`
+	ModelCatalog       *string                            `json:"model_catalog,omitempty"`
+	BillingSlot        *string                            `json:"billing_slot,omitempty"`
+	IconKey            *string                            `json:"icon_key,omitempty"`
+	DeviceControl      bool                               `json:"device_control"`
+	RuntimeProfile     *string                            `json:"runtime_profile,omitempty"`
+	FreePlan           bool                               `json:"free_plan"`
 	ResourceVersion    int64                              `json:"resource_version"`
+	HasEverRun         bool                               `json:"has_ever_run"`
 	CreatedAt          string                             `json:"created_at"`
 	UpdatedAt          string                             `json:"updated_at"`
 	Capabilities       RuntimeInstanceSummaryCapabilities `json:"capabilities"`
 }
 
-type RuntimeUpgradeJob struct {
-	JobID       string  `json:"job_id"`
-	InstanceID  string  `json:"instance_id"`
-	Status      string  `json:"status"`
-	Target      string  `json:"target"`
-	CreatedAt   string  `json:"created_at"`
-	CompletedAt *string `json:"completed_at,omitempty"`
-	Error       *string `json:"error,omitempty"`
+type RuntimeOperationSummary struct {
+	ID        string  `json:"id"`
+	Kind      string  `json:"kind"`
+	Phase     string  `json:"phase"`
+	ErrorCode *string `json:"error_code,omitempty"`
+}
+
+type RuntimeInstanceResult struct {
+	Data      RuntimeInstanceSummary  `json:"data"`
+	Operation RuntimeOperationSummary `json:"operation"`
+}
+
+type RuntimeExecResult struct {
+	ExitCode  int64  `json:"exit_code"`
+	Stdout    string `json:"stdout"`
+	Stderr    string `json:"stderr"`
+	Truncated bool   `json:"truncated"`
 }
 
 type RuntimeLLM struct {
@@ -1824,23 +1964,14 @@ type RuntimeLLMModel struct {
 	Order      int64  `json:"order"`
 }
 
-type RuntimeOperationSummary struct {
-	ID        string  `json:"id"`
-	Kind      string  `json:"kind"`
-	Phase     string  `json:"phase"`
-	ErrorCode *string `json:"error_code,omitempty"`
-}
-
-type RuntimeInstanceResult struct {
-	Data      RuntimeInstanceSummary  `json:"data"`
-	Operation RuntimeOperationSummary `json:"operation"`
-}
-
-type RuntimeExecResult struct {
-	ExitCode  int64  `json:"exit_code"`
-	Stdout    string `json:"stdout"`
-	Stderr    string `json:"stderr"`
-	Truncated bool   `json:"truncated"`
+type RuntimeUpgradeJob struct {
+	JobID       string  `json:"job_id"`
+	InstanceID  string  `json:"instance_id"`
+	Status      string  `json:"status"`
+	Target      string  `json:"target"`
+	CreatedAt   string  `json:"created_at"`
+	CompletedAt *string `json:"completed_at,omitempty"`
+	Error       *string `json:"error,omitempty"`
 }
 
 type FileFile struct {
@@ -1860,15 +1991,15 @@ type FileFile struct {
 }
 
 type FileOrigin struct {
-	Source       string  `json:"source"`
-	InstanceID   *string `json:"instance_id,omitempty"`
-	AgentID      *string `json:"agent_id,omitempty"`
-	OperationID  *string `json:"operation_id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	AgentName    *string `json:"agent_name,omitempty"`
-	AvatarURL    *string `json:"avatar_url,omitempty"`
-	Harness      *string `json:"harness,omitempty"`
-	Destroyed    *bool   `json:"destroyed,omitempty"`
+	Source         string  `json:"source"`
+	InstanceID     *string `json:"instance_id,omitempty"`
+	AgentID        *string `json:"agent_id,omitempty"`
+	OperationID    *string `json:"operation_id,omitempty"`
+	InstanceName   *string `json:"instance_name,omitempty"`
+	AgentName      *string `json:"agent_name,omitempty"`
+	AvatarURL      *string `json:"avatar_url,omitempty"`
+	AgentFramework *string `json:"agent_framework,omitempty"`
+	Destroyed      *bool   `json:"destroyed,omitempty"`
 }
 
 type FileTransferDescriptor struct {
@@ -2001,6 +2132,40 @@ type A2ADataPartOut struct {
 	Metadata map[string]JSONValue `json:"metadata,omitempty"`
 }
 
+type a2aTaskView struct {
+	ID                string               `json:"id"`
+	ContextID         string               `json:"contextId"`
+	Status            A2ATaskStatus        `json:"status"`
+	Artifacts         []A2AArtifact        `json:"artifacts,omitempty"`
+	History           []A2AMessage         `json:"history,omitempty"`
+	Metadata          map[string]JSONValue `json:"metadata,omitempty"`
+	CallerPrincipalID string               `json:"caller_principal_id"`
+	CallerAgentID     string               `json:"caller_agent_id"`
+	CallerOwnerID     string               `json:"caller_owner_id"`
+	TargetPrincipalID string               `json:"target_principal_id"`
+	TargetAgentID     string               `json:"target_agent_id"`
+	TargetOwnerID     string               `json:"target_owner_id"`
+	ChannelID         *string              `json:"channel_id,omitempty"`
+	CreatedAt         *string              `json:"created_at,omitempty"`
+	UpdatedAt         *string              `json:"updated_at,omitempty"`
+	CompletedAt       *string              `json:"completed_at,omitempty"`
+}
+
+type agentTemplateCatalogView struct {
+	ID              string   `json:"id"`
+	DisplayName     string   `json:"display_name"`
+	Summary         string   `json:"summary"`
+	Description     string   `json:"description"`
+	Category        string   `json:"category"`
+	Vibe            string   `json:"vibe"`
+	IconURL         string   `json:"icon_url"`
+	BannerURL       string   `json:"banner_url"`
+	DefaultModel    string   `json:"default_model"`
+	Tags            []string `json:"tags"`
+	AgentFramework  string   `json:"agent_framework"`
+	TemplateVersion string   `json:"template_version"`
+}
+
 type agentBindWire struct {
 	Status         string           `json:"status"`
 	BindID         *string          `json:"bind_id,omitempty"`
@@ -2021,7 +2186,7 @@ type agentBindDetailsWire struct {
 	BindID           string  `json:"bind_id"`
 	Hostname         string  `json:"hostname"`
 	FingerprintShort string  `json:"fingerprint_short"`
-	Harness          string  `json:"harness"`
+	AgentFramework   string  `json:"agent_framework"`
 	OsType           *string `json:"os_type,omitempty"`
 	ExpiresAt        int64   `json:"expires_at"`
 	Status           string  `json:"status"`
@@ -2044,45 +2209,11 @@ type portalBindWire struct {
 	ResourceVersion *int64  `json:"resource_version,omitempty"`
 }
 
-type agentTemplateCatalogView struct {
-	ID              string   `json:"id"`
-	DisplayName     string   `json:"display_name"`
-	Summary         string   `json:"summary"`
-	Description     string   `json:"description"`
-	Category        string   `json:"category"`
-	Vibe            string   `json:"vibe"`
-	IconURL         string   `json:"icon_url"`
-	BannerURL       string   `json:"banner_url"`
-	DefaultModel    string   `json:"default_model"`
-	Tags            []string `json:"tags"`
-	Harness         string   `json:"harness"`
-	TemplateVersion string   `json:"template_version"`
-}
-
-type a2aTaskView struct {
-	ID                string               `json:"id"`
-	ContextID         string               `json:"contextId"`
-	Status            A2ATaskStatus        `json:"status"`
-	Artifacts         []A2AArtifact        `json:"artifacts,omitempty"`
-	History           []A2AMessage         `json:"history,omitempty"`
-	Metadata          map[string]JSONValue `json:"metadata,omitempty"`
-	CallerPrincipalID string               `json:"caller_principal_id"`
-	CallerAgentID     string               `json:"caller_agent_id"`
-	CallerOwnerID     string               `json:"caller_owner_id"`
-	TargetPrincipalID string               `json:"target_principal_id"`
-	TargetAgentID     string               `json:"target_agent_id"`
-	TargetOwnerID     string               `json:"target_owner_id"`
-	ChannelID         *string              `json:"channel_id,omitempty"`
-	CreatedAt         *string              `json:"created_at,omitempty"`
-	UpdatedAt         *string              `json:"updated_at,omitempty"`
-	CompletedAt       *string              `json:"completed_at,omitempty"`
-}
-
 type CreateServerInstanceInput struct {
-	Name      string                            `json:"name"`
-	VariantID *string                           `json:"variant_id,omitempty"`
-	Harness   *CreateServerInstanceInputHarness `json:"harness,omitempty"`
-	LLM       *RuntimeLLM                       `json:"llm,omitempty"`
+	Name           string                                   `json:"name"`
+	VariantID      *string                                  `json:"variant_id,omitempty"`
+	AgentFramework *CreateServerInstanceInputAgentFramework `json:"agent_framework,omitempty"`
+	LLM            *RuntimeLLM                              `json:"llm,omitempty"`
 }
 
 type ServerUsageSummary struct {
@@ -2390,81 +2521,6 @@ type DeviceBindingErrorResponse struct {
 	Message string `json:"message"`
 }
 
-type UHPHarnessCreate struct {
-	Name                 *string              `json:"name,omitempty"`
-	Base                 string               `json:"base"`
-	DefaultModel         *string              `json:"default_model,omitempty"`
-	SystemPrompt         *string              `json:"system_prompt,omitempty"`
-	McpServers           []UHPMcpServer       `json:"mcp_servers,omitempty"`
-	Skills               []UHPSkill           `json:"skills,omitempty"`
-	Plugins              []UHPPlugin          `json:"plugins,omitempty"`
-	Environment          *string              `json:"environment,omitempty"`
-	DisabledTools        []string             `json:"disabled_tools,omitempty"`
-	MaxStep              *int64               `json:"max_step,omitempty"`
-	TimeoutSeconds       *int64               `json:"timeout_seconds,omitempty"`
-	InstanceID           *string              `json:"instance_id,omitempty"`
-	TemplateID           *string              `json:"template_id,omitempty"`
-	AdditionalProperties map[string]JSONValue `json:"-"`
-}
-
-func (v UHPHarnessCreate) MarshalJSON() ([]byte, error) {
-	type plain UHPHarnessCreate
-	encoded, err := json.Marshal(plain(v))
-	if err != nil {
-		return nil, err
-	}
-	values := map[string]json.RawMessage{}
-	for key, value := range v.AdditionalProperties {
-		raw, err := json.Marshal(value)
-		if err != nil {
-			return nil, err
-		}
-		values[key] = raw
-	}
-	var known map[string]json.RawMessage
-	if err := json.Unmarshal(encoded, &known); err != nil {
-		return nil, err
-	}
-	for key, value := range known {
-		values[key] = value
-	}
-	return json.Marshal(values)
-}
-func (v *UHPHarnessCreate) UnmarshalJSON(data []byte) error {
-	type plain UHPHarnessCreate
-	var decoded plain
-	if err := json.Unmarshal(data, &decoded); err != nil {
-		return err
-	}
-	var fields map[string]json.RawMessage
-	if err := json.Unmarshal(data, &fields); err != nil {
-		return err
-	}
-	delete(fields, "name")
-	delete(fields, "base")
-	delete(fields, "default_model")
-	delete(fields, "system_prompt")
-	delete(fields, "mcp_servers")
-	delete(fields, "skills")
-	delete(fields, "plugins")
-	delete(fields, "environment")
-	delete(fields, "disabled_tools")
-	delete(fields, "max_step")
-	delete(fields, "timeout_seconds")
-	delete(fields, "instance_id")
-	delete(fields, "template_id")
-	decoded.AdditionalProperties = map[string]JSONValue{}
-	for key, raw := range fields {
-		var value JSONValue
-		if err := json.Unmarshal(raw, &value); err != nil {
-			return err
-		}
-		decoded.AdditionalProperties[key] = value
-	}
-	*v = UHPHarnessCreate(decoded)
-	return nil
-}
-
 type UHPCreateResponseJSONRequest struct {
 	Input                UHPCreateResponseJSONRequestInput     `json:"input"`
 	Model                *string                               `json:"model,omitempty"`
@@ -2538,6 +2594,14 @@ func (v *UHPCreateResponseJSONRequest) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type SetConversationApprovalModeOptions struct {
+	IfMatch string `json:"If-Match"`
+}
+
+type SetConversationReasoningOptions struct {
+	IfMatch string `json:"If-Match"`
+}
+
 type CreateClientSessionOptions struct {
 	IdempotencyKey string `json:"Idempotency-Key"`
 }
@@ -2569,16 +2633,16 @@ type ListDeployRegionsOptions struct {
 }
 
 type ListDeployModelsOptions struct {
-	Harness *string `json:"harness,omitempty"`
-	Search  *string `json:"search,omitempty"`
+	AgentFramework *string `json:"agent_framework,omitempty"`
+	Search         *string `json:"search,omitempty"`
 }
 
 type ListInstanceTemplatesOptions struct {
-	Page       *int64  `json:"page,omitempty"`
-	PageSize   *int64  `json:"page_size,omitempty"`
-	Harness    *string `json:"harness,omitempty"`
-	ProviderID *string `json:"provider_id,omitempty"`
-	Search     *string `json:"search,omitempty"`
+	Page           *int64  `json:"page,omitempty"`
+	PageSize       *int64  `json:"page_size,omitempty"`
+	AgentFramework *string `json:"agent_framework,omitempty"`
+	ProviderID     *string `json:"provider_id,omitempty"`
+	Search         *string `json:"search,omitempty"`
 }
 
 type ListAgentTemplatesResponse struct {
@@ -2594,13 +2658,13 @@ type ListAgentTemplatesOptions struct {
 }
 
 type ListInstancesOptions struct {
-	Page       *int64  `json:"page,omitempty"`
-	PageSize   *int64  `json:"page_size,omitempty"`
-	Status     *string `json:"status,omitempty"`
-	ProviderID *string `json:"provider_id,omitempty"`
-	Harness    *string `json:"harness,omitempty"`
-	ClusterID  *string `json:"cluster_id,omitempty"`
-	Search     *string `json:"search,omitempty"`
+	Page           *int64  `json:"page,omitempty"`
+	PageSize       *int64  `json:"page_size,omitempty"`
+	Status         *string `json:"status,omitempty"`
+	ProviderID     *string `json:"provider_id,omitempty"`
+	AgentFramework *string `json:"agent_framework,omitempty"`
+	ClusterID      *string `json:"cluster_id,omitempty"`
+	Search         *string `json:"search,omitempty"`
 }
 
 type InstanceCreateOptions struct {
@@ -3028,9 +3092,17 @@ type ListHarnessesResponse struct {
 	Harnesses []UHPHarness `json:"harnesses"`
 }
 
+type CreateHarnessOptions struct {
+	IdempotencyKey *string `json:"Idempotency-Key,omitempty"`
+}
+
+type UpdateHarnessOptions struct {
+	IdempotencyKey *string `json:"Idempotency-Key,omitempty"`
+}
+
 type DeleteHarnessResponse struct {
-	ID      string `json:"id"`
-	Deleted bool   `json:"deleted"`
+	ID      *string `json:"id,omitempty"`
+	Deleted *bool   `json:"deleted,omitempty"`
 }
 
 type CreateResponseOptions struct {
@@ -3451,22 +3523,22 @@ const (
 )
 
 type FileSummaryInstancesItem struct {
-	Source       string  `json:"source"`
-	InstanceID   *string `json:"instance_id,omitempty"`
-	AgentID      *string `json:"agent_id,omitempty"`
-	OperationID  *string `json:"operation_id,omitempty"`
-	InstanceName *string `json:"instance_name,omitempty"`
-	AgentName    *string `json:"agent_name,omitempty"`
-	AvatarURL    *string `json:"avatar_url,omitempty"`
-	Harness      *string `json:"harness,omitempty"`
-	Destroyed    *bool   `json:"destroyed,omitempty"`
-	Count        int64   `json:"count"`
+	Source         string  `json:"source"`
+	InstanceID     *string `json:"instance_id,omitempty"`
+	AgentID        *string `json:"agent_id,omitempty"`
+	OperationID    *string `json:"operation_id,omitempty"`
+	InstanceName   *string `json:"instance_name,omitempty"`
+	AgentName      *string `json:"agent_name,omitempty"`
+	AvatarURL      *string `json:"avatar_url,omitempty"`
+	AgentFramework *string `json:"agent_framework,omitempty"`
+	Destroyed      *bool   `json:"destroyed,omitempty"`
+	Count          int64   `json:"count"`
 }
 
-type CreateServerInstanceInputHarness string
+type CreateServerInstanceInputAgentFramework string
 
 const (
-	CreateServerInstanceInputHarnessOpenclaw CreateServerInstanceInputHarness = "openclaw"
+	CreateServerInstanceInputAgentFrameworkOpenclaw CreateServerInstanceInputAgentFramework = "openclaw"
 )
 
 type RuntimeInstanceStatusResultData struct {
@@ -3815,7 +3887,7 @@ func decodeErrorBody[T APIErrorBody](schema string, payload []byte) (APIErrorBod
 }
 func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody, error) {
 	switch operation {
-	case "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
+	case "setConversationApprovalMode", "setConversationReasoning", "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
 
 		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "createTerminalSession", "createCanvasSession":
@@ -3844,7 +3916,16 @@ func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody,
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 	case "createHarness":
+		if status == 400 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 401 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
 		if status == 409 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 413 {
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		if status == 422 {
@@ -3866,10 +3947,16 @@ func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody,
 		}
 		return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 	case "updateHarness":
+		if status == 400 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
 		if status == 404 {
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		if status == 409 {
+			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
+		}
+		if status == 413 {
 			return decodeErrorBody[UHPErrorEnvelope]("UHPErrorEnvelope", payload)
 		}
 		if status == 422 {
@@ -3932,11 +4019,11 @@ type BeeOSClient struct {
 	apiKey         func() string
 	transport      *http.Client
 	externalUserID string
+	Conversations  *ConversationsResource
 	Identity       *IdentityResource
 	Catalog        *CatalogResource
 	Instances      *InstancesResource
 	Agents         *AgentsResource
-	Conversations  *ConversationsResource
 	Messages       *MessagesResource
 	Tasks          *TasksResource
 	Usage          *UsageResource
@@ -3959,11 +4046,11 @@ func NewBeeOSClient(baseURL string, keyProvider func() string, transport *http.C
 	return c, nil
 }
 func (c *BeeOSClient) initResources() {
+	c.Conversations = &ConversationsResource{client: c}
 	c.Identity = &IdentityResource{client: c}
 	c.Catalog = &CatalogResource{client: c}
 	c.Instances = &InstancesResource{client: c}
 	c.Agents = &AgentsResource{client: c}
-	c.Conversations = &ConversationsResource{client: c}
 	c.Messages = &MessagesResource{client: c}
 	c.Tasks = &TasksResource{client: c}
 	c.Usage = &UsageResource{client: c}
@@ -4090,6 +4177,205 @@ func (s *EventStream[T]) Next() (*T, error) {
 			return nil, err
 		}
 	}
+}
+
+type ConversationsResource struct{ client *BeeOSClient }
+
+func (r *ConversationsResource) SetApprovalMode(ctx context.Context, agentId string, conversationId string, input ApprovalModeSettings, options SetConversationApprovalModeOptions) (ApprovalModeResultResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/approval-mode"
+	query := url.Values{}
+	headers := http.Header{}
+	var output ApprovalModeResultResponse
+	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "setConversationApprovalMode", "PUT", path, "", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) SetReasoning(ctx context.Context, agentId string, conversationId string, input ReasoningSettings, options SetConversationReasoningOptions) (ReasoningResultResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/reasoning"
+	query := url.Values{}
+	headers := http.Header{}
+	var output ReasoningResultResponse
+	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "setConversationReasoning", "PUT", path, "", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) Create(ctx context.Context, agentId string, input CreateConversationInput, options CreateAgentConversationOptions) (ConversationResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations"
+	query := url.Values{}
+	headers := http.Header{}
+	var output ConversationResponse
+	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "createAgentConversation", "POST", path, "", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) List(ctx context.Context, agentId string, options ListAgentConversationsOptions) (ConversationPage, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations"
+	query := url.Values{}
+	headers := http.Header{}
+	var output ConversationPage
+	if options.Cursor != nil {
+		query.Set("cursor", fmt.Sprint(*options.Cursor))
+	}
+	if options.Limit != nil {
+		query.Set("limit", fmt.Sprint(*options.Limit))
+	}
+	if options.State != nil {
+		query.Set("state", fmt.Sprint(*options.State))
+	}
+	var body []byte
+	payload, err := r.client.request(ctx, "listAgentConversations", "GET", path, "", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) Get(ctx context.Context, agentId string, conversationId string) (ConversationResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output ConversationResponse
+	var body []byte
+	payload, err := r.client.request(ctx, "getConversation", "GET", path, "", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) Update(ctx context.Context, agentId string, conversationId string, input UpdateConversationInput, options UpdateConversationOptions) (ConversationResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	var output ConversationResponse
+	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "updateConversation", "PATCH", path, "", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) Delete(ctx context.Context, agentId string, conversationId string, options DeleteConversationOptions) error {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + ""
+	query := url.Values{}
+	headers := http.Header{}
+	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
+	var body []byte
+	_, err := r.client.request(ctx, "deleteConversation", "DELETE", path, "", query, headers, body, "")
+	return err
+}
+
+func (r *ConversationsResource) Cancel(ctx context.Context, agentId string, conversationId string, input CancelConversationInput, options CancelConversationOptions) (CommandReceiptResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/cancel"
+	query := url.Values{}
+	headers := http.Header{}
+	var output CommandReceiptResponse
+	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "cancelConversation", "POST", path, "", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) Clear(ctx context.Context, agentId string, conversationId string, options ClearConversationOptions) (ClearConversationReceiptResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/clear"
+	query := url.Values{}
+	headers := http.Header{}
+	var output ClearConversationReceiptResponse
+	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
+	var body []byte
+	payload, err := r.client.request(ctx, "clearConversation", "POST", path, "", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) SetModel(ctx context.Context, agentId string, conversationId string, input SetConversationModelInput, options SetConversationModelOptions) (CommandReceiptResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/model"
+	query := url.Values{}
+	headers := http.Header{}
+	var output CommandReceiptResponse
+	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "setConversationModel", "PUT", path, "", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
+
+func (r *ConversationsResource) Resume(ctx context.Context, agentId string, conversationId string, options ResumeConversationOptions) (ResumeConversationResponse, error) {
+	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/resume"
+	query := url.Values{}
+	headers := http.Header{}
+	var output ResumeConversationResponse
+	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
+	var body []byte
+	payload, err := r.client.request(ctx, "resumeConversation", "POST", path, "", query, headers, body, "")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
 }
 
 type IdentityResource struct{ client *BeeOSClient }
@@ -4219,8 +4505,8 @@ func (r *CatalogResource) ListModels(ctx context.Context, options ListDeployMode
 	query := url.Values{}
 	headers := http.Header{}
 	var output ModelPage
-	if options.Harness != nil {
-		query.Set("harness", fmt.Sprint(*options.Harness))
+	if options.AgentFramework != nil {
+		query.Set("agent_framework", fmt.Sprint(*options.AgentFramework))
 	}
 	if options.Search != nil {
 		query.Set("search", fmt.Sprint(*options.Search))
@@ -4245,8 +4531,8 @@ func (r *CatalogResource) ListInstanceTemplates(ctx context.Context, options Lis
 	if options.PageSize != nil {
 		query.Set("page_size", fmt.Sprint(*options.PageSize))
 	}
-	if options.Harness != nil {
-		query.Set("harness", fmt.Sprint(*options.Harness))
+	if options.AgentFramework != nil {
+		query.Set("agent_framework", fmt.Sprint(*options.AgentFramework))
 	}
 	if options.ProviderID != nil {
 		query.Set("provider_id", fmt.Sprint(*options.ProviderID))
@@ -4350,8 +4636,8 @@ func (r *InstancesResource) List(ctx context.Context, options ListInstancesOptio
 	if options.ProviderID != nil {
 		query.Set("provider_id", fmt.Sprint(*options.ProviderID))
 	}
-	if options.Harness != nil {
-		query.Set("harness", fmt.Sprint(*options.Harness))
+	if options.AgentFramework != nil {
+		query.Set("agent_framework", fmt.Sprint(*options.AgentFramework))
 	}
 	if options.ClusterID != nil {
 		query.Set("cluster_id", fmt.Sprint(*options.ClusterID))
@@ -4705,165 +4991,6 @@ func (r *AgentsResource) Invoke(ctx context.Context, agentId string, input Agent
 	}
 	body = encoded
 	payload, err := r.client.request(ctx, "invokeAgent", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type ConversationsResource struct{ client *BeeOSClient }
-
-func (r *ConversationsResource) Create(ctx context.Context, agentId string, input CreateConversationInput, options CreateAgentConversationOptions) (ConversationResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ConversationResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "createAgentConversation", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConversationsResource) List(ctx context.Context, agentId string, options ListAgentConversationsOptions) (ConversationPage, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ConversationPage
-	if options.Cursor != nil {
-		query.Set("cursor", fmt.Sprint(*options.Cursor))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	if options.State != nil {
-		query.Set("state", fmt.Sprint(*options.State))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "listAgentConversations", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConversationsResource) Get(ctx context.Context, agentId string, conversationId string) (ConversationResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output ConversationResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "getConversation", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConversationsResource) Update(ctx context.Context, agentId string, conversationId string, input UpdateConversationInput, options UpdateConversationOptions) (ConversationResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output ConversationResponse
-	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "updateConversation", "PATCH", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConversationsResource) Delete(ctx context.Context, agentId string, conversationId string, options DeleteConversationOptions) error {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	_, err := r.client.request(ctx, "deleteConversation", "DELETE", path, "", query, headers, body, "")
-	return err
-}
-
-func (r *ConversationsResource) Cancel(ctx context.Context, agentId string, conversationId string, input CancelConversationInput, options CancelConversationOptions) (CommandReceiptResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/cancel"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CommandReceiptResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "cancelConversation", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConversationsResource) Clear(ctx context.Context, agentId string, conversationId string, options ClearConversationOptions) (ClearConversationReceiptResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/clear"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ClearConversationReceiptResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	payload, err := r.client.request(ctx, "clearConversation", "POST", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConversationsResource) SetModel(ctx context.Context, agentId string, conversationId string, input SetConversationModelInput, options SetConversationModelOptions) (CommandReceiptResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/model"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CommandReceiptResponse
-	headers.Set("If-Match", fmt.Sprint(options.IfMatch))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "setConversationModel", "PUT", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *ConversationsResource) Resume(ctx context.Context, agentId string, conversationId string, options ResumeConversationOptions) (ResumeConversationResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/conversations/" + url.PathEscape(fmt.Sprint(conversationId)) + "/resume"
-	query := url.Values{}
-	headers := http.Header{}
-	var output ResumeConversationResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	payload, err := r.client.request(ctx, "resumeConversation", "POST", path, "", query, headers, body, "")
 	if err != nil {
 		return output, err
 	}
@@ -5848,11 +5975,14 @@ func (r *HarnessesResource) List(ctx context.Context) (ListHarnessesResponse, er
 	return output, err
 }
 
-func (r *HarnessesResource) Create(ctx context.Context, input UHPHarnessCreate) (UHPHarness, error) {
+func (r *HarnessesResource) Create(ctx context.Context, input UHPHarnessCreate, options CreateHarnessOptions) (UHPHarness, error) {
 	path := "/harnesses"
 	query := url.Values{}
 	headers := http.Header{}
 	var output UHPHarness
+	if options.IdempotencyKey != nil {
+		headers.Set("Idempotency-Key", fmt.Sprint(*options.IdempotencyKey))
+	}
 	var body []byte
 	encoded, err := json.Marshal(input)
 	if err != nil {
@@ -5881,11 +6011,14 @@ func (r *HarnessesResource) Get(ctx context.Context, harnessid string) (UHPHarne
 	return output, err
 }
 
-func (r *HarnessesResource) Update(ctx context.Context, harnessid string, input UHPHarnessCreate) (UHPHarness, error) {
+func (r *HarnessesResource) Update(ctx context.Context, harnessid string, input UHPHarnessCreate, options UpdateHarnessOptions) (UHPHarness, error) {
 	path := "/harnesses/" + url.PathEscape(fmt.Sprint(harnessid)) + ""
 	query := url.Values{}
 	headers := http.Header{}
 	var output UHPHarness
+	if options.IdempotencyKey != nil {
+		headers.Set("Idempotency-Key", fmt.Sprint(*options.IdempotencyKey))
+	}
 	var body []byte
 	encoded, err := json.Marshal(input)
 	if err != nil {

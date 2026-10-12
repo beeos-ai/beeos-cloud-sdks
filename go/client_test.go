@@ -217,10 +217,13 @@ func TestHarnessUpdateSendsUHPBodyWithExtensions(t *testing.T) {
 		if input["template_id"] != "tpl_1" || input["base"] != "openclaw" {
 			t.Fatalf("harness body=%v", input)
 		}
+		if request.Header.Get("Idempotency-Key") != "retry-1" {
+			t.Fatalf("Idempotency-Key=%q", request.Header.Get("Idempotency-Key"))
+		}
 		return mockResponse(200, `{"id":"chrn_1","name":"a","base":"openclaw"}`), nil
 	})
-	templateID := "tpl_1"
-	harness, err := client.Harnesses.Update(context.Background(), "chrn_1", UHPHarnessCreate{Base: "openclaw", TemplateID: &templateID})
+	templateID, key := "tpl_1", "retry-1"
+	harness, err := client.Harnesses.Update(context.Background(), "chrn_1", UHPHarnessCreate{Base: "openclaw", TemplateID: &templateID}, UpdateHarnessOptions{IdempotencyKey: &key})
 	if err != nil || harness.ID != "chrn_1" {
 		t.Fatalf("harness=%+v err=%v", harness, err)
 	}

@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import ts from 'typescript';
 import openapiTS, { astToString } from 'openapi-typescript';
-import { operations, resolve, pascal } from './common.mjs';
+import { operations, resolve, pascal, requestBodyType } from './common.mjs';
 
 const quote = JSON.stringify;
 export async function generateTypeScript(spec) {
@@ -43,7 +43,7 @@ export async function generateTypeScript(spec) {
     const output = media === 'text/event-stream' ? `AsyncIterable<${eventSchema?.$ref ? `components[\"schemas\"][${quote(eventSchema.$ref.split('/').pop())}]` : 'JSONValue'}>` : media && media !== 'application/json' ? 'Uint8Array' : success?.content ? `operations[${quote(op.operationId)}][\"responses\"][${response[0]}][\"content\"][${quote(media)}]` : 'void';
     return [
       `export type ${name}Response = ${output};`,
-      ...(request ? [`export type ${name}Input = NonNullable<operations[${quote(op.operationId)}]["requestBody"]>["content"][${quote(Object.keys(request.content)[0])}];`] : []),
+      ...(request && !spec.components.schemas[requestBodyType(spec, op)] ? [`export type ${requestBodyType(spec, op)} = NonNullable<operations[${quote(op.operationId)}]["requestBody"]>["content"][${quote(Object.keys(request.content)[0])}];`] : []),
       ...(op.parameters.some(p => p.in === 'query') ? [`export type ${name}Query = NonNullable<operations[${quote(op.operationId)}]["parameters"]["query"]>;`] : []),
     ];
   });
@@ -70,9 +70,10 @@ export async function generateTypeScript(spec) {
       present.add(op.operationId);
       let text = member.getText(parsed);
       const name = pascal(op.operationId);
-      text = text.replace(/\b(input|patch): unknown/g, `$1: Models.${name}Input`);
+      const bodyType = requestBodyType(spec, op);
+      text = text.replace(/\b(input|patch): unknown/g, `$1: Models.${bodyType}`);
       if (op.parameters.some(p=>p.in==='query')) text = text.replace(/query(\?)?: Query/g, `query$1: Models.${name}Query`);
-      text = text.replace('input: { name: string }', `input: Models.${name}Input`).replace('json: { name: input.name }', 'json: input');
+      text = text.replace('input: { name: string }', `input: Models.${bodyType}`).replace('json: { name: input.name }', 'json: input');
       const bodyStart = text.indexOf('{', text.indexOf(')'));
       text = text.slice(0,bodyStart).trimEnd() + `: Promise<Models.${name}Response> ` + text.slice(bodyStart);
       text = text.replace(/this.client.request\(/g, `this.client.request<Models.${name}Response>(`);
@@ -86,7 +87,7 @@ export async function generateTypeScript(spec) {
     const name = pascal(op.operationId);
     const args = op.parameters.filter(p=>p.in==='path').map(p=>`${p.name}: string`);
     const body = resolve(spec,op.requestBody);
-    if(body) args.push(`input${body.required ? '' : '?'}: Models.${name}Input`);
+    if(body) args.push(`input${body.required ? '' : '?'}: Models.${requestBodyType(spec,op)}`);
     const headerParams = op.parameters.filter(p=>p.in==='header' && p.name !== 'X-BeeOS-External-User-ID');
     for(const p of headerParams) args.push(`${p.name==='Idempotency-Key'?'idempotencyKey':p.name==='If-Match'?'version':p.name.replace(/[^a-zA-Z0-9]/g,'')}${p.required?'':'?'}: ${p.name==='If-Match'?'number':'string'}`);
     if(op.parameters.some(p=>p.in==='query')) args.push(`query?: Models.${name}Query`);
@@ -106,7 +107,7 @@ export async function generateTypeScript(spec) {
       source=source.replace('  readonly identity:', `  readonly ${resource}: ${className};\n  readonly identity:`).replace('    this.identity =', `    this.${resource} = new ${className}(this);\n    this.identity =`);
     }
   }
-  source=source.replace('upload(input: unknown', 'upload(input: Models.PresignFileUploadInput');
+  source=source.replace('upload(input: unknown', `upload(input: Models.${requestBodyType(spec, ops.find(op => op.operationId === 'presignFileUpload'))}`);
   source=source.replace(/\bunknown\b/g,'JSONValue');
   source += await fs.readFile(new URL('./templates/typescript-stream.ts', import.meta.url),'utf8');
   const responseOp = ops.find(op => op.operationId === 'createResponse');
