@@ -1,5 +1,5 @@
 {
-  "source": "beeos-ai/beeos-cloud-backend openapi/beeos-cloud/webhooks/cloud-webhooks-v1.schema.json @ 9a33f621 (PR #243)",
+  "source": "beeos-ai/beeos-cloud-backend openapi/beeos-cloud/webhooks/cloud-webhooks-v1.schema.json @ 4b71da3b (merge of PR #243)",
   "x-signature-test-vector": {
     "description": "Fixed test vector for the Cloud developer webhook signature. Asserted against `cloudwebhook.Sign` in Go tests; reuse it to test a verifier. The secret is a made-up test value.",
     "secret": "docs-test-secret-DO-NOT-USE-0123456789abcdef",
