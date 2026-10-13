@@ -37,7 +37,6 @@ export class BeeOSClient {
   readonly agents: AgentsModule;
   readonly conversations: ConversationsModule;
   readonly messages: MessagesModule;
-  readonly tasks: TasksModule;
   readonly files: FilesModule;
 
   constructor(private readonly options: BeeOSClientOptions) {
@@ -49,7 +48,6 @@ export class BeeOSClient {
     this.agents = new AgentsModule(this);
     this.conversations = new ConversationsModule(this);
     this.messages = new MessagesModule(this);
-    this.tasks = new TasksModule(this);
     this.files = new FilesModule(this);
   }
 
@@ -236,28 +234,6 @@ class MessagesModule {
   }
   get(agentId: string, conversationId: string, messageId: string) {
     return this.client.request("GET", `agents/${agentId}/conversations/${conversationId}/messages/${messageId}`);
-  }
-}
-
-class TasksModule {
-  constructor(private readonly client: BeeOSClient) {}
-  create(agentId: string, input: unknown, idempotencyKey: string) {
-    return this.client.request("POST", `agents/${agentId}/tasks`, { json: input, idempotencyKey });
-  }
-  list(agentId: string, query?: Query) {
-    return this.client.request("GET", `agents/${agentId}/tasks`, { query });
-  }
-  get(agentId: string, taskId: string) {
-    return this.client.request("GET", `agents/${agentId}/tasks/${taskId}`);
-  }
-  listMessages(agentId: string, taskId: string, query?: Query) {
-    return this.client.request("GET", `agents/${agentId}/tasks/${taskId}/messages`, { query });
-  }
-  cancel(agentId: string, taskId: string, idempotencyKey: string) {
-    return this.client.request("POST", `agents/${agentId}/tasks/${taskId}/cancel`, { idempotencyKey });
-  }
-  continueTask(agentId: string, taskId: string, input: unknown, idempotencyKey: string) {
-    return this.client.request("POST", `agents/${agentId}/tasks/${taskId}/continue`, { json: input, idempotencyKey });
   }
 }
 

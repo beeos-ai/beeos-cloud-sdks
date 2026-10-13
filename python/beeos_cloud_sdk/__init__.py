@@ -328,65 +328,6 @@ ClearConversationReceiptResponse = TypedDict("ClearConversationReceiptResponse",
     "data": "Required[ClearConversationReceipt]",
 })
 
-CreateTaskInput = TypedDict("CreateTaskInput", {
-    "message": "Required[str]",
-    "context_id": "NotRequired[str]",
-    "deadline_ms": "NotRequired[int]",
-    "metadata": "NotRequired[dict[str, str]]",
-    "attachments": "NotRequired[list[JSONValue]]",
-})
-
-CreateTaskResult = TypedDict("CreateTaskResult", {
-    "task_id": "Required[str]",
-    "agent_id": "Required[str]",
-    "status": "Required[str]",
-    "created_at": "Required[str]",
-})
-
-CreateTaskResponse = TypedDict("CreateTaskResponse", {
-    "data": "Required[CreateTaskResult]",
-})
-
-Task = TypedDict("Task", {
-    "task_id": "Required[str]",
-    "organization_id": "NotRequired[str]",
-    "app_id": "NotRequired[str]",
-    "instance_id": "NotRequired[str]",
-    "agent_id": "Required[str]",
-    "conversation_id": "NotRequired[str]",
-    "status": "Required[str]",
-    "result": "NotRequired[JSONValue]",
-    "error": "NotRequired[str]",
-    "metadata": "NotRequired[dict[str, str]]",
-    "resource_version": "NotRequired[int]",
-    "created_at": "Required[str]",
-    "started_at": "NotRequired[str]",
-    "completed_at": "NotRequired[str]",
-    "deadline_at": "NotRequired[str]",
-    "truncated": "NotRequired[bool]",
-    "history_generation": "Required[int]",
-    "latest_offset": "Required[int]",
-})
-
-TaskResponse = TypedDict("TaskResponse", {
-    "data": "Required[Task]",
-})
-
-TaskPage = TypedDict("TaskPage", {
-    "tasks": "Required[list[Task]]",
-    "next_since": "NotRequired[str]",
-    "has_more": "Required[bool]",
-})
-
-CancelTaskInput = TypedDict("CancelTaskInput", {
-    "reason": "NotRequired[str]",
-})
-
-ContinueTaskInput = TypedDict("ContinueTaskInput", {
-    "input": "NotRequired[JSONValue]",
-    "auth_grant": "NotRequired[bool]",
-})
-
 ActiveConversationResponse = TypedDict("ActiveConversationResponse", {
     "response_id": "Required[str]",
     "last_event_id": "Required[str]",
@@ -875,25 +816,6 @@ AgentAgent = TypedDict("AgentAgent", {
     "conversation_transport": "Required[str]",
     "created_at": "Required[str]",
     "updated_at": "Required[str]",
-})
-
-AgentAttachment = TypedDict("AgentAttachment", {
-    "file_id": "Required[str]",
-})
-
-AgentInvokeInput = TypedDict("AgentInvokeInput", {
-    "message": "Required[str]",
-    "context_id": "NotRequired[str]",
-    "timeout_ms": "NotRequired[int]",
-    "metadata": "NotRequired[dict[str, str]]",
-    "attachments": "NotRequired[list[AgentAttachment]]",
-})
-
-AgentInvokeResult = TypedDict("AgentInvokeResult", {
-    "operation_id": "NotRequired[str]",
-    "text": "Required[str]",
-    "context_id": "Required[str]",
-    "is_error": "Required[bool]",
 })
 
 A2AMessage = TypedDict("A2AMessage", {
@@ -1447,35 +1369,6 @@ SetConversationModelOptions = TypedDict("SetConversationModelOptions", {
     "If-Match": "Required[str]",
 })
 
-CreateAgentTaskOptions = TypedDict("CreateAgentTaskOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-ListAgentTasksOptions = TypedDict("ListAgentTasksOptions", {
-    "cursor": "NotRequired[str]",
-    "since": "NotRequired[str]",
-    "limit": "NotRequired[int]",
-    "state": "NotRequired[Literal[\"all\", \"queued\", \"running\", \"input_required\", \"auth_required\", \"completed\", \"failed\", \"canceled\", \"timeout\", \"rejected\"]]",
-})
-
-ListAgentTaskMessagesOptions = TypedDict("ListAgentTaskMessagesOptions", {
-    "cursor": "NotRequired[str]",
-    "since": "NotRequired[str]",
-    "limit": "NotRequired[int]",
-})
-
-CancelAgentTaskOptions = TypedDict("CancelAgentTaskOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-ContinueAgentTaskOptions = TypedDict("ContinueAgentTaskOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
-InvokeAgentOptions = TypedDict("InvokeAgentOptions", {
-    "Idempotency-Key": "Required[str]",
-})
-
 GetUsageSummaryOptions = TypedDict("GetUsageSummaryOptions", {
     "period": "NotRequired[Literal[\"day\", \"week\", \"month\"]]",
     "external_user_id": "NotRequired[str]",
@@ -2004,7 +1897,7 @@ class InvalidResponseBody(TypedDict):
     raw_body: bytes
     reason: str
 
-_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"setConversationApprovalMode":{"default":"ErrorResponse"},"setConversationReasoning":{"default":"ErrorResponse"},"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"createAgentTask":{"default":"ErrorResponse"},"listAgentTasks":{"default":"ErrorResponse"},"getAgentTask":{"default":"ErrorResponse"},"listAgentTaskMessages":{"default":"ErrorResponse"},"cancelAgentTask":{"default":"ErrorResponse"},"continueAgentTask":{"default":"ErrorResponse"},"invokeAgent":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createHarness":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"updateHarness":{"400":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteHarness":{"404":"UHPErrorEnvelope","422":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
+_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"setConversationApprovalMode":{"default":"ErrorResponse"},"setConversationReasoning":{"default":"ErrorResponse"},"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createHarness":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"updateHarness":{"400":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteHarness":{"404":"UHPErrorEnvelope","422":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
 
 def _matches_error_body(schema: str | None, value: JSONValue) -> bool:
     if not isinstance(value, dict):
@@ -2037,7 +1930,6 @@ class BeeOSClient:
         self.instances = InstancesResource(self)
         self.agents = AgentsResource(self)
         self.messages = MessagesResource(self)
-        self.tasks = TasksResource(self)
         self.usage = UsageResource(self)
         self.files = FilesResource(self)
         self.automations = AutomationsResource(self)
@@ -2592,16 +2484,6 @@ class AgentsResource:
         payload = self._client._request("updateAgent", "PATCH", path, "", query, headers, json.dumps(input).encode(), "application/json")
         return cast("AgentResponse", json.loads(payload))
 
-    def invoke(self, agent_id: str, input: AgentInvokeInput, options: InvokeAgentOptions) -> AgentInvokeResult:
-        path = f"/agents/{quote(str(agent_id), safe='')}/invoke"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("invokeAgent", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("AgentInvokeResult", json.loads(payload))
-
 
 class MessagesResource:
     def __init__(self, client: BeeOSClient) -> None:
@@ -2653,78 +2535,6 @@ class MessagesResource:
         headers: dict[str, str] = {}
         payload = self._client._request("resolveReplyShare", "GET", path, "", query, headers, None, "")
         return cast("ReplyShareResponse", json.loads(payload))
-
-
-class TasksResource:
-    def __init__(self, client: BeeOSClient) -> None:
-        self._client = client
-
-    def create(self, agent_id: str, input: CreateTaskInput, options: CreateAgentTaskOptions) -> CreateTaskResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("createAgentTask", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
-        return cast("CreateTaskResponse", json.loads(payload))
-
-    def list(self, agent_id: str, options: ListAgentTasksOptions | None = None) -> TaskPage:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "cursor" in opts:
-            query["cursor"] = str(opts["cursor"])
-        if "since" in opts:
-            query["since"] = str(opts["since"])
-        if "limit" in opts:
-            query["limit"] = str(opts["limit"])
-        if "state" in opts:
-            query["state"] = str(opts["state"])
-        payload = self._client._request("listAgentTasks", "GET", path, "", query, headers, None, "")
-        return cast("TaskPage", json.loads(payload))
-
-    def get(self, agent_id: str, task_id: str) -> TaskResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        payload = self._client._request("getAgentTask", "GET", path, "", query, headers, None, "")
-        return cast("TaskResponse", json.loads(payload))
-
-    def list_messages(self, agent_id: str, task_id: str, options: ListAgentTaskMessagesOptions | None = None) -> MessagePage:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/messages"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options if options is not None else {}
-        if "cursor" in opts:
-            query["cursor"] = str(opts["cursor"])
-        if "since" in opts:
-            query["since"] = str(opts["since"])
-        if "limit" in opts:
-            query["limit"] = str(opts["limit"])
-        payload = self._client._request("listAgentTaskMessages", "GET", path, "", query, headers, None, "")
-        return cast("MessagePage", json.loads(payload))
-
-    def cancel(self, agent_id: str, task_id: str, input: CancelTaskInput | None = None, *, options: CancelAgentTaskOptions) -> CommandReceiptResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/cancel"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("cancelAgentTask", "POST", path, "", query, headers, json.dumps(input).encode() if input is not None else None, "application/json")
-        return cast("CommandReceiptResponse", json.loads(payload))
-
-    def continue_task(self, agent_id: str, task_id: str, input: ContinueTaskInput | None = None, *, options: ContinueAgentTaskOptions) -> CommandReceiptResponse:
-        path = f"/agents/{quote(str(agent_id), safe='')}/tasks/{quote(str(task_id), safe='')}/continue"
-        query: dict[str, str] = {}
-        headers: dict[str, str] = {}
-        opts = options
-        if "Idempotency-Key" in opts:
-            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
-        payload = self._client._request("continueAgentTask", "POST", path, "", query, headers, json.dumps(input).encode() if input is not None else None, "application/json")
-        return cast("CommandReceiptResponse", json.loads(payload))
 
 
 class UsageResource:

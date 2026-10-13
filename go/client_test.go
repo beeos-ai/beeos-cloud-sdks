@@ -229,7 +229,7 @@ func TestHarnessUpdateSendsUHPBodyWithExtensions(t *testing.T) {
 	}
 }
 
-func TestOptionalTaskCancelBodyCanBeOmitted(t *testing.T) {
+func TestOptionalRefreshClientSessionBodyCanBeOmitted(t *testing.T) {
 	client := testClient(t, func(request *http.Request) (*http.Response, error) {
 		payload, err := io.ReadAll(request.Body)
 		if err != nil || len(payload) != 0 {
@@ -237,7 +237,7 @@ func TestOptionalTaskCancelBodyCanBeOmitted(t *testing.T) {
 		}
 		return mockResponse(202, `{}`), nil
 	}).WithExternalUser("user-1")
-	if _, err := client.Tasks.Cancel(context.Background(), "agent-1", "task-1", nil, CancelAgentTaskOptions{IdempotencyKey: "operation-1"}); err != nil {
+	if _, err := client.Identity.RefreshClientSession(context.Background(), "session-1", nil, RefreshClientSessionOptions{IdempotencyKey: "operation-1"}); err != nil {
 		t.Fatal(err)
 	}
 }

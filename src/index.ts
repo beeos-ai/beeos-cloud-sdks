@@ -48,7 +48,6 @@ export class BeeOSClient {
   readonly agents: AgentsModule;
   readonly conversations: ConversationsModule;
   readonly messages: MessagesModule;
-  readonly tasks: TasksModule;
   readonly files: FilesModule;
 
   constructor(private readonly options: BeeOSClientOptions) {
@@ -67,7 +66,6 @@ export class BeeOSClient {
     this.agents = new AgentsModule(this);
     this.conversations = new ConversationsModule(this);
     this.messages = new MessagesModule(this);
-    this.tasks = new TasksModule(this);
     this.files = new FilesModule(this);
   }
 
@@ -239,10 +237,6 @@ class InstancesModule {
 }
 
 class AgentsModule {
-  invoke(agentId: string, input: Models.AgentInvokeInput, idempotencyKey: string): Promise<Models.InvokeAgentResponse> {
-    return this.client.request<Models.InvokeAgentResponse>("POST", `agents/${encodeURIComponent(agentId)}/invoke`, { json: input, idempotencyKey });
-  }
-
   constructor(private readonly client: BeeOSClient) {}
   list(query?: Models.ListAgentsQuery): Promise<Models.ListAgentsResponse> {
     return this.client.request<Models.ListAgentsResponse>("GET", "agents", { query });
@@ -316,28 +310,6 @@ class MessagesModule {
   }
   get(agentId: string, conversationId: string, messageId: string): Promise<Models.GetConversationMessageResponse> {
     return this.client.request<Models.GetConversationMessageResponse>("GET", `agents/${agentId}/conversations/${conversationId}/messages/${messageId}`);
-  }
-}
-
-class TasksModule {
-  constructor(private readonly client: BeeOSClient) {}
-  create(agentId: string, input: Models.CreateTaskInput, idempotencyKey: string): Promise<Models.CreateAgentTaskResponse> {
-    return this.client.request<Models.CreateAgentTaskResponse>("POST", `agents/${agentId}/tasks`, { json: input, idempotencyKey });
-  }
-  list(agentId: string, query?: Models.ListAgentTasksQuery): Promise<Models.ListAgentTasksResponse> {
-    return this.client.request<Models.ListAgentTasksResponse>("GET", `agents/${agentId}/tasks`, { query });
-  }
-  get(agentId: string, taskId: string): Promise<Models.GetAgentTaskResponse> {
-    return this.client.request<Models.GetAgentTaskResponse>("GET", `agents/${agentId}/tasks/${taskId}`);
-  }
-  listMessages(agentId: string, taskId: string, query?: Models.ListAgentTaskMessagesQuery): Promise<Models.ListAgentTaskMessagesResponse> {
-    return this.client.request<Models.ListAgentTaskMessagesResponse>("GET", `agents/${agentId}/tasks/${taskId}/messages`, { query });
-  }
-  cancel(agentId: string, taskId: string, idempotencyKey: string): Promise<Models.CancelAgentTaskResponse> {
-    return this.client.request<Models.CancelAgentTaskResponse>("POST", `agents/${agentId}/tasks/${taskId}/cancel`, { idempotencyKey });
-  }
-  continueTask(agentId: string, taskId: string, input: Models.ContinueTaskInput, idempotencyKey: string): Promise<Models.ContinueAgentTaskResponse> {
-    return this.client.request<Models.ContinueAgentTaskResponse>("POST", `agents/${agentId}/tasks/${taskId}/continue`, { json: input, idempotencyKey });
   }
 }
 
