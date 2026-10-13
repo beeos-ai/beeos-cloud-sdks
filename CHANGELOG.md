@@ -1,8 +1,6 @@
 # Changelog
 
-## 3.1.0 — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v3`
-
-Not yet published.
+## 3.1.0 (2026-10-14) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v3`
 
 ### BREAKING
 
@@ -108,6 +106,7 @@ started, err := client.Responses.Create(ctx, sdk.UHPCreateResponseJSONRequest{
 	Background: &background,
 }, sdk.CreateResponseOptions{IdempotencyKey: &key})
 current, err := client.Responses.Get(ctx, started.ID)
+_, _, _, _, _ = response, stream, started, current, err
 ```
 
 ## 3.0.0 — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v3`

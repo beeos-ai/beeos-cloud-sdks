@@ -231,9 +231,10 @@ it('keeps transport failures without an HTTP status visible', async () => {
 
 it('removes the inactive server resources and methods in v2', () => {
   const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: 'example-api-key' });
-  for (const resource of ['images', 'imageVersions', 'eventSessions', 'taskWebhooks', 'runtime', 'appWebhooks']) expect(resource in client).toBe(false);
+  for (const resource of ['images', 'imageVersions', 'eventSessions', 'taskWebhooks', 'tasks', 'runtime', 'appWebhooks']) expect(resource in client).toBe(false);
   for (const method of ['getHistory', 'getLimits']) expect(method in client.usage).toBe(false);
   expect('send' in client.messages).toBe(false);
+  expect('invoke' in client.agents).toBe(false);
   expect('methods' in client).toBe(false);
   expect('operations' in client).toBe(false);
 });
