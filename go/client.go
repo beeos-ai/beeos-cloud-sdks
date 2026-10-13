@@ -325,65 +325,6 @@ type ClearConversationReceiptResponse struct {
 	Data ClearConversationReceipt `json:"data"`
 }
 
-type CreateTaskInput struct {
-	Message     string            `json:"message"`
-	ContextID   *string           `json:"context_id,omitempty"`
-	DeadlineMs  *int64            `json:"deadline_ms,omitempty"`
-	Metadata    map[string]string `json:"metadata,omitempty"`
-	Attachments []json.RawMessage `json:"attachments,omitempty"`
-}
-
-type CreateTaskResult struct {
-	TaskID    string `json:"task_id"`
-	AgentID   string `json:"agent_id"`
-	Status    string `json:"status"`
-	CreatedAt string `json:"created_at"`
-}
-
-type CreateTaskResponse struct {
-	Data CreateTaskResult `json:"data"`
-}
-
-type Task struct {
-	TaskID            string            `json:"task_id"`
-	OrganizationID    *string           `json:"organization_id,omitempty"`
-	AppID             *string           `json:"app_id,omitempty"`
-	InstanceID        *string           `json:"instance_id,omitempty"`
-	AgentID           string            `json:"agent_id"`
-	ConversationID    *string           `json:"conversation_id,omitempty"`
-	Status            string            `json:"status"`
-	Result            json.RawMessage   `json:"result,omitempty"`
-	Error             *string           `json:"error,omitempty"`
-	Metadata          map[string]string `json:"metadata,omitempty"`
-	ResourceVersion   *int64            `json:"resource_version,omitempty"`
-	CreatedAt         string            `json:"created_at"`
-	StartedAt         *string           `json:"started_at,omitempty"`
-	CompletedAt       *string           `json:"completed_at,omitempty"`
-	DeadlineAt        *string           `json:"deadline_at,omitempty"`
-	Truncated         *bool             `json:"truncated,omitempty"`
-	HistoryGeneration int64             `json:"history_generation"`
-	LatestOffset      int64             `json:"latest_offset"`
-}
-
-type TaskResponse struct {
-	Data Task `json:"data"`
-}
-
-type TaskPage struct {
-	Tasks     []Task  `json:"tasks"`
-	NextSince *string `json:"next_since,omitempty"`
-	HasMore   bool    `json:"has_more"`
-}
-
-type CancelTaskInput struct {
-	Reason *string `json:"reason,omitempty"`
-}
-
-type ContinueTaskInput struct {
-	Input     json.RawMessage `json:"input,omitempty"`
-	AuthGrant *bool           `json:"auth_grant,omitempty"`
-}
-
 type ActiveConversationResponse struct {
 	ResponseID     string  `json:"response_id"`
 	LastEventID    string  `json:"last_event_id"`
@@ -2071,25 +2012,6 @@ type AgentAgent struct {
 	UpdatedAt             string          `json:"updated_at"`
 }
 
-type AgentAttachment struct {
-	FileID string `json:"file_id"`
-}
-
-type AgentInvokeInput struct {
-	Message     string            `json:"message"`
-	ContextID   *string           `json:"context_id,omitempty"`
-	TimeoutMs   *int64            `json:"timeout_ms,omitempty"`
-	Metadata    map[string]string `json:"metadata,omitempty"`
-	Attachments []AgentAttachment `json:"attachments,omitempty"`
-}
-
-type AgentInvokeResult struct {
-	OperationID *string `json:"operation_id,omitempty"`
-	Text        string  `json:"text"`
-	ContextID   string  `json:"context_id"`
-	IsError     bool    `json:"is_error"`
-}
-
 type A2AMessage struct {
 	MessageID        string               `json:"messageId"`
 	Role             string               `json:"role"`
@@ -2750,35 +2672,6 @@ type ClearConversationOptions struct {
 
 type SetConversationModelOptions struct {
 	IfMatch string `json:"If-Match"`
-}
-
-type CreateAgentTaskOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type ListAgentTasksOptions struct {
-	Cursor *string                     `json:"cursor,omitempty"`
-	Since  *string                     `json:"since,omitempty"`
-	Limit  *int64                      `json:"limit,omitempty"`
-	State  *ListAgentTasksOptionsState `json:"state,omitempty"`
-}
-
-type ListAgentTaskMessagesOptions struct {
-	Cursor *string `json:"cursor,omitempty"`
-	Since  *string `json:"since,omitempty"`
-	Limit  *int64  `json:"limit,omitempty"`
-}
-
-type CancelAgentTaskOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type ContinueAgentTaskOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
-}
-
-type InvokeAgentOptions struct {
-	IdempotencyKey string `json:"Idempotency-Key"`
 }
 
 type GetUsageSummaryOptions struct {
@@ -3726,21 +3619,6 @@ const (
 	ListAgentConversationsOptionsStateAll    ListAgentConversationsOptionsState = "all"
 )
 
-type ListAgentTasksOptionsState string
-
-const (
-	ListAgentTasksOptionsStateAll           ListAgentTasksOptionsState = "all"
-	ListAgentTasksOptionsStateQueued        ListAgentTasksOptionsState = "queued"
-	ListAgentTasksOptionsStateRunning       ListAgentTasksOptionsState = "running"
-	ListAgentTasksOptionsStateInputRequired ListAgentTasksOptionsState = "input_required"
-	ListAgentTasksOptionsStateAuthRequired  ListAgentTasksOptionsState = "auth_required"
-	ListAgentTasksOptionsStateCompleted     ListAgentTasksOptionsState = "completed"
-	ListAgentTasksOptionsStateFailed        ListAgentTasksOptionsState = "failed"
-	ListAgentTasksOptionsStateCanceled      ListAgentTasksOptionsState = "canceled"
-	ListAgentTasksOptionsStateTimeout       ListAgentTasksOptionsState = "timeout"
-	ListAgentTasksOptionsStateRejected      ListAgentTasksOptionsState = "rejected"
-)
-
 type GetUsageSummaryOptionsPeriod string
 
 const (
@@ -3887,7 +3765,7 @@ func decodeErrorBody[T APIErrorBody](schema string, payload []byte) (APIErrorBod
 }
 func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody, error) {
 	switch operation {
-	case "setConversationApprovalMode", "setConversationReasoning", "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "createAgentTask", "listAgentTasks", "getAgentTask", "listAgentTaskMessages", "cancelAgentTask", "continueAgentTask", "invokeAgent", "getUsageSummary", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
+	case "setConversationApprovalMode", "setConversationReasoning", "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "getUsageSummary", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
 
 		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "createTerminalSession", "createCanvasSession":
@@ -4025,7 +3903,6 @@ type BeeOSClient struct {
 	Instances      *InstancesResource
 	Agents         *AgentsResource
 	Messages       *MessagesResource
-	Tasks          *TasksResource
 	Usage          *UsageResource
 	Files          *FilesResource
 	Automations    *AutomationsResource
@@ -4052,7 +3929,6 @@ func (c *BeeOSClient) initResources() {
 	c.Instances = &InstancesResource{client: c}
 	c.Agents = &AgentsResource{client: c}
 	c.Messages = &MessagesResource{client: c}
-	c.Tasks = &TasksResource{client: c}
 	c.Usage = &UsageResource{client: c}
 	c.Files = &FilesResource{client: c}
 	c.Automations = &AutomationsResource{client: c}
@@ -4978,26 +4854,6 @@ func (r *AgentsResource) Update(ctx context.Context, agentId string, input Agent
 	return output, err
 }
 
-func (r *AgentsResource) Invoke(ctx context.Context, agentId string, input AgentInvokeInput, options InvokeAgentOptions) (AgentInvokeResult, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/invoke"
-	query := url.Values{}
-	headers := http.Header{}
-	var output AgentInvokeResult
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "invokeAgent", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
 type MessagesResource struct{ client *BeeOSClient }
 
 func (r *MessagesResource) List(ctx context.Context, agentId string, conversationId string, options ListConversationMessagesOptions) (MessagePage, error) {
@@ -5078,135 +4934,6 @@ func (r *MessagesResource) ResolveShare(ctx context.Context, slug string) (Reply
 	var output ReplyShareResponse
 	var body []byte
 	payload, err := r.client.request(ctx, "resolveReplyShare", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-type TasksResource struct{ client *BeeOSClient }
-
-func (r *TasksResource) Create(ctx context.Context, agentId string, input CreateTaskInput, options CreateAgentTaskOptions) (CreateTaskResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CreateTaskResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	encoded, err := json.Marshal(input)
-	if err != nil {
-		return output, err
-	}
-	body = encoded
-	payload, err := r.client.request(ctx, "createAgentTask", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *TasksResource) List(ctx context.Context, agentId string, options ListAgentTasksOptions) (TaskPage, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks"
-	query := url.Values{}
-	headers := http.Header{}
-	var output TaskPage
-	if options.Cursor != nil {
-		query.Set("cursor", fmt.Sprint(*options.Cursor))
-	}
-	if options.Since != nil {
-		query.Set("since", fmt.Sprint(*options.Since))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	if options.State != nil {
-		query.Set("state", fmt.Sprint(*options.State))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "listAgentTasks", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *TasksResource) Get(ctx context.Context, agentId string, taskId string) (TaskResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + ""
-	query := url.Values{}
-	headers := http.Header{}
-	var output TaskResponse
-	var body []byte
-	payload, err := r.client.request(ctx, "getAgentTask", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *TasksResource) ListMessages(ctx context.Context, agentId string, taskId string, options ListAgentTaskMessagesOptions) (MessagePage, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + "/messages"
-	query := url.Values{}
-	headers := http.Header{}
-	var output MessagePage
-	if options.Cursor != nil {
-		query.Set("cursor", fmt.Sprint(*options.Cursor))
-	}
-	if options.Since != nil {
-		query.Set("since", fmt.Sprint(*options.Since))
-	}
-	if options.Limit != nil {
-		query.Set("limit", fmt.Sprint(*options.Limit))
-	}
-	var body []byte
-	payload, err := r.client.request(ctx, "listAgentTaskMessages", "GET", path, "", query, headers, body, "")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *TasksResource) Cancel(ctx context.Context, agentId string, taskId string, input *CancelTaskInput, options CancelAgentTaskOptions) (CommandReceiptResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + "/cancel"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CommandReceiptResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	if input != nil {
-		encoded, err := json.Marshal(input)
-		if err != nil {
-			return output, err
-		}
-		body = encoded
-	}
-	payload, err := r.client.request(ctx, "cancelAgentTask", "POST", path, "", query, headers, body, "application/json")
-	if err != nil {
-		return output, err
-	}
-	err = json.Unmarshal(payload, &output)
-	return output, err
-}
-
-func (r *TasksResource) ContinueTask(ctx context.Context, agentId string, taskId string, input *ContinueTaskInput, options ContinueAgentTaskOptions) (CommandReceiptResponse, error) {
-	path := "/agents/" + url.PathEscape(fmt.Sprint(agentId)) + "/tasks/" + url.PathEscape(fmt.Sprint(taskId)) + "/continue"
-	query := url.Values{}
-	headers := http.Header{}
-	var output CommandReceiptResponse
-	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
-	var body []byte
-	if input != nil {
-		encoded, err := json.Marshal(input)
-		if err != nil {
-			return output, err
-		}
-		body = encoded
-	}
-	payload, err := r.client.request(ctx, "continueAgentTask", "POST", path, "", query, headers, body, "application/json")
 	if err != nil {
 		return output, err
 	}

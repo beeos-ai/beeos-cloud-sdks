@@ -76,10 +76,10 @@ class ClientTests(unittest.TestCase):
             self.assertEqual(request.get_header("Idempotency-key"), "retry-1")
             self.assertEqual(send.call_args.kwargs["timeout"], 60.0)
 
-    def test_optional_task_cancel_body_can_be_omitted(self):
+    def test_optional_refresh_client_session_body_can_be_omitted(self):
         client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime").with_external_user("user-1")
         with patch("beeos_cloud_sdk.urlopen", return_value=io.BytesIO(b'{}')) as send:
-            client.tasks.cancel("agent-1", "task-1", options={"Idempotency-Key": "operation-1"})
+            client.identity.refresh_client_session("session-1", options={"Idempotency-Key": "operation-1"})
             self.assertIsNone(send.call_args.args[0].data)
 
     def test_cloud_and_device_binding_error_shapes(self):
