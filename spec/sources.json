@@ -2,7 +2,7 @@
   "spec": "server.openapi.json",
   "producer": {
     "repository": "beeos-ai/beeos-cloud-backend",
-    "revision": "9308a3143b32b45ed7606a4eecb1836db1ac549c",
+    "revision": "aac68ae5b95efc4566cbe79037c8916398ac714a",
     "read_method": "git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)"
   },
   "app_sdk": {
