@@ -85,6 +85,7 @@ for path,ops in d['paths'].items():
 # Extract exact JSON-tagged producer structs. Open JSON is explicit and recursive.
 S['JSONValue']={'description':'A genuinely open JSON value (provider/plugin parameters or arbitrary metadata).','oneOf':[{'type':'null'},{'type':'boolean'},{'type':'number'},{'type':'string'},arr(ref('JSONValue')),{'type':'object','additionalProperties':ref('JSONValue')}]}
 models={}
+docs={}
 for folder,prefix in [(B/'pkg/beeoscloudruntime','Runtime'),(B/'pkg/beeoscloudfiles','File'),(B/'pkg/beeoscloudagent','Agent'),(B/'pkg/a2a','A2A'),(B/'services/openapi-gateway/internal/beeoscloud',''),(V,'')]:
  for p in listdir(folder,'.go'):
   if p.name.endswith('_test.go') or p.name.endswith('.gen.go'):continue
@@ -93,11 +94,16 @@ for folder,prefix in [(B/'pkg/beeoscloudruntime','Runtime'),(B/'pkg/beeoscloudfi
    start=m.end();depth=1;i=start
    while i<len(t) and depth:
     depth+=(t[i]=='{')-(t[i]=='}');i+=1
-   body=t[start:i-1]; fields=[]
+   body=t[start:i-1]; fields=[]; notes={}; pending=[]
    for line in body.splitlines():
+    c=re.match(r'\s*//\s?(.*)$',line)
+    if c:pending.append(c[1]);continue
     f=re.match(r'\s*(\w+)\s+(.+?)\s+`json:"([^\"]+)"`',line)
-    if f and f[3]!='-':fields.append((f[1],f[2],f[3]))
-   if fields:models[prefix+m[1]]=(fields,prefix,body)
+    if f and f[3]!='-':
+     fields.append((f[1],f[2],f[3]))
+     if pending:notes[f[3].split(',')[0]]=' '.join(' '.join(pending).split())
+    pending=[]
+   if fields:models[prefix+m[1]]=(fields,prefix,body);docs[prefix+m[1]]=notes
 def go_type(t,prefix):
  t=t.strip()
  if t.startswith('*'):return {'anyOf':[go_type(t[1:],prefix),{'type':'null'}]}
@@ -383,6 +389,44 @@ for path in list(spec['paths']):
    operation['responses']['400']=uhp_error
    operation['responses']['503']=uhp_error
  spec['paths'][path[len('/uhp/v1'):]]=ops
+# Descriptions come from the producer: the // comment above a Go struct field (docs), and
+# server-field-descriptions.json for what has no struct field to carry a comment. Existing
+# descriptions are never replaced, and a key that matches nothing fails instead of drifting.
+FIELD_DOCS=json.loads(read(B/'openapi/beeos-cloud/rest/server-field-descriptions.json'))
+# Server routes still return the producer Runtime structs behind these vendored App schemas.
+DOC_ALIAS={'InstancePage':'RuntimeInstancePage','InstanceSummary':'RuntimeInstanceSummary'}
+def describe(props,path,text,where):
+ *head,last=path.split('.')
+ for part in head:
+  props=(props.get(part) or {}).get('properties')
+  if props is None:raise SystemExit('field description names no property: '+where+' '+path)
+ if last not in props:raise SystemExit('field description names no property: '+where+' '+path)
+ if 'description' not in props[last]:props[last]={**props[last],'description':text}
+for name,schema in S.items():
+ for key,text in docs.get(DOC_ALIAS.get(name,name),{}).items():
+  if key in schema.get('properties',{}):describe(schema['properties'],key,text,name)
+for name,notes in FIELD_DOCS['schemas'].items():
+ if name not in S or 'properties' not in S[name]:raise SystemExit('field description names no schema: '+name)
+ for path,text in notes.items():describe(S[name]['properties'],path,text,name)
+operations={o['operationId']:o for ops in spec['paths'].values() for o in ops.values()}
+def describe_parameters(o,notes):
+ names={a['name'] for a in o['parameters']}
+ if not set(notes)<=names:raise SystemExit('parameter description names no parameter: '+o['operationId']+' '+', '.join(sorted(set(notes)-names)))
+ o['parameters']=[{**a,'description':notes[a['name']]} if a['name'] in notes and 'description' not in a else a for a in o['parameters']]
+for resource,groups in FIELD_DOCS['parameters'].items():
+ members=[o for o in operations.values() if o['x-sdk-resource']==resource]
+ if not members:raise SystemExit('parameter descriptions name no resource: '+resource)
+ for opid in set(groups)-{'*'}:
+  if opid not in operations or operations[opid]['x-sdk-resource']!=resource:raise SystemExit('parameter description names no operation: '+resource+' '+opid)
+ for o in members:
+  names={a['name'] for a in o['parameters']}
+  describe_parameters(o,{**{k:v for k,v in groups.get('*',{}).items() if k in names},**groups.get(o['operationId'],{})})
+ unused=set(groups.get('*',{}))-{a['name'] for o in members for a in o['parameters']}
+ if unused:raise SystemExit('shared parameter description names no parameter: '+resource+' '+', '.join(sorted(unused)))
+for opid,notes in FIELD_DOCS['request_bodies'].items():
+ if opid not in operations:raise SystemExit('request body description names no operation: '+opid)
+ schema=operations[opid]['requestBody']['content']['application/json']['schema']
+ for path,text in notes.items():describe(schema.get('properties',{}),path,text,opid)
 # Retain only components transitively reachable from live public operations.
 needed={section:set() for section in spec['components']}
 needed['securitySchemes'].add('ServerAPIKey')
@@ -412,7 +456,7 @@ manifest={
  'producer':{'repository':'beeos-ai/beeos-cloud-backend','revision':PB[1],'read_method':'git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)'},
  'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':PV[1],'read_method':'git ls-tree / git show at <revision> for every input','directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'reference wire types for live Server operations; producer implementations override the public shapes'},
  'canvas':{'repository':'beeos-ai/beeos-cloud-canvas','revision':'55a9822c96958bb1b70b04751cef3c39e1abb6ce','files':['pkg/infrastructure/server/http/handler.go','pkg/domain/canvas.go','pkg/domain/share.go'],'role':'persisted Canvas public response projections forwarded verbatim by backend runtime_canvas_rest.go'},
- 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes.'},
+ 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from openapi/beeos-cloud/rest/server-field-descriptions.json, and the script fails when a description key matches no schema, property, operation or parameter.'},
  'version':'3.1.0',
  'activation':{'live':'Registered Server-key producer route; all non-live operations are excluded'},
  'input_sha256':dict(sorted(inputs.items()))}

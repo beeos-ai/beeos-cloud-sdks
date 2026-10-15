@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Docs
+
+- The Server API spec now carries field and parameter descriptions for the instances
+  resource (and its types) in `src/models.ts`, taken from the producer's source
+  comments. No API or behavior change.
+
 ## 3.1.0 (2026-10-14) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v3`
 
 ### BREAKING
