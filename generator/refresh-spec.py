@@ -395,7 +395,7 @@ for path in list(spec['paths']):
 # matches nothing fails instead of drifting. Enum values are written as x-enumDescriptions, never
 # as `enum`: that keeps every generated SDK type unchanged. The producer's guard test
 # (field_descriptions_test.go) ties each value set to the Go constants it is named after.
-FIELD_DOCS={'schemas':{},'parameters':{},'request_bodies':{},'variants':{}}
+FIELD_DOCS={'schemas':{},'parameters':{},'request_bodies':{},'responses':{},'variants':{}}
 for p in listdir(B/'openapi/beeos-cloud/rest/field-descriptions','.json'):
  for section,values in json.loads(read(p)).items():
   if section=='$comment':continue
@@ -469,6 +469,16 @@ for opid,notes in FIELD_DOCS['request_bodies'].items():
  if opid not in operations:raise SystemExit('request body description names no operation: '+opid)
  schema=operations[opid]['requestBody']['content']['application/json']['schema']
  for path,text in notes.items():describe(schema.get('properties',{}),path,text,opid)
+# Inline response bodies (no named schema to describe): operationId -> status code -> dot path.
+# A body that is a $ref is described through the schemas section instead.
+for opid,statuses in FIELD_DOCS['responses'].items():
+ if opid not in operations:raise SystemExit('response description names no operation: '+opid)
+ for status,notes in statuses.items():
+  response=operations[opid]['responses'].get(status)
+  if response is None:raise SystemExit('response description names no status: '+opid+' '+status)
+  schema=response.get('content',{}).get('application/json',{}).get('schema')
+  if schema is None or '$ref' in schema:raise SystemExit('response description needs an inline JSON body (use schemas for a $ref): '+opid+' '+status)
+  for path,entry in notes.items():describe(schema.get('properties',{}),path,entry,opid+' '+status)
 # Discriminated shapes. Each variant becomes a named schema built from the parent's own
 # properties (a list of names) or from literal property schemas, and the discriminated node gets
 # x-variants: {property|sibling, mapping: {value: $ref}}. The mapping must cover exactly the
@@ -544,7 +554,7 @@ manifest={
  'producer':{'repository':'beeos-ai/beeos-cloud-backend','revision':PB[1],'read_method':'git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)'},
  'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':PV[1],'read_method':'git ls-tree / git show at <revision> for every input','directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'reference wire types for live Server operations; producer implementations override the public shapes'},
  'canvas':{'repository':'beeos-ai/beeos-cloud-canvas','revision':'55a9822c96958bb1b70b04751cef3c39e1abb6ce','files':['pkg/infrastructure/server/http/handler.go','pkg/domain/canvas.go','pkg/domain/share.go'],'role':'persisted Canvas public response projections forwarded verbatim by backend runtime_canvas_rest.go'},
- 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from the per-resource files in openapi/beeos-cloud/rest/field-descriptions/, and the script fails when a description key matches no schema, property, operation or parameter. Enum values are published as x-enumDescriptions (never as enum, so generated SDK types do not change); the producer test TestFieldDescriptionEnumsMatchGoConstants keeps each set equal to the Go constants it names.'},
+ 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from the per-resource files in openapi/beeos-cloud/rest/field-descriptions/ (schemas, parameters, request_bodies, responses for inline response bodies), and the script fails when a description key matches no schema, property, operation or parameter. Enum values are published as x-enumDescriptions (never as enum, so generated SDK types do not change); the producer test TestFieldDescriptionEnumsMatchGoConstants keeps each set equal to the Go constants it names.'},
  'version':'3.1.0',
  'activation':{'live':'Registered Server-key producer route; all non-live operations are excluded'},
  'input_sha256':dict(sorted(inputs.items()))}

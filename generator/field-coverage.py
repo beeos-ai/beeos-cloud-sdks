@@ -2,7 +2,8 @@
 """Report how many documented fields of spec/server.openapi.json still lack a description.
 
 Per x-sdk-resource it counts, over everything reachable from that resource's operations:
-  properties          schema properties with no description
+  properties          schema properties with no description, including properties of objects
+                      declared inline in a request or response body (named `<operationId>/<status>.path`)
   parameters          operation parameters with no description
   enum_missing        string properties that look like discriminators (see DISCRIMINATOR_NAMES)
                       and carry neither `enum` nor `x-enumDescriptions`
@@ -99,6 +100,30 @@ def schema_gaps(name, schema, schemas, variants, siblings):
     return gaps
 
 
+def inline_objects(node, path):
+    """Objects declared inline (not through $ref) in a body schema, with their path."""
+    if not isinstance(node, dict) or '$ref' in node:
+        return
+    for key in ('anyOf', 'oneOf', 'allOf'):
+        for child in node.get(key, []):
+            yield from inline_objects(child, path)
+    if 'items' in node:
+        yield from inline_objects(node['items'], path + '[]')
+    if node.get('properties'):
+        yield path, node
+        for key, prop in node['properties'].items():
+            yield from inline_objects(prop, path + '.' + key)
+
+
+def inline_bodies(op):
+    bodies = [('request', op.get('requestBody', {}).get('content', {}))]
+    bodies += [(status, response.get('content', {})) for status, response in op['responses'].items() if isinstance(response, dict)]
+    for where, content in bodies:
+        for body in content.values():
+            if 'schema' in body:
+                yield from inline_objects(body['schema'], op['operationId'] + '/' + where)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--spec', default=str(Path(__file__).resolve().parent.parent / 'spec/server.openapi.json'))
@@ -125,10 +150,16 @@ def main():
             for param in op.get('parameters', []):
                 if not param.get('description'):
                     gaps['parameters'].append(op['operationId'] + ':' + param['name'])
+        inline_total = 0
+        for op in entry['ops']:
+            for path, node in inline_bodies(op):
+                inline_total += len(node['properties'])
+                for kind, items in schema_gaps(path, node, schemas, variants, siblings).items():
+                    gaps[kind].extend(items)
         for name in sorted(closure(schemas, entry['seeds'])):
             for kind, items in schema_gaps(name, schemas[name], schemas, variants, siblings).items():
                 gaps[kind].extend(items)
-        total = sum(len(s.get('properties', {})) for n, s in schemas.items() if n in closure(schemas, entry['seeds']))
+        total = inline_total + sum(len(s.get('properties', {})) for n, s in schemas.items() if n in closure(schemas, entry['seeds']))
         report[resource] = {'schema_properties': total, **{k: sorted(set(v)) for k, v in gaps.items()}}
     if args.json:
         print(json.dumps(report, indent=1))
