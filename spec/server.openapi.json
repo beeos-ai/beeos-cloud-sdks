@@ -2086,7 +2086,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the agent, the `id` returned by the agents API."
           },
           {
             "name": "conversationId",
@@ -2094,7 +2095,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the conversation, as returned when it was created or listed."
           },
           {
             "name": "X-BeeOS-External-User-ID",
@@ -2105,14 +2107,16 @@
               "minLength": 1,
               "maxLength": 128
             },
-            "x-sdk-client-option": "externalUserId"
+            "x-sdk-client-option": "externalUserId",
+            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           },
           {
             "name": "cursor",
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Cursor from `next_cursor` of the previous page. Omit it to get the first page. At most 4096 characters."
           },
           {
             "name": "limit",
@@ -2121,7 +2125,8 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 100
-            }
+            },
+            "description": "Maximum number of messages to return in one page. Defaults to 50."
           }
         ],
         "responses": {
@@ -2167,7 +2172,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the agent, the `id` returned by the agents API."
           },
           {
             "name": "conversationId",
@@ -2175,7 +2181,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the conversation, as returned when it was created or listed."
           },
           {
             "name": "messageId",
@@ -2183,7 +2190,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the message."
           },
           {
             "name": "X-BeeOS-External-User-ID",
@@ -2194,7 +2202,8 @@
               "minLength": 1,
               "maxLength": 128
             },
-            "x-sdk-client-option": "externalUserId"
+            "x-sdk-client-option": "externalUserId",
+            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "responses": {
@@ -3522,7 +3531,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the agent, the `id` returned by the agents API."
           },
           {
             "name": "conversationId",
@@ -3530,7 +3540,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the conversation, as returned when it was created or listed."
           },
           {
             "name": "messageId",
@@ -3538,7 +3549,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the message."
           }
         ],
         "responses": {
@@ -3600,7 +3612,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the agent, the `id` returned by the agents API."
           },
           {
             "name": "conversationId",
@@ -3608,7 +3621,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the conversation, as returned when it was created or listed."
           },
           {
             "name": "messageId",
@@ -3616,7 +3630,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the message."
           }
         ],
         "responses": {
@@ -3678,7 +3693,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the agent, the `id` returned by the agents API."
           },
           {
             "name": "conversationId",
@@ -3686,7 +3702,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the conversation, as returned when it was created or listed."
           },
           {
             "name": "messageId",
@@ -3694,7 +3711,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the message."
           }
         ],
         "responses": {
@@ -3729,7 +3747,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Public slug of the shared reply, the `data.slug` returned when the share was created."
           }
         ],
         "responses": {
@@ -6670,7 +6689,8 @@
               "examples": [
                 "2026-08-11"
               ]
-            }
+            },
+            "description": "Protocol version to use: `2026-10-04` (the default), `2026-09-28`, `2026-09-12` or `2026-08-11`. The version served is echoed in the same header of the response. An unsupported version is rejected with `unsupported_protocol_version`."
           }
         ],
         "requestBody": {
@@ -6811,7 +6831,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the response. It starts with `resp_`."
           }
         ],
         "servers": [
@@ -6872,7 +6893,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the response. It starts with `resp_`."
           }
         ],
         "servers": [
@@ -6943,7 +6965,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the response. It starts with `resp_`."
           }
         ],
         "servers": [
@@ -6998,7 +7021,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the response. It starts with `resp_`."
           }
         ],
         "servers": [
@@ -7022,7 +7046,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the response. It starts with `resp_`."
           },
           {
             "name": "Last-Event-ID",
@@ -7030,7 +7055,8 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Sequence number of the last event the client received. The stream resumes after it. Must be a non-negative integer."
           },
           {
             "name": "UHP-Version",
@@ -7038,7 +7064,8 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Protocol version to use: `2026-10-04` (the default), `2026-09-28`, `2026-09-12` or `2026-08-11`. The version served is echoed in the same header of the response. An unsupported version is rejected with `unsupported_protocol_version`."
           }
         ],
         "responses": {
@@ -8002,43 +8029,119 @@
         ],
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the message."
           },
           "conversation_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the conversation the message belongs to."
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "description": "Kind of the message. Use it to tell the caller's prompts from the agent's replies and other messages. New kinds can be added, so ignore values you do not know.",
+            "x-enumDescriptions": {
+              "chat_message": "A prompt sent by the caller to the agent.",
+              "agent_reply": "The agent's reply to a `chat_message`. While `state` is `streaming` the reply is still being written and `body` holds the text produced so far.",
+              "agent_reply_error": "An error reply from the agent, sent as its own message kind instead of an `agent_reply` that carries an error.",
+              "agent.refuse": "The agent declined to handle the message. `content` holds a `reason`, for example `agent_busy` when the agent was already working on another turn, and a readable `message`.",
+              "agent_busy": "Older name of `agent.refuse`, still sent by some agent runtimes. Treat it the same way.",
+              "agent_reply_delta": "A chunk of an agent reply that is still being produced.",
+              "agent_reasoning": "The agent's reasoning (\"thinking\") text. It is stored as its own message next to the `agent_reply` it belongs to, with the same `reply_to`, and the reasoning text is in `body`. It is never the final answer.",
+              "a2a_status_update": "A status change of an Agent-to-Agent (A2A) task.",
+              "a2a_result": "The final outcome of an A2A task, sent when the task completes or cannot be dispatched.",
+              "agent_request": "The task request delivered to an agent for an A2A task.",
+              "a2a_task": "The first message of an A2A task, published when the task is dispatched in queue mode.",
+              "chat_cancel": "A request to stop the agent's turn for an earlier `chat_message`. `content` holds `target_message_id` and an optional `reason`.",
+              "device_command": "One tool call for controlling a device or computer, such as a screenshot, click or typing. The agent runs it on the device without a model turn.",
+              "device_result": "The successful result of a `device_command`. `reply_to` is the ID of the command.",
+              "device_error": "The failure of a `device_command`. `content` holds `error` and `code`."
+            }
           },
           "content": {
-            "x-go-type": "json.RawMessage"
+            "x-go-type": "json.RawMessage",
+            "description": "Payload of the message as JSON. Its structure depends on `type`; see the variants listed for this field. For current agent replies read `body` and `parts` instead. The server removes the `metadata` and `from` keys before returning it.",
+            "x-variants": {
+              "sibling": "Message.type",
+              "mapping": {
+                "chat_message": {
+                  "$ref": "#/components/x-variantSchemas/MessageContentChatMessage"
+                },
+                "agent_reply": {
+                  "$ref": "#/components/x-variantSchemas/MessageContentAgentReply"
+                },
+                "agent_reply_error": {
+                  "$ref": "#/components/x-variantSchemas/MessageContentAgentReply"
+                },
+                "agent.refuse": {
+                  "$ref": "#/components/x-variantSchemas/MessageContentAgentRefuse"
+                },
+                "agent_busy": {
+                  "$ref": "#/components/x-variantSchemas/MessageContentAgentRefuse"
+                },
+                "chat_cancel": {
+                  "$ref": "#/components/x-variantSchemas/MessageContentChatCancel"
+                },
+                "device_command": {
+                  "$ref": "#/components/x-variantSchemas/MessageContentDeviceCommand"
+                },
+                "device_error": {
+                  "$ref": "#/components/x-variantSchemas/MessageContentDeviceError"
+                }
+              }
+            }
           },
           "sender": {
-            "type": "string"
+            "type": "string",
+            "description": "Identity that sent the message. A message sent by the end user named in the `X-BeeOS-External-User-ID` header is shown as `user:<external user ID>`. Other senders appear as their own identity ID."
           },
           "reply_to": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the message this message replies to, for example the `chat_message` an `agent_reply` answers. Omitted for messages that are not replies."
           },
           "created_at": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time the message was created, in RFC 3339 format."
           },
           "offset": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "Position of the message in the conversation history. Newer messages have larger offsets."
           },
           "history_generation": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "Generation of the conversation history the message belongs to."
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "description": "Lifecycle state of the message. A message starts as `streaming` and moves exactly once to one of the final states; a final message never changes again. Messages stored before states existed have an empty state and are final.",
+            "x-enumDescriptions": {
+              "streaming": "The message is still being written. `body` and `parts` can still change.",
+              "completed": "The message was finished normally.",
+              "failed": "The agent failed to finish the message.",
+              "refused": "The agent refused to answer. `body` holds the refusal text.",
+              "cancelled": "The message was stopped on request before it finished."
+            }
           },
           "stop_reason": {
-            "type": "string"
+            "type": "string",
+            "description": "Why the message reached a final state. Present only on final messages and can be empty when the reason is unknown.",
+            "x-enumDescriptions": {
+              "end_turn": "The agent finished its turn normally.",
+              "max_tokens": "The output limit was reached before the agent finished.",
+              "tool_use": "The agent stopped to call a tool.",
+              "user_stop": "The user stopped the agent.",
+              "timeout": "The time limit was reached before the agent finished.",
+              "error": "The agent stopped because of an error.",
+              "refused": "The agent refused to answer.",
+              "content_filter": "The reply was stopped by a content filter.",
+              "agent_lost": "The server ended the message because the agent that was producing it is no longer running, for example because it crashed or was replaced."
+            }
           },
           "body": {
-            "type": "string"
+            "type": "string",
+            "description": "Text of the message. For a reply that is still `streaming` it is the text produced so far."
           },
           "parts": {
             "type": "array",
@@ -8047,18 +8150,47 @@
               "additionalProperties": {
                 "$ref": "#/components/schemas/JSONValue"
               },
-              "x-go-type": "json.RawMessage"
-            }
+              "x-go-type": "json.RawMessage",
+              "x-variants": {
+                "property": "type",
+                "mapping": {
+                  "text": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartText"
+                  },
+                  "thinking": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartThinking"
+                  },
+                  "tool_use": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartToolUse"
+                  },
+                  "tool_result": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartToolResult"
+                  },
+                  "file": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartFile"
+                  },
+                  "source": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartSource"
+                  },
+                  "custom": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartCustom"
+                  }
+                }
+              }
+            },
+            "description": "Structured parts of the message in order, such as reasoning, tool calls, files and sources. Each part has a `type`; see the variants listed for the items of this field."
           },
           "updated_at": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time the message was last changed, in RFC 3339 format. Omitted when the message was never updated."
           },
           "runtime_dispatch": {
             "type": "object",
             "additionalProperties": {
               "$ref": "#/components/schemas/JSONValue"
-            }
+            },
+            "description": "Result of handing the message to the agent runtime, as an object with `status` and `code`. Omitted when no result is recorded."
           },
           "realtime_publish_status": {
             "type": "string",
@@ -8066,7 +8198,8 @@
               "published",
               "unconfirmed",
               "not_republished"
-            ]
+            ],
+            "description": "Reserved. The Server API does not currently return this field."
           }
         }
       },
@@ -8084,25 +8217,31 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Message"
-            }
+            },
+            "description": "Messages on this page."
           },
           "next_cursor": {
-            "type": "string"
+            "type": "string",
+            "description": "Cursor to pass as `cursor` to get the next page. Empty when `has_more` is false."
           },
           "has_more": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether more messages are available after this page."
           },
           "latest_offset": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "Upper bound of the offsets scanned for this page. It is not the history boundary; use `history_boundary_offset` for that."
           },
           "history_generation": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "Generation of the conversation history this page was read from."
           },
           "history_boundary_offset": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "Offset of the history boundary for the current generation: the point a clear or recovery of the history moved the start of the history to."
           }
         }
       },
@@ -8118,22 +8257,45 @@
         ],
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the message."
           },
           "conversation_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the conversation the message belongs to."
           },
           "type": {
-            "type": "string"
+            "type": "string",
+            "description": "Kind of the message. Use it to tell the caller's prompts from the agent's replies and other messages. New kinds can be added, so ignore values you do not know.",
+            "x-enumDescriptions": {
+              "chat_message": "A prompt sent by the caller to the agent.",
+              "agent_reply": "The agent's reply to a `chat_message`. While `state` is `streaming` the reply is still being written and `body` holds the text produced so far.",
+              "agent_reply_error": "An error reply from the agent, sent as its own message kind instead of an `agent_reply` that carries an error.",
+              "agent.refuse": "The agent declined to handle the message. `content` holds a `reason`, for example `agent_busy` when the agent was already working on another turn, and a readable `message`.",
+              "agent_busy": "Older name of `agent.refuse`, still sent by some agent runtimes. Treat it the same way.",
+              "agent_reply_delta": "A chunk of an agent reply that is still being produced.",
+              "agent_reasoning": "The agent's reasoning (\"thinking\") text. It is stored as its own message next to the `agent_reply` it belongs to, with the same `reply_to`, and the reasoning text is in `body`. It is never the final answer.",
+              "a2a_status_update": "A status change of an Agent-to-Agent (A2A) task.",
+              "a2a_result": "The final outcome of an A2A task, sent when the task completes or cannot be dispatched.",
+              "agent_request": "The task request delivered to an agent for an A2A task.",
+              "a2a_task": "The first message of an A2A task, published when the task is dispatched in queue mode.",
+              "chat_cancel": "A request to stop the agent's turn for an earlier `chat_message`. `content` holds `target_message_id` and an optional `reason`.",
+              "device_command": "One tool call for controlling a device or computer, such as a screenshot, click or typing. The agent runs it on the device without a model turn.",
+              "device_result": "The successful result of a `device_command`. `reply_to` is the ID of the command.",
+              "device_error": "The failure of a `device_command`. `content` holds `error` and `code`."
+            }
           },
           "sender": {
-            "type": "string"
+            "type": "string",
+            "description": "Identity that sent the message. A message sent by the end user named in the `X-BeeOS-External-User-ID` header is shown as `user:<external user ID>`. Other senders appear as their own identity ID."
           },
           "reply_to": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the message this message replies to, for example the `chat_message` an `agent_reply` answers. Omitted for messages that are not replies."
           },
           "body": {
-            "type": "string"
+            "type": "string",
+            "description": "Text of the message. For a reply that is still `streaming` it is the text produced so far."
           },
           "parts": {
             "type": "array",
@@ -8142,25 +8304,75 @@
               "additionalProperties": {
                 "$ref": "#/components/schemas/JSONValue"
               },
-              "x-go-type": "json.RawMessage"
-            }
+              "x-go-type": "json.RawMessage",
+              "x-variants": {
+                "property": "type",
+                "mapping": {
+                  "text": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartText"
+                  },
+                  "thinking": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartThinking"
+                  },
+                  "tool_use": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartToolUse"
+                  },
+                  "tool_result": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartToolResult"
+                  },
+                  "file": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartFile"
+                  },
+                  "source": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartSource"
+                  },
+                  "custom": {
+                    "$ref": "#/components/x-variantSchemas/MessagePartCustom"
+                  }
+                }
+              }
+            },
+            "description": "Structured parts of the message in order, such as reasoning, tool calls, files and sources. Each part has a `type`; see the variants listed for the items of this field."
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "description": "Lifecycle state of the message. A message starts as `streaming` and moves exactly once to one of the final states; a final message never changes again. Messages stored before states existed have an empty state and are final.",
+            "x-enumDescriptions": {
+              "streaming": "The message is still being written. `body` and `parts` can still change.",
+              "completed": "The message was finished normally.",
+              "failed": "The agent failed to finish the message.",
+              "refused": "The agent refused to answer. `body` holds the refusal text.",
+              "cancelled": "The message was stopped on request before it finished."
+            }
           },
           "stop_reason": {
-            "type": "string"
+            "type": "string",
+            "description": "Why the message reached a final state. Present only on final messages and can be empty when the reason is unknown.",
+            "x-enumDescriptions": {
+              "end_turn": "The agent finished its turn normally.",
+              "max_tokens": "The output limit was reached before the agent finished.",
+              "tool_use": "The agent stopped to call a tool.",
+              "user_stop": "The user stopped the agent.",
+              "timeout": "The time limit was reached before the agent finished.",
+              "error": "The agent stopped because of an error.",
+              "refused": "The agent refused to answer.",
+              "content_filter": "The reply was stopped by a content filter.",
+              "agent_lost": "The server ended the message because the agent that was producing it is no longer running, for example because it crashed or was replaced."
+            }
           },
           "content": {
-            "x-go-type": "json.RawMessage"
+            "x-go-type": "json.RawMessage",
+            "description": "Reserved. The Server API does not currently return this field; read `body` and `parts`."
           },
           "created_at": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time the message was created, in RFC 3339 format."
           },
           "updated_at": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time the message was last changed, in RFC 3339 format. Omitted when the message was never updated."
           }
         }
       },
@@ -8171,7 +8383,8 @@
         ],
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/MessageEnvelope"
+            "$ref": "#/components/schemas/MessageEnvelope",
+            "description": "The message."
           }
         }
       },
@@ -9244,26 +9457,31 @@
           },
           "stream": {
             "type": "boolean",
-            "default": false
+            "default": false,
+            "description": "When true the response is streamed as server-sent events; see `UHPEvent`. Otherwise the call returns the finished response. Defaults to false."
           },
           "previous_response_id": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "ID of an earlier response to continue. The new response runs in the same session. The earlier response must exist and belong to the same harness."
           },
           "instructions": {
-            "type": "string"
+            "type": "string",
+            "description": "Instructions placed before the input text and separated from it by a line containing `---`."
           },
           "store": {
             "type": "boolean",
-            "default": true
+            "default": true,
+            "description": "Whether to keep the response so it can be fetched later. Defaults to true."
           },
           "max_output_tokens": {
             "type": [
               "integer",
               "null"
-            ]
+            ],
+            "description": "Reserved and ignored. It is reported in `metadata.ignored_fields` of the response."
           },
           "max_step": {
             "type": [
@@ -9298,7 +9516,8 @@
           },
           "background": {
             "type": "boolean",
-            "default": false
+            "default": false,
+            "description": "When true on a request that is not streamed, the call returns at once with the response still `in_progress`; fetch the result later. Ignored when `stream` is true."
           }
         },
         "additionalProperties": {
@@ -9318,10 +9537,15 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^resp_"
+            "pattern": "^resp_",
+            "description": "ID of the response. It starts with `resp_`."
           },
           "object": {
             "type": "string",
+            "description": "Object type.",
+            "x-enumDescriptions": {
+              "response": "A response object."
+            },
             "enum": [
               "response"
             ]
@@ -9331,7 +9555,8 @@
             "description": "Unix seconds"
           },
           "status": {
-            "$ref": "#/components/schemas/UHPResponseStatus"
+            "$ref": "#/components/schemas/UHPResponseStatus",
+            "description": "Status of the response. See `UHPResponseStatus` for the values."
           },
           "error": {
             "oneOf": [
@@ -9351,13 +9576,15 @@
             ],
             "additionalProperties": {
               "$ref": "#/components/schemas/JSONValue"
-            }
+            },
+            "description": "Why the response is incomplete. When `status` is `incomplete` it holds `reason`: `max_tokens` or `timeout`. Otherwise null."
           },
           "previous_response_id": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "ID of the response this one continues, when the request set `previous_response_id`."
           },
           "model": {
             "type": "string",
@@ -9367,10 +9594,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UHPOutputItem"
-            }
+            },
+            "description": "Output items produced so far, in order."
           },
           "store": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the response is kept so it can be fetched later."
           },
           "usage": {
             "oneOf": [
@@ -9387,7 +9616,8 @@
             "type": "object",
             "properties": {
               "session_id": {
-                "type": "string"
+                "type": "string",
+                "description": "ID of the session the response ran in. Responses chained with `previous_response_id` share it."
               },
               "environment": {
                 "type": "string",
@@ -9414,7 +9644,8 @@
             },
             "additionalProperties": {
               "$ref": "#/components/schemas/JSONValue"
-            }
+            },
+            "description": "Extra information about the run."
           }
         },
         "additionalProperties": {
@@ -9430,7 +9661,14 @@
           "incomplete",
           "cancelled"
         ],
-        "description": "`incomplete` means a budget stopped the work and is usually worth continuing.\n`failed` means it could not be done. `cancelled` means the client asked for a stop, and must\nnever be reported as `failed`.\n"
+        "description": "`incomplete` means a budget stopped the work and is usually worth continuing.\n`failed` means it could not be done. `cancelled` means the client asked for a stop, and must\nnever be reported as `failed`.\n",
+        "x-enumDescriptions": {
+          "in_progress": "The response is still running.",
+          "completed": "The response finished successfully.",
+          "failed": "The work could not be done.",
+          "incomplete": "A limit, such as the output limit or the time limit, stopped the work. It is usually worth continuing.",
+          "cancelled": "The client asked to stop. A cancelled response is never reported as `failed`."
+        }
       },
       "UHPOutputItem": {
         "type": "object",
@@ -9440,7 +9678,8 @@
         "description": "A client must tolerate item types it does not recognise. A client that renders only `message`\nitems and ignores the rest is a valid client.\n",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the output item."
           },
           "type": {
             "type": "string",
@@ -9449,19 +9688,36 @@
               "reasoning",
               "function_call",
               "function_call_output"
-            ]
+            ],
+            "description": "Kind of the output item. Clients should ignore item types they do not know.",
+            "x-enumDescriptions": {
+              "message": "A message written by the agent. Its text is in `content`.",
+              "reasoning": "The agent's reasoning. Its summary is in `summary`.",
+              "function_call": "A tool call made by the agent, with `name` and `arguments`.",
+              "function_call_output": "The result of a tool call, in `output`."
+            }
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Progress of the item.",
+            "x-enumDescriptions": {
+              "in_progress": "The item is still being produced.",
+              "completed": "The item is complete."
+            }
           },
           "role": {
-            "type": "string"
+            "type": "string",
+            "description": "Who wrote a `message` item.",
+            "x-enumDescriptions": {
+              "assistant": "The agent."
+            }
           },
           "content": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UHPContentPart"
-            }
+            },
+            "description": "Content parts of a `message` item."
           },
           "summary": {
             "type": "array",
@@ -9470,24 +9726,45 @@
               "additionalProperties": {
                 "$ref": "#/components/schemas/JSONValue"
               }
-            }
+            },
+            "description": "Summary of a `reasoning` item."
           },
           "call_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the function call. A `function_call_output` item refers to its call with the same `call_id`."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of the function the agent called."
           },
           "arguments": {
             "type": "string",
             "description": "JSON, as a string"
           },
           "output": {
-            "type": "string"
+            "type": "string",
+            "description": "Result of the function call, as text."
           }
         },
         "additionalProperties": {
           "$ref": "#/components/schemas/JSONValue"
+        },
+        "x-variants": {
+          "property": "type",
+          "mapping": {
+            "message": {
+              "$ref": "#/components/x-variantSchemas/UHPOutputItemMessage"
+            },
+            "reasoning": {
+              "$ref": "#/components/x-variantSchemas/UHPOutputItemReasoning"
+            },
+            "function_call": {
+              "$ref": "#/components/x-variantSchemas/UHPOutputItemFunctionCall"
+            },
+            "function_call_output": {
+              "$ref": "#/components/x-variantSchemas/UHPOutputItemFunctionCallOutput"
+            }
+          }
         }
       },
       "UHPContentPart": {
@@ -9500,20 +9777,38 @@
             "type": "string",
             "examples": [
               "output_text"
-            ]
+            ],
+            "description": "Kind of the part.",
+            "x-enumDescriptions": {
+              "output_text": "Text of a `message` item, with optional annotations.",
+              "summary_text": "Summary text of a `reasoning` item."
+            }
           },
           "text": {
-            "type": "string"
+            "type": "string",
+            "description": "Text of the part."
           },
           "annotations": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/UHPAnnotation"
-            }
+            },
+            "description": "Annotations that refer to ranges of `text`."
           }
         },
         "additionalProperties": {
           "$ref": "#/components/schemas/JSONValue"
+        },
+        "x-variants": {
+          "property": "type",
+          "mapping": {
+            "output_text": {
+              "$ref": "#/components/x-variantSchemas/UHPContentPartOutputText"
+            },
+            "summary_text": {
+              "$ref": "#/components/x-variantSchemas/UHPContentPartSummaryText"
+            }
+          }
         }
       },
       "UHPAnnotation": {
@@ -9524,28 +9819,38 @@
         "properties": {
           "type": {
             "type": "string",
+            "description": "Kind of the annotation.",
+            "x-enumDescriptions": {
+              "container_file_citation": "The text refers to a file produced by the agent."
+            },
             "enum": [
               "container_file_citation"
             ]
           },
           "container_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the container that holds the file. BeeOS does not currently set it."
           },
           "file_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the file. BeeOS does not currently set it."
           },
           "filename": {
-            "type": "string"
+            "type": "string",
+            "description": "Name of the file."
           },
           "download_url": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "description": "Absolute URL the file can be downloaded from."
           },
           "start_index": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Start of the cited range in the text, counted in characters. BeeOS sets it to 0."
           },
           "end_index": {
-            "type": "integer"
+            "type": "integer",
+            "description": "End of the cited range in the text, counted in characters. BeeOS sets it to the length of the text."
           }
         },
         "additionalProperties": {
@@ -9557,23 +9862,28 @@
         "properties": {
           "input_tokens": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Number of input tokens."
           },
           "output_tokens": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Number of output tokens."
           },
           "total_tokens": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Total number of tokens used."
           },
           "cache_read_tokens": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Input tokens read from the cache."
           },
           "cache_write_tokens": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Input tokens written to the cache."
           }
         },
         "additionalProperties": {
@@ -9587,7 +9897,8 @@
         ],
         "properties": {
           "error": {
-            "$ref": "#/components/schemas/UHPError"
+            "$ref": "#/components/schemas/UHPError",
+            "description": "The error."
           },
           "detail": {
             "type": "string",
@@ -9616,7 +9927,16 @@
               "rate_limit_error",
               "harness_error",
               "server_error"
-            ]
+            ],
+            "description": "Category of the error. It follows from the HTTP status.",
+            "x-enumDescriptions": {
+              "invalid_request_error": "The request is invalid or refers to something that does not exist or conflicts with current state.",
+              "authentication_error": "The API key is missing or invalid.",
+              "permission_error": "The API key does not have the scope the call needs.",
+              "rate_limit_error": "Too many requests.",
+              "harness_error": "The harness failed to do what was asked.",
+              "server_error": "The server could not serve the request."
+            }
           },
           "code": {
             "type": "string",
@@ -9677,7 +9997,8 @@
             ],
             "additionalProperties": {
               "$ref": "#/components/schemas/JSONValue"
-            }
+            },
+            "description": "Additional structured detail about the error, when available."
           }
         },
         "additionalProperties": {
@@ -9713,67 +10034,171 @@
               "response.incomplete",
               "response.failed",
               "error"
-            ]
+            ],
+            "description": "Kind of the event. Clients should ignore event types they do not know. Exactly one of `response.completed`, `response.incomplete` and `response.failed` ends a stream.",
+            "x-enumDescriptions": {
+              "response.created": "The response was created. `response` is the initial snapshot with status `in_progress`.",
+              "response.in_progress": "The response is running. `response` is a snapshot.",
+              "response.output_item.added": "A new output item started. `item` is its initial form and `output_index` its position in the output.",
+              "response.output_item.done": "An output item is complete. `item` is its final form.",
+              "response.content_part.added": "A content part was added to a `message` item. `part` is its initial form.",
+              "response.content_part.done": "A content part of a `message` item is complete. `part` is its final form.",
+              "response.output_text.delta": "More text was appended to the text of a `message` item. `delta` is the new text.",
+              "response.output_text.done": "The text of a `message` item is complete. `text` is the full text.",
+              "response.output_text.annotation.added": "An annotation, such as a file citation, was added to the text of a `message` item.",
+              "response.reasoning_summary_part.added": "A summary part was added to a `reasoning` item.",
+              "response.reasoning_summary_text.delta": "More text was appended to the summary of a `reasoning` item. `delta` is the new text.",
+              "response.reasoning_summary_part.done": "A summary part of a `reasoning` item is complete. `part` is its final form.",
+              "response.function_call_arguments.delta": "The arguments of a `function_call` item were written. `delta` holds the arguments text.",
+              "response.function_call_arguments.done": "The arguments of a `function_call` item are complete. `arguments` holds them as a JSON string.",
+              "response.completed": "The response finished successfully. This is a terminal event: exactly one terminal event ends the stream.",
+              "response.incomplete": "The response stopped because of a limit, for example the output limit or the time limit. This is a terminal event.",
+              "response.failed": "The response failed or was cancelled; `response.status` is `failed` or `cancelled`. This is a terminal event.",
+              "error": "An error that did not end the response. `code`, `message` and `param` describe it, and a terminal event still follows.",
+              "beeos.approval.requested": "BeeOS extension. The agent asks for approval of an action. The `approval` property holds the approval request document.",
+              "beeos.approval.resolved": "BeeOS extension. An approval request was resolved. The `approval` property holds the resolution document."
+            }
           },
           "sequence_number": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Position of the event in the stream, starting at 0 and increasing by 1 per event. A gap means an event was lost."
           },
           "response": {
-            "$ref": "#/components/schemas/UHPResponse"
+            "$ref": "#/components/schemas/UHPResponse",
+            "description": "Snapshot of the response. Present on lifecycle events."
           },
           "item": {
-            "$ref": "#/components/schemas/UHPOutputItem"
+            "$ref": "#/components/schemas/UHPOutputItem",
+            "description": "The output item. Present on `response.output_item.added` and `response.output_item.done`."
           },
           "part": {
-            "$ref": "#/components/schemas/UHPContentPart"
+            "$ref": "#/components/schemas/UHPContentPart",
+            "description": "The content or summary part. Present on content part and reasoning summary part events."
           },
           "annotation": {
-            "$ref": "#/components/schemas/UHPAnnotation"
+            "$ref": "#/components/schemas/UHPAnnotation",
+            "description": "The annotation. Present on `response.output_text.annotation.added`."
           },
           "delta": {
-            "type": "string"
+            "type": "string",
+            "description": "New text, or new function arguments, since the previous delta."
           },
           "text": {
-            "type": "string"
+            "type": "string",
+            "description": "The complete text. Present on `response.output_text.done`."
           },
           "arguments": {
-            "type": "string"
+            "type": "string",
+            "description": "The complete function arguments as a JSON string. Present on `response.function_call_arguments.done`."
           },
           "item_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
           },
           "output_index": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
           },
           "content_index": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Index of the content part within the item."
           },
           "summary_index": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Index of the summary part within the item."
           },
           "annotation_index": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "description": "Index of the annotation within the content part."
           },
           "code": {
-            "type": "string"
+            "type": "string",
+            "description": "Machine-readable error code. Present on `error` events."
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Readable error message. Present on `error` events."
           },
           "param": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Dotted path of the field the error is about, or null. Present on `error` events."
           }
         },
         "additionalProperties": {
           "$ref": "#/components/schemas/JSONValue"
+        },
+        "x-variants": {
+          "property": "type",
+          "mapping": {
+            "response.created": {
+              "$ref": "#/components/x-variantSchemas/UHPEventResponse"
+            },
+            "response.in_progress": {
+              "$ref": "#/components/x-variantSchemas/UHPEventResponse"
+            },
+            "response.completed": {
+              "$ref": "#/components/x-variantSchemas/UHPEventResponse"
+            },
+            "response.incomplete": {
+              "$ref": "#/components/x-variantSchemas/UHPEventResponse"
+            },
+            "response.failed": {
+              "$ref": "#/components/x-variantSchemas/UHPEventResponse"
+            },
+            "response.output_item.added": {
+              "$ref": "#/components/x-variantSchemas/UHPEventOutputItem"
+            },
+            "response.output_item.done": {
+              "$ref": "#/components/x-variantSchemas/UHPEventOutputItem"
+            },
+            "response.content_part.added": {
+              "$ref": "#/components/x-variantSchemas/UHPEventContentPart"
+            },
+            "response.content_part.done": {
+              "$ref": "#/components/x-variantSchemas/UHPEventContentPart"
+            },
+            "response.reasoning_summary_part.added": {
+              "$ref": "#/components/x-variantSchemas/UHPEventReasoningSummaryPart"
+            },
+            "response.reasoning_summary_part.done": {
+              "$ref": "#/components/x-variantSchemas/UHPEventReasoningSummaryPart"
+            },
+            "response.output_text.delta": {
+              "$ref": "#/components/x-variantSchemas/UHPEventOutputTextDelta"
+            },
+            "response.reasoning_summary_text.delta": {
+              "$ref": "#/components/x-variantSchemas/UHPEventReasoningSummaryTextDelta"
+            },
+            "response.output_text.done": {
+              "$ref": "#/components/x-variantSchemas/UHPEventOutputTextDone"
+            },
+            "response.output_text.annotation.added": {
+              "$ref": "#/components/x-variantSchemas/UHPEventAnnotationAdded"
+            },
+            "response.function_call_arguments.delta": {
+              "$ref": "#/components/x-variantSchemas/UHPEventFunctionCallArgumentsDelta"
+            },
+            "response.function_call_arguments.done": {
+              "$ref": "#/components/x-variantSchemas/UHPEventFunctionCallArgumentsDone"
+            },
+            "error": {
+              "$ref": "#/components/x-variantSchemas/UHPEventError"
+            },
+            "beeos.approval.requested": {
+              "$ref": "#/components/x-variantSchemas/UHPEventApproval"
+            },
+            "beeos.approval.resolved": {
+              "$ref": "#/components/x-variantSchemas/UHPEventApproval"
+            }
+          }
         }
       },
       "JSONValue": {
@@ -11283,22 +11708,27 @@
             "type": "object",
             "properties": {
               "slug": {
-                "type": "string"
+                "type": "string",
+                "description": "Public slug that identifies the share."
               },
               "created_at": {
-                "type": "string"
+                "type": "string",
+                "description": "Time the share was created."
               },
               "agent": {
                 "type": "object",
                 "properties": {
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Display name of the agent."
                   },
                   "avatar_url": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "URL of the agent's avatar."
                   },
                   "framework": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Agent framework of the instance the agent runs on."
                   }
                 },
                 "required": [
@@ -11306,7 +11736,8 @@
                   "avatar_url",
                   "framework"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "description": "The agent that wrote the reply."
               },
               "reply": {
                 "type": "object",
@@ -11317,10 +11748,12 @@
                       "type": "object",
                       "properties": {
                         "type": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Always `text`."
                         },
                         "text": {
-                          "type": "string"
+                          "type": "string",
+                          "description": "Text of the reply."
                         }
                       },
                       "required": [
@@ -11328,17 +11761,20 @@
                         "text"
                       ],
                       "additionalProperties": false
-                    }
+                    },
+                    "description": "Content of the reply. It holds one part of type `text`."
                   },
                   "created_at": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Time the reply message was created."
                   }
                 },
                 "required": [
                   "parts",
                   "created_at"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "description": "The shared reply."
               },
               "sources": {
                 "type": "array",
@@ -11346,15 +11782,18 @@
                   "type": "object",
                   "properties": {
                     "url": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "URL of the source."
                     },
                     "title": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Title of the source, when the agent provided one."
                     }
                   },
                   "required": [],
                   "additionalProperties": false
-                }
+                },
+                "description": "Web sources the reply cites. Only `https` sources are listed."
               },
               "files": {
                 "type": "array",
@@ -11376,7 +11815,8 @@
                   },
                   "required": [],
                   "additionalProperties": false
-                }
+                },
+                "description": "Files the reply links to. Only files published by BeeOS are listed."
               }
             },
             "required": [
@@ -11387,7 +11827,8 @@
               "sources",
               "files"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "description": "The shared reply."
           }
         },
         "required": [
@@ -12367,8 +12808,926 @@
           ]
         }
       }
+    },
+    "x-variantSchemas": {
+      "MessageContentChatMessage": {
+        "type": "object",
+        "description": "Content of a prompt sent to the agent.",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Text of the prompt."
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessageContentAgentReply": {
+        "type": "object",
+        "description": "Content of an agent reply. A successful reply carries `text`; a failed one carries `error`.",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Text of the reply."
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message when the reply is a failure."
+          }
+        },
+        "required": [],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessageContentAgentRefuse": {
+        "type": "object",
+        "description": "Content of a message in which the agent declines the task.",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Why the agent declined, for example `agent_busy`."
+          },
+          "message": {
+            "type": "string",
+            "description": "Readable explanation."
+          }
+        },
+        "required": [],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessageContentChatCancel": {
+        "type": "object",
+        "description": "Content of a request to stop the agent's turn.",
+        "properties": {
+          "target_message_id": {
+            "type": "string",
+            "description": "ID of the `chat_message` whose turn should stop."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the turn should stop: `canceled`, `caller_disconnected` or `timeout`."
+          }
+        },
+        "required": [
+          "target_message_id"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessageContentDeviceCommand": {
+        "type": "object",
+        "description": "Content of a device tool call.",
+        "properties": {
+          "tool": {
+            "type": "string",
+            "description": "Name of the device tool to run, for example `screenshot`, `click` or `tap`."
+          },
+          "args": {
+            "description": "Arguments of the tool; they depend on the tool.",
+            "$ref": "#/components/schemas/JSONValue"
+          },
+          "channel_id": {
+            "type": "string",
+            "description": "ID of the conversation the command belongs to."
+          },
+          "context_id": {
+            "type": "string",
+            "description": "ID of the conversation the command belongs to."
+          }
+        },
+        "required": [],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessageContentDeviceError": {
+        "type": "object",
+        "description": "Content of the failure of a device tool call.",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Readable error message."
+          },
+          "code": {
+            "type": "string",
+            "description": "Kind of failure reported by the device tool, for example `unsupported`, `invalid_args` or `internal_error`."
+          }
+        },
+        "required": [],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessagePartText": {
+        "type": "object",
+        "description": "A piece of the reply text.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `text`."
+          },
+          "text": {
+            "type": "string",
+            "description": "The text."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessagePartThinking": {
+        "type": "object",
+        "description": "A piece of the agent's reasoning.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `thinking`."
+          },
+          "text": {
+            "type": "string",
+            "description": "The reasoning text."
+          },
+          "state": {
+            "type": "string",
+            "description": "Whether the reasoning is still being written.",
+            "x-enumDescriptions": {
+              "streaming": "The part is still being written.",
+              "done": "The part is complete. A missing state also means done."
+            }
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessagePartToolUse": {
+        "type": "object",
+        "description": "A tool call made by the agent.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `tool_use`."
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of the tool call. A `tool_result` part refers to it with `tool_use_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the tool."
+          },
+          "arguments": {
+            "$ref": "#/components/schemas/JSONValue",
+            "description": "Arguments of the call as JSON."
+          },
+          "state": {
+            "type": "string",
+            "description": "Whether the arguments are still being written.",
+            "x-enumDescriptions": {
+              "streaming": "The part is still being written.",
+              "done": "The part is complete. A missing state also means done."
+            }
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessagePartToolResult": {
+        "type": "object",
+        "description": "The result of a tool call.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `tool_result`."
+          },
+          "tool_use_id": {
+            "type": "string",
+            "description": "ID of the `tool_use` part this result belongs to."
+          },
+          "content": {
+            "$ref": "#/components/schemas/JSONValue",
+            "description": "Result of the tool: a JSON object or a plain string."
+          },
+          "is_error": {
+            "type": "boolean",
+            "description": "Whether the tool call failed."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessagePartFile": {
+        "type": "object",
+        "description": "A file attached to the message. Images, audio and video are all `file` parts; tell them apart by `mime_type`.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `file`."
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the file."
+          },
+          "mime_type": {
+            "type": "string",
+            "description": "MIME type of the file, for example `image/png`."
+          },
+          "name": {
+            "type": "string",
+            "description": "File name."
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Size of the file in bytes."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessagePartSource": {
+        "type": "object",
+        "description": "A cited source or reference.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `source`."
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the source."
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of the source."
+          },
+          "snippet": {
+            "type": "string",
+            "description": "Excerpt of the source."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "MessagePartCustom": {
+        "type": "object",
+        "description": "An extension part for structured content that has no dedicated type. `kind` says what the part is.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `custom`."
+          },
+          "kind": {
+            "type": "string",
+            "description": "What kind of custom part this is."
+          },
+          "data": {
+            "$ref": "#/components/schemas/JSONValue",
+            "description": "Payload of the part as JSON; it depends on `kind`."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventResponse": {
+        "type": "object",
+        "description": "A response lifecycle event that carries a snapshot of the response.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "One of `response.created`, `response.in_progress`, `response.completed`, `response.incomplete`, `response.failed`."
+          },
+          "response": {
+            "$ref": "#/components/schemas/UHPResponse",
+            "description": "Snapshot of the response. Present on lifecycle events."
+          }
+        },
+        "required": [
+          "type",
+          "response"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventOutputItem": {
+        "type": "object",
+        "description": "An output item started or finished.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "One of `response.output_item.added`, `response.output_item.done`."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "item": {
+            "$ref": "#/components/schemas/UHPOutputItem",
+            "description": "The output item. Present on `response.output_item.added` and `response.output_item.done`."
+          }
+        },
+        "required": [
+          "type",
+          "output_index",
+          "item"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventContentPart": {
+        "type": "object",
+        "description": "A content part of a `message` item was added or finished.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "One of `response.content_part.added`, `response.content_part.done`."
+          },
+          "item_id": {
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "content_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Index of the content part within the item."
+          },
+          "part": {
+            "$ref": "#/components/schemas/UHPContentPart",
+            "description": "The content or summary part. Present on content part and reasoning summary part events."
+          }
+        },
+        "required": [
+          "type",
+          "item_id",
+          "output_index",
+          "content_index",
+          "part"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventReasoningSummaryPart": {
+        "type": "object",
+        "description": "A summary part of a `reasoning` item was added or finished.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "One of `response.reasoning_summary_part.added`, `response.reasoning_summary_part.done`."
+          },
+          "item_id": {
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "summary_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Index of the summary part within the item."
+          },
+          "part": {
+            "$ref": "#/components/schemas/UHPContentPart",
+            "description": "The content or summary part. Present on content part and reasoning summary part events."
+          }
+        },
+        "required": [
+          "type",
+          "item_id",
+          "output_index",
+          "summary_index",
+          "part"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventOutputTextDelta": {
+        "type": "object",
+        "description": "New text of a `message` item.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `response.output_text.delta`."
+          },
+          "item_id": {
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "content_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Index of the content part within the item."
+          },
+          "delta": {
+            "type": "string",
+            "description": "New text, or new function arguments, since the previous delta."
+          }
+        },
+        "required": [
+          "type",
+          "item_id",
+          "output_index",
+          "content_index",
+          "delta"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventReasoningSummaryTextDelta": {
+        "type": "object",
+        "description": "New summary text of a `reasoning` item.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `response.reasoning_summary_text.delta`."
+          },
+          "item_id": {
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "summary_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Index of the summary part within the item."
+          },
+          "delta": {
+            "type": "string",
+            "description": "New text, or new function arguments, since the previous delta."
+          }
+        },
+        "required": [
+          "type",
+          "item_id",
+          "output_index",
+          "summary_index",
+          "delta"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventOutputTextDone": {
+        "type": "object",
+        "description": "The text of a `message` item is complete.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `response.output_text.done`."
+          },
+          "item_id": {
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "content_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Index of the content part within the item."
+          },
+          "text": {
+            "type": "string",
+            "description": "The complete text. Present on `response.output_text.done`."
+          }
+        },
+        "required": [
+          "type",
+          "item_id",
+          "output_index",
+          "content_index",
+          "text"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventAnnotationAdded": {
+        "type": "object",
+        "description": "An annotation was added to the text of a `message` item.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `response.output_text.annotation.added`."
+          },
+          "item_id": {
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "content_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Index of the content part within the item."
+          },
+          "annotation_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Index of the annotation within the content part."
+          },
+          "annotation": {
+            "$ref": "#/components/schemas/UHPAnnotation",
+            "description": "The annotation. Present on `response.output_text.annotation.added`."
+          }
+        },
+        "required": [
+          "type",
+          "item_id",
+          "output_index",
+          "content_index",
+          "annotation_index",
+          "annotation"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventFunctionCallArgumentsDelta": {
+        "type": "object",
+        "description": "The arguments of a function call were written.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `response.function_call_arguments.delta`."
+          },
+          "item_id": {
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "delta": {
+            "type": "string",
+            "description": "New text, or new function arguments, since the previous delta."
+          }
+        },
+        "required": [
+          "type",
+          "item_id",
+          "output_index",
+          "delta"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventFunctionCallArgumentsDone": {
+        "type": "object",
+        "description": "The arguments of a function call are complete.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `response.function_call_arguments.done`."
+          },
+          "item_id": {
+            "type": "string",
+            "description": "ID of the output item the event belongs to."
+          },
+          "output_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Position of the item in the `output` of the response."
+          },
+          "arguments": {
+            "type": "string",
+            "description": "The complete function arguments as a JSON string. Present on `response.function_call_arguments.done`."
+          }
+        },
+        "required": [
+          "type",
+          "item_id",
+          "output_index",
+          "arguments"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventError": {
+        "type": "object",
+        "description": "An error that did not end the response.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `error`."
+          },
+          "code": {
+            "type": "string",
+            "description": "Machine-readable error code. Present on `error` events."
+          },
+          "message": {
+            "type": "string",
+            "description": "Readable error message. Present on `error` events."
+          },
+          "param": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Dotted path of the field the error is about, or null. Present on `error` events."
+          }
+        },
+        "required": [
+          "type",
+          "code",
+          "message"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPEventApproval": {
+        "type": "object",
+        "description": "BeeOS extension: an approval request or its resolution.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "One of `beeos.approval.requested`, `beeos.approval.resolved`."
+          },
+          "approval": {
+            "$ref": "#/components/schemas/JSONValue",
+            "description": "The approval document, passed through from the agent host."
+          }
+        },
+        "required": [
+          "type",
+          "approval"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPOutputItemMessage": {
+        "type": "object",
+        "description": "A message written by the agent.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `message`."
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of the output item."
+          },
+          "status": {
+            "type": "string",
+            "description": "Progress of the item.",
+            "x-enumDescriptions": {
+              "in_progress": "The item is still being produced.",
+              "completed": "The item is complete."
+            }
+          },
+          "role": {
+            "type": "string",
+            "description": "Who wrote a `message` item.",
+            "x-enumDescriptions": {
+              "assistant": "The agent."
+            }
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UHPContentPart"
+            },
+            "description": "Content parts of a `message` item."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPOutputItemReasoning": {
+        "type": "object",
+        "description": "The agent's reasoning.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `reasoning`."
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of the output item."
+          },
+          "status": {
+            "type": "string",
+            "description": "Progress of the item.",
+            "x-enumDescriptions": {
+              "in_progress": "The item is still being produced.",
+              "completed": "The item is complete."
+            }
+          },
+          "summary": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JSONValue"
+              }
+            },
+            "description": "Summary of a `reasoning` item."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPOutputItemFunctionCall": {
+        "type": "object",
+        "description": "A tool call made by the agent.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `function_call`."
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of the output item."
+          },
+          "status": {
+            "type": "string",
+            "description": "Progress of the item.",
+            "x-enumDescriptions": {
+              "in_progress": "The item is still being produced.",
+              "completed": "The item is complete."
+            }
+          },
+          "call_id": {
+            "type": "string",
+            "description": "ID of the function call. A `function_call_output` item refers to its call with the same `call_id`."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the function the agent called."
+          },
+          "arguments": {
+            "type": "string",
+            "description": "JSON, as a string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPOutputItemFunctionCallOutput": {
+        "type": "object",
+        "description": "The result of a tool call.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `function_call_output`."
+          },
+          "id": {
+            "type": "string",
+            "description": "ID of the output item."
+          },
+          "status": {
+            "type": "string",
+            "description": "Progress of the item.",
+            "x-enumDescriptions": {
+              "in_progress": "The item is still being produced.",
+              "completed": "The item is complete."
+            }
+          },
+          "call_id": {
+            "type": "string",
+            "description": "ID of the function call. A `function_call_output` item refers to its call with the same `call_id`."
+          },
+          "output": {
+            "type": "string",
+            "description": "Result of the function call, as text."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPContentPartOutputText": {
+        "type": "object",
+        "description": "Text of a `message` item.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `output_text`."
+          },
+          "text": {
+            "type": "string",
+            "description": "Text of the part."
+          },
+          "annotations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UHPAnnotation"
+            },
+            "description": "Annotations that refer to ranges of `text`."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
+      "UHPContentPartSummaryText": {
+        "type": "object",
+        "description": "Summary text of a `reasoning` item.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Always `summary_text`."
+          },
+          "text": {
+            "type": "string",
+            "description": "Text of the part."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      }
     }
   },
   "x-producer-repository": "beeos-ai/beeos-cloud-backend",
-  "x-producer-revision": "fc99d057112be3ae9393c54e7734e7fe7678231d"
+  "x-producer-revision": "9308a3143b32b45ed7606a4eecb1836db1ac549c"
 }

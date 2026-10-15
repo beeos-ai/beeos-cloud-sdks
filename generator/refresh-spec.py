@@ -390,27 +390,66 @@ for path in list(spec['paths']):
    operation['responses']['503']=uhp_error
  spec['paths'][path[len('/uhp/v1'):]]=ops
 # Descriptions come from the producer: the // comment above a Go struct field (docs), and
-# server-field-descriptions.json for what has no struct field to carry a comment. Existing
-# descriptions are never replaced, and a key that matches nothing fails instead of drifting.
-FIELD_DOCS=json.loads(read(B/'openapi/beeos-cloud/rest/server-field-descriptions.json'))
+# openapi/beeos-cloud/rest/field-descriptions/*.json (one file per SDK resource) for what has no
+# struct field to carry a comment. Existing descriptions are never replaced, and a key that
+# matches nothing fails instead of drifting. Enum values are written as x-enumDescriptions, never
+# as `enum`: that keeps every generated SDK type unchanged. The producer's guard test
+# (field_descriptions_test.go) ties each value set to the Go constants it is named after.
+FIELD_DOCS={'schemas':{},'parameters':{},'request_bodies':{},'variants':{}}
+for p in listdir(B/'openapi/beeos-cloud/rest/field-descriptions','.json'):
+ for section,values in json.loads(read(p)).items():
+  if section=='$comment':continue
+  if section not in FIELD_DOCS:raise SystemExit('unknown section in '+p.name+': '+section)
+  for key,value in values.items():
+   if key in FIELD_DOCS[section]:raise SystemExit('duplicate '+section+' key '+key+' in '+p.name)
+   FIELD_DOCS[section][key]=value
 # Server routes still return the producer Runtime structs behind these vendored App schemas.
 DOC_ALIAS={'InstancePage':'RuntimeInstancePage','InstanceSummary':'RuntimeInstanceSummary'}
-def describe(props,path,text,where):
+ENUM_KEYS=('x-enumDescriptions',)
+def describe(props,path,entry,where):
+ if path=='$self':raise SystemExit('internal: $self needs a schema '+where)
  *head,last=path.split('.')
  for part in head:
-  props=(props.get(part) or {}).get('properties')
+  node=props.get(part[:-2] if part.endswith('[]') else part) or {}
+  if part.endswith('[]'):node=node.get('items') or {}
+  props=node.get('properties')
   if props is None:raise SystemExit('field description names no property: '+where+' '+path)
  if last not in props:raise SystemExit('field description names no property: '+where+' '+path)
- if 'description' not in props[last]:props[last]={**props[last],'description':text}
+ props[last]=enriched(props[last],entry,where+' '+path)
+def enriched(target,entry,where):
+ if isinstance(entry,str):entry={'description':entry}
+ target={**target}
+ for key,value in entry.items():
+  if key in ('x-enumSource','same_as'):continue
+  if key!='description' and key not in ENUM_KEYS:raise SystemExit('unknown field description key '+key+': '+where)
+  if key not in target:target[key]=value
+ values=target.get('enum',target.get('const'))
+ if values is not None and 'x-enumDescriptions' in target and set(target['x-enumDescriptions'])!=set(values if isinstance(values,list) else [values]):
+  raise SystemExit('x-enumDescriptions do not match the schema enum: '+where)
+ return target
 # A commented field must exist in the schema built from its struct. The one allowed gap is an
 # aliased vendored App schema, which is a subset of the producer struct (see DOC_ALIAS).
 for name,schema in S.items():
  for key,text in docs.get(DOC_ALIAS.get(name,name),{}).items():
   if key in schema.get('properties',{}):describe(schema['properties'],key,text,name)
   elif name not in DOC_ALIAS:raise SystemExit('struct field comment names no property: '+name+' '+key)
-for name,notes in FIELD_DOCS['schemas'].items():
- if name not in S or 'properties' not in S[name]:raise SystemExit('field description names no schema: '+name)
- for path,text in notes.items():describe(S[name]['properties'],path,text,name)
+def schema_entries(entries,second):
+ for name,notes in entries.items():
+  if name not in S:raise SystemExit('field description names no schema: '+name)
+  for path,entry in notes.items():
+   if isinstance(entry,dict) and ('same_as' in entry)!=second:continue
+   if isinstance(entry,dict) and 'same_as' in entry:
+    other,_,other_path=entry['same_as'].partition('.')
+    *head,last=other_path.split('.');holder=S[other]
+    for part in head:holder=holder['properties'][part]
+    base=holder['properties'][last]
+    if 'description' not in base:raise SystemExit('same_as names an undescribed property: '+entry['same_as'])
+    entry={**{k:v for k,v in base.items() if k=='description' or k in ENUM_KEYS},**entry}
+   if path=='$self':S[name]=enriched(S[name],entry,name)
+   elif 'properties' in S[name]:describe(S[name]['properties'],path,entry,name)
+   else:raise SystemExit('field description names no property: '+name+' '+path)
+schema_entries(FIELD_DOCS['schemas'],False)
+schema_entries(FIELD_DOCS['schemas'],True)
 operations={o['operationId']:o for ops in spec['paths'].values() for o in ops.values()}
 def describe_parameters(o,notes):
  names={a['name'] for a in o['parameters']}
@@ -430,6 +469,52 @@ for opid,notes in FIELD_DOCS['request_bodies'].items():
  if opid not in operations:raise SystemExit('request body description names no operation: '+opid)
  schema=operations[opid]['requestBody']['content']['application/json']['schema']
  for path,text in notes.items():describe(schema.get('properties',{}),path,text,opid)
+# Discriminated shapes. Each variant becomes a named schema built from the parent's own
+# properties (a list of names) or from literal property schemas, and the discriminated node gets
+# x-variants: {property|sibling, mapping: {value: $ref}}. The mapping must cover exactly the
+# values the node documents unless the entry is marked partial. Variant schemas live under
+# components.x-variantSchemas, not components.schemas: the generators emit a public type for
+# every component schema, and documenting a shape must not add SDK types.
+VS=spec['components'].setdefault('x-variantSchemas',{})
+def variant_node(target):
+ name,_,path=target.partition('.')
+ if name not in S:raise SystemExit('variants name no schema: '+target)
+ node=S[name]
+ for part in filter(None,path.split('.')):
+  key=part[:-2] if part.endswith('[]') else part
+  node=(node.get('properties') or {}).get(key)
+  if node is None:raise SystemExit('variants name no property: '+target)
+  if part.endswith('[]'):
+   node=node.get('items')
+   if node is None:raise SystemExit('variants name no array items: '+target)
+ return node
+for target,v in FIELD_DOCS['variants'].items():
+ if 'same_as' in v:continue
+ node=variant_node(target)
+ selector='property' if 'property' in v else 'sibling'
+ mapping={}
+ for vname,vs in v['schemas'].items():
+  if vname in S or vname in VS:raise SystemExit('variant schema name collides with an existing schema: '+vname)
+  props={}
+  if selector=='property':props[v['property']]={'type':'string','description':('Always `'+vs['types'][0]+'`.') if len(vs['types'])==1 else 'One of '+', '.join('`'+t+'`' for t in vs['types'])+'.'}
+  listed=vs.get('properties',[])
+  if isinstance(listed,list):
+   for n in listed:
+    if n not in node.get('properties',{}):raise SystemExit('variant property is not on the parent: '+target+' '+vname+' '+n)
+    props[n]=node['properties'][n]
+  else:props.update({n:{k:v for k,v in literal.items() if k!='x-enumSource'} for n,literal in listed.items()})
+  required=([v['property']] if selector=='property' else [])+vs.get('required',[])
+  if not set(required)<=set(props):raise SystemExit('variant requires an undeclared property: '+vname)
+  VS[vname]={'type':'object','description':vs['description'],'properties':props,'required':required,'additionalProperties':True}
+  for t in vs['types']:
+   if t in mapping:raise SystemExit('variant value mapped twice: '+target+' '+t)
+   mapping[t]={'$ref':'#/components/x-variantSchemas/'+vname}
+ if selector=='property':
+  documented=set(node.get('properties',{}).get(v['property'],{}).get('x-enumDescriptions',{}))
+  if documented and not v.get('partial') and set(mapping)!=documented:raise SystemExit('variants do not cover the documented values of '+target+': '+', '.join(sorted(set(mapping)^documented)))
+ node['x-variants']={selector:v[selector],'mapping':mapping}
+for target,v in FIELD_DOCS['variants'].items():
+ if 'same_as' in v:variant_node(target)['x-variants']=copy.deepcopy(variant_node(v['same_as'])['x-variants'])
 # Retain only components transitively reachable from live public operations.
 needed={section:set() for section in spec['components']}
 needed['securitySchemes'].add('ServerAPIKey')
@@ -459,7 +544,7 @@ manifest={
  'producer':{'repository':'beeos-ai/beeos-cloud-backend','revision':PB[1],'read_method':'git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)'},
  'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':PV[1],'read_method':'git ls-tree / git show at <revision> for every input','directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'reference wire types for live Server operations; producer implementations override the public shapes'},
  'canvas':{'repository':'beeos-ai/beeos-cloud-canvas','revision':'55a9822c96958bb1b70b04751cef3c39e1abb6ce','files':['pkg/infrastructure/server/http/handler.go','pkg/domain/canvas.go','pkg/domain/share.go'],'role':'persisted Canvas public response projections forwarded verbatim by backend runtime_canvas_rest.go'},
- 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from openapi/beeos-cloud/rest/server-field-descriptions.json, and the script fails when a description key matches no schema, property, operation or parameter.'},
+ 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from the per-resource files in openapi/beeos-cloud/rest/field-descriptions/, and the script fails when a description key matches no schema, property, operation or parameter. Enum values are published as x-enumDescriptions (never as enum, so generated SDK types do not change); the producer test TestFieldDescriptionEnumsMatchGoConstants keeps each set equal to the Go constants it names.'},
  'version':'3.1.0',
  'activation':{'live':'Registered Server-key producer route; all non-live operations are excluded'},
  'input_sha256':dict(sorted(inputs.items()))}

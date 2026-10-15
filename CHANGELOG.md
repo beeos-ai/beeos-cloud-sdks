@@ -7,6 +7,11 @@
 - The Server API spec now carries field and parameter descriptions for the instances
   resource (and its types) in `src/models.ts`, taken from the producer's source
   comments. No API or behavior change.
+- Field, parameter and enum descriptions for the messages and responses resources.
+  Enum values and the shape of each `type` of an object are published in the spec as
+  `x-enumDescriptions` and `x-variants` (shapes under `components.x-variantSchemas`);
+  no `enum` is added, so no generated type changes. `generator/field-coverage.py`
+  reports what is still undocumented per resource.
 
 ## 3.1.0 (2026-10-14) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v3`
 
