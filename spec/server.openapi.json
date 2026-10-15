@@ -7758,7 +7758,7 @@
           "has_ever_run": {
             "type": "boolean",
             "x-go-type": "*bool",
-            "description": "Whether authoritative instance state history has ever reached running."
+            "description": "Whether the instance has ever reached the running state. False means it has never delivered a running service."
           },
           "id": {
             "type": "string",
@@ -7845,35 +7845,35 @@
           },
           "image_slot": {
             "type": "string",
-            "description": "Variant trait. Key into the Runtime execution image map. Not a container repository name."
+            "description": "Variant trait. Key that selects the execution image for the instance. Not a container repository name."
           },
           "worker_image_id": {
             "type": "string",
-            "description": "Variant trait. AgentBay Wuying worker image. Never the platform `image_id`."
+            "description": "Variant trait. AgentBay worker image. Never the platform `image_id`."
           },
           "model_catalog": {
             "type": "string",
-            "description": "Variant trait. `served` when Cloud answers models/list and session/set_reasoning, `none` when it answers neither."
+            "description": "Variant trait. `served` when Cloud answers model-list and reasoning-level requests, `none` when it answers neither. Empty and unknown values behave as `none`."
           },
           "billing_slot": {
             "type": "string",
-            "description": "Variant trait. Key into the monthly fee table."
+            "description": "Variant trait. Key into the monthly fee table that prices the instance."
           },
           "icon_key": {
             "type": "string",
-            "description": "Variant trait. UI icon selector. Replaces any `harness` + `os_type` branch on the client."
+            "description": "Variant trait. UI icon selector. Clients must not derive it from `harness`."
           },
           "device_control": {
             "type": "boolean",
-            "description": "Variant trait. Whether the instance accepts device control commands."
+            "description": "Variant trait. Whether the instance accepts device-control commands. False means those commands are rejected."
           },
           "runtime_profile": {
             "type": "string",
-            "description": "Variant trait. cluster-proxy pod contract, or empty."
+            "description": "Variant trait. Profile of the agent runtime the instance uses. Known values are `openclaw`, `hermes` and `beeos-browser`."
           },
           "free_plan": {
             "type": "boolean",
-            "description": "Variant trait. Whether the free tier may run this variant."
+            "description": "Variant trait. Whether the free plan allows the instance's variant. False means the free plan does not allow it."
           },
           "cloud_provider": {
             "type": "string",
@@ -10570,7 +10570,9 @@
               "response.failed": "The response failed or was cancelled; `response.status` is `failed` or `cancelled`. This is a terminal event.",
               "error": "An error that did not end the response. `code`, `message` and `param` describe it, and a terminal event still follows.",
               "beeos.approval.requested": "BeeOS extension. The agent asks for approval of an action. The `approval` property holds the approval request document.",
-              "beeos.approval.resolved": "BeeOS extension. An approval request was resolved. The `approval` property holds the resolution document."
+              "beeos.approval.resolved": "BeeOS extension. An approval request was resolved. The `approval` property holds the resolution document.",
+              "beeos.question.requested": "BeeOS extension. The agent asks the user a question. The `question` property holds the question request document.",
+              "beeos.question.resolved": "BeeOS extension. A question request was resolved. The `question` property holds the resolution document."
             }
           },
           "sequence_number": {
@@ -10711,6 +10713,12 @@
             },
             "beeos.approval.resolved": {
               "$ref": "#/components/x-variantSchemas/UHPEventApproval"
+            },
+            "beeos.question.requested": {
+              "$ref": "#/components/x-variantSchemas/UHPEventQuestion"
+            },
+            "beeos.question.resolved": {
+              "$ref": "#/components/x-variantSchemas/UHPEventQuestion"
             }
           }
         }
@@ -14668,6 +14676,27 @@
           "$ref": "#/components/schemas/JSONValue"
         }
       },
+      "UHPEventQuestion": {
+        "type": "object",
+        "description": "BeeOS extension: a question request or its resolution.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "One of `beeos.question.requested`, `beeos.question.resolved`."
+          },
+          "question": {
+            "$ref": "#/components/schemas/JSONValue",
+            "description": "The question document, passed through from the agent host."
+          }
+        },
+        "required": [
+          "type",
+          "question"
+        ],
+        "additionalProperties": {
+          "$ref": "#/components/schemas/JSONValue"
+        }
+      },
       "UHPOutputItemMessage": {
         "type": "object",
         "description": "A message written by the agent.",
@@ -14874,5 +14903,5 @@
     }
   },
   "x-producer-repository": "beeos-ai/beeos-cloud-backend",
-  "x-producer-revision": "677cbb0f1ee9b4dd2ad19c2a658b716978f99a5b"
+  "x-producer-revision": "b9dfe76a9f2a2c8523b63a1a817661840efb63d0"
 }

@@ -1568,7 +1568,7 @@ export interface components {
             total: number;
         };
         InstanceSummary: {
-            /** @description Whether authoritative instance state history has ever reached running. */
+            /** @description Whether the instance has ever reached the running state. False means it has never delivered a running service. */
             has_ever_run: boolean;
             /** @description Unique ID of the instance. */
             id: string;
@@ -1605,21 +1605,21 @@ export interface components {
              * @description Version of the instance record, starting at 1. Send it in the `If-Match` header of write requests so concurrent changes are detected.
              */
             resource_version: number;
-            /** @description Variant trait. Key into the Runtime execution image map. Not a container repository name. */
+            /** @description Variant trait. Key that selects the execution image for the instance. Not a container repository name. */
             image_slot?: string;
-            /** @description Variant trait. AgentBay Wuying worker image. Never the platform `image_id`. */
+            /** @description Variant trait. AgentBay worker image. Never the platform `image_id`. */
             worker_image_id?: string;
-            /** @description Variant trait. `served` when Cloud answers models/list and session/set_reasoning, `none` when it answers neither. */
+            /** @description Variant trait. `served` when Cloud answers model-list and reasoning-level requests, `none` when it answers neither. Empty and unknown values behave as `none`. */
             model_catalog?: string;
-            /** @description Variant trait. Key into the monthly fee table. */
+            /** @description Variant trait. Key into the monthly fee table that prices the instance. */
             billing_slot?: string;
-            /** @description Variant trait. UI icon selector. Replaces any `harness` + `os_type` branch on the client. */
+            /** @description Variant trait. UI icon selector. Clients must not derive it from `harness`. */
             icon_key?: string;
-            /** @description Variant trait. Whether the instance accepts device control commands. */
+            /** @description Variant trait. Whether the instance accepts device-control commands. False means those commands are rejected. */
             device_control?: boolean;
-            /** @description Variant trait. cluster-proxy pod contract, or empty. */
+            /** @description Variant trait. Profile of the agent runtime the instance uses. Known values are `openclaw`, `hermes` and `beeos-browser`. */
             runtime_profile?: string;
-            /** @description Variant trait. Whether the free tier may run this variant. */
+            /** @description Variant trait. Whether the free plan allows the instance's variant. False means the free plan does not allow it. */
             free_plan?: boolean;
             /** @description `agentbay`, `beeos`, or empty when self-hosted. */
             cloud_provider?: string;
