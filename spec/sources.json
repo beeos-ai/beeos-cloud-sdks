@@ -2,7 +2,7 @@
   "spec": "server.openapi.json",
   "producer": {
     "repository": "beeos-ai/beeos-cloud-backend",
-    "revision": "fc99d057112be3ae9393c54e7734e7fe7678231d",
+    "revision": "aac68ae5b95efc4566cbe79037c8916398ac714a",
     "read_method": "git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)"
   },
   "app_sdk": {
@@ -25,7 +25,7 @@
   "refresh": {
     "command": "python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>",
     "dependency": "PyYAML==6.0.3",
-    "procedure": "Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from openapi/beeos-cloud/rest/server-field-descriptions.json, and the script fails when a description key matches no schema, property, operation or parameter."
+    "procedure": "Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from the per-resource files in openapi/beeos-cloud/rest/field-descriptions/, and the script fails when a description key matches no schema, property, operation or parameter. Enum values are published as x-enumDescriptions (never as enum, so generated SDK types do not change); the producer test TestFieldDescriptionEnumsMatchGoConstants keeps each set equal to the Go constants it names."
   },
   "version": "3.1.0",
   "activation": {
@@ -53,7 +53,9 @@
     "app-sdk/t06-server.openapi.json": "091830c93719b68536588a06a593bfe522751c1cc23966b93fd634a39626ae7a",
     "app-sdk/t07-server.openapi.json": "81df0669ece1c8de1eda3a5f58001b6d3d1a3a12b3c531dace88632bced30de3",
     "producer/openapi/beeos-cloud/fragments/C01/server.openapi.json": "fbf5213c919620cbf7938a7ddcecf49a2129d2506131a64d89934698089881c8",
-    "producer/openapi/beeos-cloud/rest/server-field-descriptions.json": "e95d8e99f801a585781fe5a94aa0c4bdd7c447109bb35192698e6e32ebd5e3bc",
+    "producer/openapi/beeos-cloud/rest/field-descriptions/instances.json": "e95d8e99f801a585781fe5a94aa0c4bdd7c447109bb35192698e6e32ebd5e3bc",
+    "producer/openapi/beeos-cloud/rest/field-descriptions/messages.json": "70eba54f110670ae58b5365c3e75231af304661ac03fccfc4613ff21cb2ff70f",
+    "producer/openapi/beeos-cloud/rest/field-descriptions/responses.json": "dc95904c48098d9edc779247b306945e6faa38feccc227aab97f566f5f46c475",
     "producer/openapi/beeos-cloud/rest/server-openapi.yaml": "fec9ca025a9c495274c5b23e6f470dcc8056b9e4bdbd95864d4e0811ecda55c9",
     "producer/openapi/beeos-cloud/rest/server-operation-summaries.json": "707428d7a6d24d08c7942c86787a9d5ae735eb5a5f85b0eaabfd2a8a3ed1a5ca",
     "producer/openapi/beeos-cloud/schemas/error.schema.json": "69a345d762826379d2d470a71f6aecf4448a1a16073a5ac3e50cea21e95d3ba0",

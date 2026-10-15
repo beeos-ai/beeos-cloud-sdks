@@ -1690,62 +1690,117 @@ export interface components {
             has_more: boolean;
         };
         Message: {
+            /** @description ID of the message. */
             id: string;
+            /** @description ID of the conversation the message belongs to. */
             conversation_id: string;
+            /** @description Kind of the message. Use it to tell the caller's prompts from the agent's replies and other messages. New kinds can be added, so ignore values you do not know. */
             type: string;
+            /** @description Payload of the message as JSON. Its structure depends on `type`; see the variants listed for this field. For current agent replies read `body` and `parts` instead. The server removes the `metadata` and `from` keys before returning it. */
             content: JSONValue;
+            /** @description Identity that sent the message. A message sent by the end user named in the `X-BeeOS-External-User-ID` header is shown as `user:<external user ID>`. Other senders appear as their own identity ID. */
             sender: string;
+            /** @description ID of the message this message replies to, for example the `chat_message` an `agent_reply` answers. Omitted for messages that are not replies. */
             reply_to?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Time the message was created, in RFC 3339 format.
+             */
             created_at: string;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description Position of the message in the conversation history. Newer messages have larger offsets.
+             */
             offset: number;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description Generation of the conversation history the message belongs to.
+             */
             history_generation: number;
+            /** @description Lifecycle state of the message. A message starts as `streaming` and moves exactly once to one of the final states; a final message never changes again. Messages stored before states existed have an empty state and are final. */
             state?: string;
+            /** @description Why the message reached a final state. Present only on final messages and can be empty when the reason is unknown. */
             stop_reason?: string;
+            /** @description Text of the message. For a reply that is still `streaming` it is the text produced so far. */
             body?: string;
+            /** @description Structured parts of the message in order, such as reasoning, tool calls, files and sources. Each part has a `type`; see the variants listed for the items of this field. */
             parts?: {
                 [key: string]: JSONValue;
             }[];
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Time the message was last changed, in RFC 3339 format. Omitted when the message was never updated.
+             */
             updated_at?: string;
+            /** @description Result of handing the message to the agent runtime, as an object with `status` and `code`. Omitted when no result is recorded. */
             runtime_dispatch?: {
                 [key: string]: JSONValue;
             };
-            /** @enum {string} */
+            /**
+             * @description Reserved. The Server API does not currently return this field.
+             * @enum {string}
+             */
             realtime_publish_status?: "published" | "unconfirmed" | "not_republished";
         };
         MessagePage: {
+            /** @description Messages on this page. */
             messages: components["schemas"]["Message"][];
+            /** @description Cursor to pass as `cursor` to get the next page. Empty when `has_more` is false. */
             next_cursor?: string;
+            /** @description Whether more messages are available after this page. */
             has_more: boolean;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description Upper bound of the offsets scanned for this page. It is not the history boundary; use `history_boundary_offset` for that.
+             */
             latest_offset: number;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description Generation of the conversation history this page was read from.
+             */
             history_generation: number;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description Offset of the history boundary for the current generation: the point a clear or recovery of the history moved the start of the history to.
+             */
             history_boundary_offset: number;
         };
         MessageEnvelope: {
+            /** @description ID of the message. */
             id: string;
+            /** @description ID of the conversation the message belongs to. */
             conversation_id: string;
+            /** @description Kind of the message. Use it to tell the caller's prompts from the agent's replies and other messages. New kinds can be added, so ignore values you do not know. */
             type: string;
+            /** @description Identity that sent the message. A message sent by the end user named in the `X-BeeOS-External-User-ID` header is shown as `user:<external user ID>`. Other senders appear as their own identity ID. */
             sender: string;
+            /** @description ID of the message this message replies to, for example the `chat_message` an `agent_reply` answers. Omitted for messages that are not replies. */
             reply_to?: string;
+            /** @description Text of the message. For a reply that is still `streaming` it is the text produced so far. */
             body: string;
+            /** @description Structured parts of the message in order, such as reasoning, tool calls, files and sources. Each part has a `type`; see the variants listed for the items of this field. */
             parts?: {
                 [key: string]: JSONValue;
             }[];
+            /** @description Lifecycle state of the message. A message starts as `streaming` and moves exactly once to one of the final states; a final message never changes again. Messages stored before states existed have an empty state and are final. */
             state: string;
+            /** @description Why the message reached a final state. Present only on final messages and can be empty when the reason is unknown. */
             stop_reason?: string;
+            /** @description Reserved. The Server API does not currently return this field; read `body` and `parts`. */
             content?: JSONValue;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Time the message was created, in RFC 3339 format.
+             */
             created_at?: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Time the message was last changed, in RFC 3339 format. Omitted when the message was never updated.
+             */
             updated_at?: string;
         };
         MessageEnvelopeResponse: {
+            /** @description The message. */
             data: components["schemas"]["MessageEnvelope"];
         };
         UpdateConversationInput: {
@@ -2194,12 +2249,21 @@ export interface components {
             } & {
                 [key: string]: JSONValue;
             };
-            /** @default false */
+            /**
+             * @description When true the response is streamed as server-sent events; see `UHPEvent`. Otherwise the call returns the finished response. Defaults to false.
+             * @default false
+             */
             stream?: boolean;
+            /** @description ID of an earlier response to continue. The new response runs in the same session. The earlier response must exist and belong to the same harness. */
             previous_response_id?: string | null;
+            /** @description Instructions placed before the input text and separated from it by a line containing `---`. */
             instructions?: string;
-            /** @default true */
+            /**
+             * @description Whether to keep the response so it can be fetched later. Defaults to true.
+             * @default true
+             */
             store?: boolean;
+            /** @description Reserved and ignored. It is reported in `metadata.ignored_fields` of the response. */
             max_output_tokens?: number | null;
             /** @description Agent step (tool-call round) budget */
             max_step?: number | null;
@@ -2221,34 +2285,48 @@ export interface components {
              *     server recognised would be one it named itself. Tasks §1.4.
              */
             include?: string[];
-            /** @default false */
+            /**
+             * @description When true on a request that is not streamed, the call returns at once with the response still `in_progress`; fetch the result later. Ignored when `stream` is true.
+             * @default false
+             */
             background?: boolean;
         } & {
             [key: string]: JSONValue;
         };
         UHPResponse: {
+            /** @description ID of the response. It starts with `resp_`. */
             id: string;
-            /** @enum {string} */
+            /**
+             * @description Object type.
+             * @enum {string}
+             */
             object: "response";
             /** @description Unix seconds */
             created_at: number;
+            /** @description Status of the response. See `UHPResponseStatus` for the values. */
             status: components["schemas"]["UHPResponseStatus"];
             /** @description Non-null only when status is `failed`. */
             error?: null | components["schemas"]["UHPError"];
+            /** @description Why the response is incomplete. When `status` is `incomplete` it holds `reason`: `max_tokens` or `timeout`. Otherwise null. */
             incomplete_details?: {
                 [key: string]: JSONValue;
             } | null;
+            /** @description ID of the response this one continues, when the request set `previous_response_id`. */
             previous_response_id?: string | null;
             /** @description The model that actually ran. */
             model: string;
+            /** @description Output items produced so far, in order. */
             output: components["schemas"]["UHPOutputItem"][];
+            /** @description Whether the response is kept so it can be fetched later. */
             store?: boolean;
             /**
              * @description null when the server cannot account for usage. A fabricated zero would be worse than an
              *     honest absence, because a client cannot tell it from a free task.
              */
             usage?: null | components["schemas"]["UHPUsage"];
+            /** @description Extra information about the run. */
             metadata?: {
+                /** @description ID of the session the response ran in. Responses chained with `previous_response_id` share it. */
                 session_id?: string;
                 /** @description The environment the task read, when it read one (capability `environments`). */
                 environment?: string;
@@ -2281,59 +2359,90 @@ export interface components {
          *     items and ignores the rest is a valid client.
          */
         UHPOutputItem: {
+            /** @description ID of the output item. */
             id?: string;
             /**
+             * @description Kind of the output item. Clients should ignore item types they do not know.
              * @example message
              * @example reasoning
              * @example function_call
              * @example function_call_output
              */
             type: string;
+            /** @description Progress of the item. */
             status?: string;
+            /** @description Who wrote a `message` item. */
             role?: string;
+            /** @description Content parts of a `message` item. */
             content?: components["schemas"]["UHPContentPart"][];
+            /** @description Summary of a `reasoning` item. */
             summary?: {
                 [key: string]: JSONValue;
             }[];
+            /** @description ID of the function call. A `function_call_output` item refers to its call with the same `call_id`. */
             call_id?: string;
+            /** @description Name of the function the agent called. */
             name?: string;
             /** @description JSON, as a string */
             arguments?: string;
+            /** @description Result of the function call, as text. */
             output?: string;
         } & {
             [key: string]: JSONValue;
         };
         UHPContentPart: {
-            /** @example output_text */
+            /**
+             * @description Kind of the part.
+             * @example output_text
+             */
             type: string;
+            /** @description Text of the part. */
             text?: string;
+            /** @description Annotations that refer to ranges of `text`. */
             annotations?: components["schemas"]["UHPAnnotation"][];
         } & {
             [key: string]: JSONValue;
         };
         UHPAnnotation: {
-            /** @enum {string} */
+            /**
+             * @description Kind of the annotation.
+             * @enum {string}
+             */
             type: "container_file_citation";
+            /** @description ID of the container that holds the file. BeeOS does not currently set it. */
             container_id?: string;
+            /** @description ID of the file. BeeOS does not currently set it. */
             file_id?: string;
+            /** @description Name of the file. */
             filename?: string;
-            /** Format: uri */
+            /**
+             * Format: uri
+             * @description Absolute URL the file can be downloaded from.
+             */
             download_url?: string;
+            /** @description Start of the cited range in the text, counted in characters. BeeOS sets it to 0. */
             start_index?: number;
+            /** @description End of the cited range in the text, counted in characters. BeeOS sets it to the length of the text. */
             end_index?: number;
         } & {
             [key: string]: JSONValue;
         };
         UHPUsage: {
+            /** @description Number of input tokens. */
             input_tokens?: number;
+            /** @description Number of output tokens. */
             output_tokens?: number;
+            /** @description Total number of tokens used. */
             total_tokens?: number;
+            /** @description Input tokens read from the cache. */
             cache_read_tokens?: number;
+            /** @description Input tokens written to the cache. */
             cache_write_tokens?: number;
         } & {
             [key: string]: JSONValue;
         };
         UHPErrorEnvelope: {
+            /** @description The error. */
             error: components["schemas"]["UHPError"];
             /**
              * @deprecated
@@ -2345,7 +2454,10 @@ export interface components {
             [key: string]: JSONValue;
         };
         UHPError: {
-            /** @enum {string} */
+            /**
+             * @description Category of the error. It follows from the HTTP status.
+             * @enum {string}
+             */
             type: "invalid_request_error" | "authentication_error" | "permission_error" | "rate_limit_error" | "harness_error" | "server_error";
             /**
              * @description Specific and machine-readable. Servers may define additional codes for conditions this
@@ -2395,6 +2507,7 @@ export interface components {
             message: string;
             /** @description Dotted path to the offending field. */
             param?: string | null;
+            /** @description Additional structured detail about the error, when available. */
             detail?: {
                 [key: string]: JSONValue;
             } | null;
@@ -2407,6 +2520,7 @@ export interface components {
          */
         UHPEvent: {
             /**
+             * @description Kind of the event. Clients should ignore event types they do not know. Exactly one of `response.completed`, `response.incomplete` and `response.failed` ends a stream.
              * @example response.created
              * @example response.in_progress
              * @example response.output_item.added
@@ -2427,21 +2541,37 @@ export interface components {
              * @example error
              */
             type: string;
+            /** @description Position of the event in the stream, starting at 0 and increasing by 1 per event. A gap means an event was lost. */
             sequence_number: number;
+            /** @description Snapshot of the response. Present on lifecycle events. */
             response?: components["schemas"]["UHPResponse"];
+            /** @description The output item. Present on `response.output_item.added` and `response.output_item.done`. */
             item?: components["schemas"]["UHPOutputItem"];
+            /** @description The content or summary part. Present on content part and reasoning summary part events. */
             part?: components["schemas"]["UHPContentPart"];
+            /** @description The annotation. Present on `response.output_text.annotation.added`. */
             annotation?: components["schemas"]["UHPAnnotation"];
+            /** @description New text, or new function arguments, since the previous delta. */
             delta?: string;
+            /** @description The complete text. Present on `response.output_text.done`. */
             text?: string;
+            /** @description The complete function arguments as a JSON string. Present on `response.function_call_arguments.done`. */
             arguments?: string;
+            /** @description ID of the output item the event belongs to. */
             item_id?: string;
+            /** @description Position of the item in the `output` of the response. */
             output_index?: number;
+            /** @description Index of the content part within the item. */
             content_index?: number;
+            /** @description Index of the summary part within the item. */
             summary_index?: number;
+            /** @description Index of the annotation within the content part. */
             annotation_index?: number;
+            /** @description Machine-readable error code. Present on `error` events. */
             code?: string;
+            /** @description Readable error message. Present on `error` events. */
             message?: string;
+            /** @description Dotted path of the field the error is about, or null. Present on `error` events. */
             param?: string | null;
         } & {
             [key: string]: null | boolean | number | string | JSONValue[] | {
@@ -2900,25 +3030,41 @@ export interface components {
             revoked: boolean;
         };
         ReplyShareResponse: {
+            /** @description The shared reply. */
             data: {
+                /** @description Public slug that identifies the share. */
                 slug: string;
+                /** @description Time the share was created. */
                 created_at: string;
+                /** @description The agent that wrote the reply. */
                 agent: {
+                    /** @description Display name of the agent. */
                     name: string;
+                    /** @description URL of the agent's avatar. */
                     avatar_url: string;
+                    /** @description Agent framework of the instance the agent runs on. */
                     framework: string;
                 };
+                /** @description The shared reply. */
                 reply: {
+                    /** @description Content of the reply. It holds one part of type `text`. */
                     parts: {
+                        /** @description Always `text`. */
                         type: string;
+                        /** @description Text of the reply. */
                         text: string;
                     }[];
+                    /** @description Time the reply message was created. */
                     created_at: string;
                 };
+                /** @description Web sources the reply cites. Only `https` sources are listed. */
                 sources: {
+                    /** @description URL of the source. */
                     url?: string;
+                    /** @description Title of the source, when the agent provided one. */
                     title?: string;
                 }[];
+                /** @description Files the reply links to. Only files published by BeeOS are listed. */
                 files: {
                     file_id?: string;
                     filename?: string;
@@ -3250,10 +3396,16 @@ export interface components {
             };
             /** @constant */
             stream?: false;
+            /** @description ID of an earlier response to continue. The new response runs in the same session. The earlier response must exist and belong to the same harness. */
             previous_response_id?: string | null;
+            /** @description Instructions placed before the input text and separated from it by a line containing `---`. */
             instructions?: string;
-            /** @default true */
+            /**
+             * @description Whether to keep the response so it can be fetched later. Defaults to true.
+             * @default true
+             */
             store?: boolean;
+            /** @description Reserved and ignored. It is reported in `metadata.ignored_fields` of the response. */
             max_output_tokens?: number | null;
             /** @description Agent step (tool-call round) budget */
             max_step?: number | null;
@@ -3275,7 +3427,10 @@ export interface components {
              *     server recognised would be one it named itself. Tasks §1.4.
              */
             include?: string[];
-            /** @default false */
+            /**
+             * @description When true on a request that is not streamed, the call returns at once with the response still `in_progress`; fetch the result later. Ignored when `stream` is true.
+             * @default false
+             */
             background?: boolean;
         } & {
             [key: string]: JSONValue;
@@ -3301,10 +3456,16 @@ export interface components {
             };
             /** @constant */
             stream?: true;
+            /** @description ID of an earlier response to continue. The new response runs in the same session. The earlier response must exist and belong to the same harness. */
             previous_response_id?: string | null;
+            /** @description Instructions placed before the input text and separated from it by a line containing `---`. */
             instructions?: string;
-            /** @default true */
+            /**
+             * @description Whether to keep the response so it can be fetched later. Defaults to true.
+             * @default true
+             */
             store?: boolean;
+            /** @description Reserved and ignored. It is reported in `metadata.ignored_fields` of the response. */
             max_output_tokens?: number | null;
             /** @description Agent step (tool-call round) budget */
             max_step?: number | null;
@@ -3326,7 +3487,10 @@ export interface components {
              *     server recognised would be one it named itself. Tasks §1.4.
              */
             include?: string[];
-            /** @default false */
+            /**
+             * @description When true on a request that is not streamed, the call returns at once with the response still `in_progress`; fetch the result later. Ignored when `stream` is true.
+             * @default false
+             */
             background?: boolean;
         } & {
             [key: string]: JSONValue;
@@ -4511,14 +4675,19 @@ export interface operations {
     listConversationMessages: {
         parameters: {
             query?: {
+                /** @description Cursor from `next_cursor` of the previous page. Omit it to get the first page. At most 4096 characters. */
                 cursor?: string;
+                /** @description Maximum number of messages to return in one page. Defaults to 50. */
                 limit?: number;
             };
             header: {
+                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
                 "X-BeeOS-External-User-ID": string;
             };
             path: {
+                /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
+                /** @description ID of the conversation, as returned when it was created or listed. */
                 conversationId: string;
             };
             cookie?: never;
@@ -4549,11 +4718,15 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
                 "X-BeeOS-External-User-ID": string;
             };
             path: {
+                /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
+                /** @description ID of the conversation, as returned when it was created or listed. */
                 conversationId: string;
+                /** @description ID of the message. */
                 messageId: string;
             };
             cookie?: never;
@@ -5353,8 +5526,11 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
+                /** @description ID of the conversation, as returned when it was created or listed. */
                 conversationId: string;
+                /** @description ID of the message. */
                 messageId: string;
             };
             cookie?: never;
@@ -5391,8 +5567,11 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
+                /** @description ID of the conversation, as returned when it was created or listed. */
                 conversationId: string;
+                /** @description ID of the message. */
                 messageId: string;
             };
             cookie?: never;
@@ -5429,8 +5608,11 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
+                /** @description ID of the conversation, as returned when it was created or listed. */
                 conversationId: string;
+                /** @description ID of the message. */
                 messageId: string;
             };
             cookie?: never;
@@ -5460,6 +5642,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Public slug of the shared reply, the `data.slug` returned when the share was created. */
                 slug: string;
             };
             cookie?: never;
@@ -7122,6 +7305,7 @@ export interface operations {
             header?: {
                 /** @description Repeating a key returns the first request's result and does not re-execute. */
                 "Idempotency-Key"?: string;
+                /** @description Protocol version to use: `2026-10-04` (the default), `2026-09-28`, `2026-09-12` or `2026-08-11`. The version served is echoed in the same header of the response. An unsupported version is rejected with `unsupported_protocol_version`. */
                 "UHP-Version"?: string;
             };
             path?: never;
@@ -7183,6 +7367,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the response. It starts with `resp_`. */
                 response_id: string;
             };
             cookie?: never;
@@ -7215,6 +7400,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the response. It starts with `resp_`. */
                 response_id: string;
             };
             cookie?: never;
@@ -7250,6 +7436,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the response. It starts with `resp_`. */
                 response_id: string;
             };
             cookie?: never;
@@ -7288,6 +7475,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the response. It starts with `resp_`. */
                 response_id: string;
             };
             cookie?: never;
@@ -7319,10 +7507,13 @@ export interface operations {
         parameters: {
             query?: never;
             header?: {
+                /** @description Sequence number of the last event the client received. The stream resumes after it. Must be a non-negative integer. */
                 "Last-Event-ID"?: string;
+                /** @description Protocol version to use: `2026-10-04` (the default), `2026-09-28`, `2026-09-12` or `2026-08-11`. The version served is echoed in the same header of the response. An unsupported version is rejected with `unsupported_protocol_version`. */
                 "UHP-Version"?: string;
             };
             path: {
+                /** @description ID of the response. It starts with `resp_`. */
                 response_id: string;
             };
             cookie?: never;
