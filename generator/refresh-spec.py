@@ -65,7 +65,7 @@ def merge(p,prefix='',paths=True):
     spec['paths'][path][m]['x-sdk-provenance']=str(p.relative_to(B)) if p.is_relative_to(B) else 'App vendored/'+p.name
 merge(B/'openapi/beeos-cloud/rest/server-openapi.yaml')
 merge(B/'openapi/beeos-cloud/fragments/C01/server.openapi.json')
-merge(V/'t06-server.openapi.json');merge(V/'t07-server.openapi.json');merge(B/'openapi/beeos-cloud/t04/server-openapi.json')
+merge(V/'t06-server.openapi.json');merge(V/'t07-server.openapi.json');VENDORED={n for f in ('t06-server.openapi.json','t07-server.openapi.json') for n in load(V/f).get('components',{}).get('schemas',{})};merge(B/'openapi/beeos-cloud/t04/server-openapi.json')
 # Shared user API schemas are only used where producer server forwards the same wire contract.
 p=B/'openapi/beeos-platform-v1.yaml';d=load(p)
 for n,v in d['components']['schemas'].items():S.setdefault(n,resolve(v,p))
@@ -391,7 +391,7 @@ for path in list(spec['paths']):
  spec['paths'][path[len('/uhp/v1'):]]=ops
 # Descriptions come from the producer: the // comment above a Go struct field (docs), and
 # openapi/beeos-cloud/rest/field-descriptions/*.json (one file per SDK resource) for what has no
-# struct field to carry a comment. Existing descriptions are never replaced, and a key that
+# struct field to carry a comment. A description already on the schema is kept, except on a schema vendored from the App SDK (VENDORED, or its DOC_ALIAS struct): there the producer text wins, because the App copy is older than the server. A key that
 # matches nothing fails instead of drifting. Enum values are written as x-enumDescriptions, never
 # as `enum`: that keeps every generated SDK type unchanged. The producer's guard test
 # (field_descriptions_test.go) ties each value set to the Go constants it is named after.
@@ -406,7 +406,7 @@ for p in listdir(B/'openapi/beeos-cloud/rest/field-descriptions','.json'):
 # Server routes still return the producer Runtime structs behind these vendored App schemas.
 DOC_ALIAS={'InstancePage':'RuntimeInstancePage','InstanceSummary':'RuntimeInstanceSummary'}
 ENUM_KEYS=('x-enumDescriptions',)
-def describe(props,path,entry,where):
+def describe(props,path,entry,where,replace=False):
  if path=='$self':raise SystemExit('internal: $self needs a schema '+where)
  *head,last=path.split('.')
  for part in head:
@@ -415,14 +415,14 @@ def describe(props,path,entry,where):
   props=node.get('properties')
   if props is None:raise SystemExit('field description names no property: '+where+' '+path)
  if last not in props:raise SystemExit('field description names no property: '+where+' '+path)
- props[last]=enriched(props[last],entry,where+' '+path)
-def enriched(target,entry,where):
+ props[last]=enriched(props[last],entry,where+' '+path,replace)
+def enriched(target,entry,where,replace=False):
  if isinstance(entry,str):entry={'description':entry}
  target={**target}
  for key,value in entry.items():
   if key in ('x-enumSource','same_as'):continue
   if key!='description' and key not in ENUM_KEYS:raise SystemExit('unknown field description key '+key+': '+where)
-  if key not in target:target[key]=value
+  if key not in target or (replace and key=='description'):target[key]=value
  values=target.get('enum',target.get('const'))
  if values is not None and 'x-enumDescriptions' in target and set(target['x-enumDescriptions'])!=set(values if isinstance(values,list) else [values]):
   raise SystemExit('x-enumDescriptions do not match the schema enum: '+where)
@@ -431,7 +431,7 @@ def enriched(target,entry,where):
 # aliased vendored App schema, which is a subset of the producer struct (see DOC_ALIAS).
 for name,schema in S.items():
  for key,text in docs.get(DOC_ALIAS.get(name,name),{}).items():
-  if key in schema.get('properties',{}):describe(schema['properties'],key,text,name)
+  if key in schema.get('properties',{}):describe(schema['properties'],key,text,name,name in DOC_ALIAS)
   elif name not in DOC_ALIAS:raise SystemExit('struct field comment names no property: '+name+' '+key)
 def schema_entries(entries,second):
  for name,notes in entries.items():
@@ -445,8 +445,8 @@ def schema_entries(entries,second):
     base=holder['properties'][last]
     if 'description' not in base:raise SystemExit('same_as names an undescribed property: '+entry['same_as'])
     entry={**{k:v for k,v in base.items() if k=='description' or k in ENUM_KEYS},**entry}
-   if path=='$self':S[name]=enriched(S[name],entry,name)
-   elif 'properties' in S[name]:describe(S[name]['properties'],path,entry,name)
+   if path=='$self':S[name]=enriched(S[name],entry,name,name in VENDORED)
+   elif 'properties' in S[name]:describe(S[name]['properties'],path,entry,name,name in VENDORED)
    else:raise SystemExit('field description names no property: '+name+' '+path)
 schema_entries(FIELD_DOCS['schemas'],False)
 schema_entries(FIELD_DOCS['schemas'],True)
@@ -554,7 +554,7 @@ manifest={
  'producer':{'repository':'beeos-ai/beeos-cloud-backend','revision':PB[1],'read_method':'git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)'},
  'app_sdk':{'repository':'beeos-ai/beeos-app-backend','revision':PV[1],'read_method':'git ls-tree / git show at <revision> for every input','directory':'services/beeos-app-service/third_party/beeos-cloud-sdk-go','role':'reference wire types for live Server operations; producer implementations override the public shapes'},
  'canvas':{'repository':'beeos-ai/beeos-cloud-canvas','revision':'55a9822c96958bb1b70b04751cef3c39e1abb6ce','files':['pkg/infrastructure/server/http/handler.go','pkg/domain/canvas.go','pkg/domain/share.go'],'role':'persisted Canvas public response projections forwarded verbatim by backend runtime_canvas_rest.go'},
- 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from the per-resource files in openapi/beeos-cloud/rest/field-descriptions/ (schemas, parameters, request_bodies, responses for inline response bodies), and the script fails when a description key matches no schema, property, operation or parameter. Enum values are published as x-enumDescriptions (never as enum, so generated SDK types do not change); the producer test TestFieldDescriptionEnumsMatchGoConstants keeps each set equal to the Go constants it names.'},
+ 'refresh':{'command':'python3 generator/refresh-spec.py --producer-root /path/to/beeos-cloud-backend --producer-ref <producer-commit> --app-sdk-root /path/to/beeos-app-backend/services/beeos-app-service/third_party/beeos-cloud-sdk-go --app-sdk-ref <app-backend-commit>','dependency':'PyYAML==6.0.3','procedure':'Fetch the producer and app-backend remotes and choose the reviewed commits (merged main); pass them as --producer-ref and --app-sdk-ref. Every input is listed and read with git at those refs, never from the working trees, and the resolved full SHAs are recorded here. Review changes in public route registrations and schema producers; the script fails on a live operation without a resource mapping or without a summary (openapi/beeos-cloud/rest/server-operation-summaries.json), so extend the mapping and the summaries file instead of defaulting. Refresh; npm run generate; run all language strict checks and tests; re-check the hand-written harness behaviour text (harness_* in refresh-spec.py) against uhp_harness*.go. Manual projection sections in refresh-spec.py deliberately mirror active producer HTTP handlers and must be reviewed with route changes. Field and parameter descriptions are not written here: they come from the // comment above each producer Go struct field and from the per-resource files in openapi/beeos-cloud/rest/field-descriptions/ (schemas, parameters, request_bodies, responses for inline response bodies), and the script fails when a description key matches no schema, property, operation or parameter. A description already present is kept, except on schemas vendored from the App SDK, where the producer text replaces it. Enum values are published as x-enumDescriptions (never as enum, so generated SDK types do not change); the producer test TestFieldDescriptionEnumsMatchGoConstants keeps each set equal to the Go constants it names.'},
  'version':'3.1.0',
  'activation':{'live':'Registered Server-key producer route; all non-live operations are excluded'},
  'input_sha256':dict(sorted(inputs.items()))}
