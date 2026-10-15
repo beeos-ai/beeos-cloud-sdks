@@ -898,7 +898,8 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 1000000
-            }
+            },
+            "description": "1-based page number, from 1 to 1000000. Defaults to 1."
           },
           {
             "name": "page_size",
@@ -907,42 +908,48 @@
               "type": "integer",
               "minimum": 1,
               "maximum": 100
-            }
+            },
+            "description": "Number of instances per page, from 1 to 100. Defaults to 20."
           },
           {
             "name": "status",
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Return only instances in this lifecycle phase: `pending`, `provisioning`, `running`, `stopped` or `terminated`. When omitted, terminated instances are not returned."
           },
           {
             "name": "provider_id",
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Return only instances hosted by this provider, at most 128 characters."
           },
           {
             "name": "harness",
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Return only instances that run this product harness (for example `openclaw`), at most 128 characters."
           },
           {
             "name": "cluster_id",
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Return only instances deployed to this cluster, at most 128 characters."
           },
           {
             "name": "search",
             "in": "query",
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Case-insensitive substring match on the instance name or ID, at most 200 characters."
           }
         ],
         "responses": {
@@ -986,7 +993,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`."
           }
         ],
         "responses": {
@@ -1038,7 +1046,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           }
         ],
         "responses": {
@@ -1078,7 +1087,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           },
           {
             "name": "If-Match",
@@ -1086,7 +1096,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Version of the instance the request applies to: the `resource_version` of the representation you last read, optionally in quotes. A stale version returns 412 `version_mismatch`; a missing or invalid one returns 428 `precondition_required`."
           }
         ],
         "responses": {
@@ -1145,7 +1156,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           },
           {
             "name": "Idempotency-Key",
@@ -1153,7 +1165,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`."
           },
           {
             "name": "If-Match",
@@ -1161,7 +1174,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Version of the instance the request applies to: the `resource_version` of the representation you last read, optionally in quotes. A stale version returns 412 `version_mismatch`; a missing or invalid one returns 428 `precondition_required`."
           }
         ],
         "responses": {
@@ -1203,7 +1217,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           }
         ],
         "responses": {
@@ -1245,7 +1260,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           },
           {
             "name": "Idempotency-Key",
@@ -1253,7 +1269,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`."
           },
           {
             "name": "If-Match",
@@ -1261,7 +1278,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Version of the instance the request applies to: the `resource_version` of the representation you last read, optionally in quotes. A stale version returns 412 `version_mismatch`; a missing or invalid one returns 428 `precondition_required`."
           }
         ],
         "responses": {
@@ -1303,7 +1321,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           },
           {
             "name": "Idempotency-Key",
@@ -1311,7 +1330,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`."
           },
           {
             "name": "If-Match",
@@ -1319,7 +1339,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Version of the instance the request applies to: the `resource_version` of the representation you last read, optionally in quotes. A stale version returns 412 `version_mismatch`; a missing or invalid one returns 428 `precondition_required`."
           }
         ],
         "responses": {
@@ -1361,7 +1382,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           },
           {
             "name": "Idempotency-Key",
@@ -1369,7 +1391,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`."
           }
         ],
         "responses": {
@@ -1402,13 +1425,16 @@
                 "type": "object",
                 "properties": {
                   "image_id": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "ID of the published platform image to upgrade to. Send at least one of `image_id`, `image_ref` and `target_version`; they select among published platform images only."
                   },
                   "image_ref": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Pinned public reference of the published platform image to upgrade to."
                   },
                   "target_version": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Version of the published platform image to upgrade to."
                   }
                 },
                 "required": [],
@@ -1434,7 +1460,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           },
           {
             "name": "jobId",
@@ -1442,7 +1469,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the upgrade job, the `job_id` returned when the upgrade was started."
           }
         ],
         "responses": {
@@ -2619,7 +2647,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           }
         ]
       }
@@ -2742,7 +2771,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           }
         ]
       }
@@ -2761,7 +2791,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           }
         ],
         "responses": {
@@ -2797,10 +2828,12 @@
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "description": "Program and arguments as an argument vector; it is never passed through a shell. 1 to 64 entries of at most 4096 bytes each and 16 KiB in total. The first entry must not be blank."
                   },
                   "timeout_seconds": {
-                    "type": "integer"
+                    "type": "integer",
+                    "description": "Maximum run time in seconds, from 1 to 30."
                   }
                 },
                 "required": [
@@ -3738,7 +3771,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           },
           {
             "name": "service",
@@ -3746,7 +3780,8 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Service to connect to: `browser` for a browser viewer or `acp` for an agent connection. Required."
           },
           {
             "name": "client_id",
@@ -3754,7 +3789,8 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID you choose for the viewing client session, 1 to 128 characters (letters, digits, `_`, `.`, `:` and `-`, starting with a letter or digit). Required when `service` is `browser`; not accepted for `acp`."
           },
           {
             "name": "role",
@@ -3762,7 +3798,8 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Access role to request: `viewer` or `controller`. Required when `service` is `browser`; not accepted for `acp`."
           },
           {
             "name": "generation",
@@ -3770,7 +3807,8 @@
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "Browser generation the access grant must be bound to, in the same format as `client_id`. The request fails when the browser's current generation differs. Only for `browser`."
           }
         ],
         "responses": {
@@ -3812,7 +3850,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the instance."
           },
           {
             "name": "viewportWidth",
@@ -3820,7 +3859,8 @@
             "required": false,
             "schema": {
               "type": "integer"
-            }
+            },
+            "description": "Viewport width in pixels, greater than 0 and below 100000."
           },
           {
             "name": "viewportHeight",
@@ -3828,7 +3868,8 @@
             "required": false,
             "schema": {
               "type": "integer"
-            }
+            },
+            "description": "Viewport height in pixels, greater than 0 and below 100000."
           },
           {
             "name": "dpr",
@@ -3836,7 +3877,8 @@
             "required": false,
             "schema": {
               "type": "number"
-            }
+            },
+            "description": "Device pixel ratio, greater than 0 and below 16."
           }
         ],
         "responses": {
@@ -7400,55 +7442,70 @@
             "description": "Whether authoritative instance state history has ever reached running."
           },
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique ID of the instance."
           },
           "organization_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the organization that owns the instance."
           },
           "app_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the app the instance belongs to."
           },
           "developer_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the developer account the instance was created under."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name of the instance."
           },
           "harness": {
             "type": "string",
             "description": "Product harness name (for example `openclaw`), not a UHP `harness_id` (`chrn_*`)."
           },
           "provider_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the provider that hosts the instance."
           },
           "region": {
-            "type": "string"
+            "type": "string",
+            "description": "Region the instance is deployed in."
           },
           "os_type": {
-            "type": "string"
+            "type": "string",
+            "description": "Operating system of the instance: `linux`, `windows`, `android` or `macos`."
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Lifecycle phase of the instance: `pending`, `provisioning`, `running`, `stopped` or `terminated`."
           },
           "desired_status": {
-            "type": "string"
+            "type": "string",
+            "description": "Lifecycle phase the instance is being driven toward: `running`, `stopped` or `terminated`."
           },
           "connectivity": {
-            "type": "string"
+            "type": "string",
+            "description": "Reachability of the instance's agent: `unknown`, `online` or `offline`."
           },
           "ms_connection_status": {
-            "type": "string"
+            "type": "string",
+            "description": "Status of the instance's message-channel connection: `unknown`, `connecting`, `connected`, `reconnecting`, `disconnected` or `failed`. It is reported independently of connectivity and is `unknown` while the instance is stopped or terminated, or has not reported recently."
           },
           "created_at": {
-            "type": "string"
+            "type": "string",
+            "description": "Time the instance was created, as an RFC 3339 UTC timestamp."
           },
           "updated_at": {
-            "type": "string"
+            "type": "string",
+            "description": "Time the instance was last updated, as an RFC 3339 UTC timestamp."
           },
           "resource_version": {
             "type": "integer",
             "format": "int64",
-            "minimum": 1
+            "minimum": 1,
+            "description": "Version of the instance record, starting at 1. Send it in the `If-Match` header of write requests so concurrent changes are detected."
           },
           "image_slot": {
             "type": "string",
@@ -7499,10 +7556,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InstanceSummary"
-            }
+            },
+            "description": "Instances on this page, newest first."
           },
           "total": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Total number of instances that match the filters, across all pages."
           }
         }
       },
@@ -8372,13 +8431,16 @@
         "type": "object",
         "properties": {
           "code": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable machine-readable error code, for example `invalid_request`, `version_mismatch` or `instance_not_found`."
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Human-readable description of the error. Use `code`, not this text, to branch in code."
           },
           "request_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the request, for support and tracing."
           }
         },
         "required": [
@@ -9747,67 +9809,87 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique ID of the instance."
           },
           "organization_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the organization that owns the instance."
           },
           "app_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the app the instance belongs to."
           },
           "developer_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the developer account the instance was created under."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name of the instance."
           },
           "harness": {
-            "type": "string"
+            "type": "string",
+            "description": "Product harness name (for example `openclaw`), not a UHP `harness_id` (`chrn_*`)."
           },
           "provider_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the provider that hosts the instance."
           },
           "region": {
-            "type": "string"
+            "type": "string",
+            "description": "Region the instance is deployed in."
           },
           "os_type": {
-            "type": "string"
+            "type": "string",
+            "description": "Operating system of the instance: `linux`, `windows`, `android` or `macos`."
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Lifecycle phase of the instance: `pending`, `provisioning`, `running`, `stopped` or `terminated`."
           },
           "desired_status": {
-            "type": "string"
+            "type": "string",
+            "description": "Lifecycle phase the instance is being driven toward: `running`, `stopped` or `terminated`."
           },
           "connectivity": {
-            "type": "string"
+            "type": "string",
+            "description": "Reachability of the instance's agent: `unknown`, `online` or `offline`."
           },
           "error_code": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable code describing a failure or degraded state reported with a lifecycle result, for example `quota_exceeded`, `capacity_pending`, `provision_failed` or `stop_failed`. Raw provider errors are never exported."
           },
           "ms_connection_status": {
-            "type": "string"
+            "type": "string",
+            "description": "Status of the instance's message-channel connection: `unknown`, `connecting`, `connected`, `reconnecting`, `disconnected` or `failed`. It is reported independently of connectivity and is `unknown` while the instance is stopped or terminated, or has not reported recently."
           },
           "image_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the platform image the instance runs."
           },
           "image_version_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the platform image version the instance runs."
           },
           "image_version": {
-            "type": "string"
+            "type": "string",
+            "description": "Version label of the platform image the instance runs."
           },
           "image_ref": {
-            "type": "string"
+            "type": "string",
+            "description": "Pinned public image reference. Provider configuration is never included."
           },
           "model_primary": {
-            "type": "string"
+            "type": "string",
+            "description": "Primary model configured for the instance."
           },
           "models": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "description": "Models configured for the instance."
           },
           "llm": {
             "anyOf": [
@@ -9817,49 +9899,64 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "description": "Model providers and models supplied for the instance, with API keys removed."
           },
           "hosting_type": {
-            "type": "string"
+            "type": "string",
+            "description": "Where the instance is hosted: `cloud` or `selfhosted`."
           },
           "cloud_provider": {
-            "type": "string"
+            "type": "string",
+            "description": "`agentbay`, `beeos`, or empty when self-hosted."
           },
           "image_slot": {
-            "type": "string"
+            "type": "string",
+            "description": "Variant trait. Key that selects the execution image for the instance. Not a container repository name."
           },
           "worker_image_id": {
-            "type": "string"
+            "type": "string",
+            "description": "Variant trait. AgentBay worker image. Never the platform `image_id`."
           },
           "model_catalog": {
-            "type": "string"
+            "type": "string",
+            "description": "Variant trait. `served` when Cloud answers model-list and reasoning-level requests, `none` when it answers neither. Empty and unknown values behave as `none`."
           },
           "billing_slot": {
-            "type": "string"
+            "type": "string",
+            "description": "Variant trait. Key into the monthly fee table that prices the instance."
           },
           "icon_key": {
-            "type": "string"
+            "type": "string",
+            "description": "Variant trait. UI icon selector. Clients must not derive it from `harness`."
           },
           "device_control": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Variant trait. Whether the instance accepts device-control commands. False means those commands are rejected."
           },
           "runtime_profile": {
-            "type": "string"
+            "type": "string",
+            "description": "Variant trait. Profile of the agent runtime the instance uses. Known values are `openclaw`, `hermes` and `beeos-browser`."
           },
           "free_plan": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Variant trait. Whether the free plan allows the instance's variant. False means the free plan does not allow it."
           },
           "resource_version": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Version of the instance record, starting at 1. Send it in the `If-Match` header of write requests so concurrent changes are detected."
           },
           "has_ever_run": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the instance has ever reached the running state. False means it has never delivered a running service."
           },
           "created_at": {
-            "type": "string"
+            "type": "string",
+            "description": "Time the instance was created, as an RFC 3339 UTC timestamp."
           },
           "updated_at": {
-            "type": "string"
+            "type": "string",
+            "description": "Time the instance was last updated, as an RFC 3339 UTC timestamp."
           },
           "capabilities": {
             "type": "object",
@@ -9878,7 +9975,8 @@
               }
             },
             "required": [],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "description": "Capabilities declared for the instance when it was provisioned, as flags such as `computer`, `mobile`, `device` and `terminal`. An empty object means none were declared."
           }
         },
         "required": [
@@ -9909,16 +10007,20 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique ID of the operation."
           },
           "kind": {
-            "type": "string"
+            "type": "string",
+            "description": "Kind of operation: `create`, `start`, `stop`, `delete` or `image_upgrade`."
           },
           "phase": {
-            "type": "string"
+            "type": "string",
+            "description": "Phase of the operation: `intent`, `reserved`, `admitted`, `provisioning`, `running`, `cleanup_pending`, `failed`, `stop_pending`, `stopped`, `delete_pending`, `deleted`, `upgrade_pending` or `rollback_pending`. It describes durable work, not observed instance health."
           },
           "error_code": {
-            "type": "string"
+            "type": "string",
+            "description": "Stable failure code, the same value as the instance `error_code`. Raw provider errors are never exported."
           }
         },
         "required": [
@@ -9932,10 +10034,12 @@
         "type": "object",
         "properties": {
           "data": {
-            "$ref": "#/components/schemas/RuntimeInstanceSummary"
+            "$ref": "#/components/schemas/RuntimeInstanceSummary",
+            "description": "The instance as of this response."
           },
           "operation": {
-            "$ref": "#/components/schemas/RuntimeOperationSummary"
+            "$ref": "#/components/schemas/RuntimeOperationSummary",
+            "description": "Lifecycle operation that this response reports on."
           }
         },
         "required": [
@@ -9948,16 +10052,20 @@
         "type": "object",
         "properties": {
           "exit_code": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Exit code of the command."
           },
           "stdout": {
-            "type": "string"
+            "type": "string",
+            "description": "Standard output of the command, at most 64 KiB."
           },
           "stderr": {
-            "type": "string"
+            "type": "string",
+            "description": "Standard error of the command, at most 64 KiB."
           },
           "truncated": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the output was truncated."
           }
         },
         "required": [
@@ -9975,13 +10083,15 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RuntimeLLMProvider"
-            }
+            },
+            "description": "Model provider endpoints, 1 to 8 entries. Every provider must be referenced by at least one model."
           },
           "models": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RuntimeLLMModel"
-            }
+            },
+            "description": "Selectable models, 1 to 256 entries. Exactly one has the `default` role."
           }
         },
         "required": [
@@ -9997,13 +10107,15 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RuntimeLLMProviderView"
-            }
+            },
+            "description": "Model provider endpoints, without API keys."
           },
           "models": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RuntimeLLMModel"
-            }
+            },
+            "description": "Selectable models."
           }
         },
         "required": [
@@ -10016,21 +10128,25 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "Caller-chosen ID that models refer to. It is unique within the request, 1 to 64 characters from `A-Z`, `a-z`, `0-9`, `_` and `-`."
           },
           "protocol": {
             "type": "string",
             "enum": [
               "openai",
               "anthropic"
-            ]
+            ],
+            "description": "API protocol the endpoint speaks: `openai` or `anthropic`."
           },
           "base_url": {
-            "type": "string"
+            "type": "string",
+            "description": "HTTPS base URL of the provider API, at most 512 characters. It must not contain credentials, a query string or a fragment."
           },
           "api_key": {
             "type": "string",
-            "writeOnly": true
+            "writeOnly": true,
+            "description": "API key for the provider, 1 to 4096 characters without whitespace. It is write-only and never returned."
           }
         },
         "required": [
@@ -10044,13 +10160,16 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the provider, as referenced by models."
           },
           "protocol": {
-            "type": "string"
+            "type": "string",
+            "description": "API protocol the endpoint speaks: `openai` or `anthropic`."
           },
           "base_url": {
-            "type": "string"
+            "type": "string",
+            "description": "HTTPS base URL of the provider API."
           }
         },
         "required": [
@@ -10064,16 +10183,20 @@
         "type": "object",
         "properties": {
           "provider_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the provider that serves the model."
           },
           "model": {
-            "type": "string"
+            "type": "string",
+            "description": "Model name as the provider API expects it. It is unique per provider."
           },
           "role": {
-            "type": "string"
+            "type": "string",
+            "description": "Role of the model: `default`, `fallback` or `available`. Exactly one model is `default`. Automatic failover uses only `fallback` models."
           },
           "order": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Position of the model, unique across all models. The `default` model has order 0; `fallback` and `available` models have order 1 or more."
           }
         },
         "required": [
@@ -10088,19 +10211,24 @@
         "type": "object",
         "properties": {
           "job_id": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique ID of the upgrade job."
           },
           "instance_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the instance being upgraded."
           },
           "status": {
-            "type": "string"
+            "type": "string",
+            "description": "Status of the job: `upgrade_pending`, `rollback_pending`, `failed` or `succeeded`."
           },
           "target": {
-            "type": "string"
+            "type": "string",
+            "description": "Image version the instance is being upgraded to."
           },
           "created_at": {
-            "type": "string"
+            "type": "string",
+            "description": "Time the job was created, as an RFC 3339 UTC timestamp."
           },
           "completed_at": {
             "anyOf": [
@@ -10110,7 +10238,8 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "description": "Time the job finished, as an RFC 3339 UTC timestamp. Omitted while the job is not finished."
           },
           "error": {
             "anyOf": [
@@ -10120,7 +10249,8 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "description": "Stable failure code. Omitted unless the job failed."
           }
         },
         "required": [
@@ -10984,16 +11114,19 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Display name of the instance, 1 to 128 bytes, without leading or trailing whitespace."
           },
           "variant_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the catalog variant to create the instance from, at most 128 characters. See the instance template catalog for available variants. An unknown ID returns 404 `variant_not_found`."
           },
           "harness": {
             "type": "string",
             "enum": [
               "openclaw"
-            ]
+            ],
+            "description": "Harness to run in the instance. Only `openclaw` is accepted."
           },
           "llm": {
             "anyOf": [
@@ -11003,7 +11136,8 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "description": "Model providers and models the instance uses. Required when the variant or harness needs caller-supplied models; omit it for variants that supply their own models. Provider API keys are write-only."
           }
         },
         "required": [
@@ -11054,19 +11188,24 @@
             "type": "object",
             "properties": {
               "id": {
-                "type": "string"
+                "type": "string",
+                "description": "Unique ID of the instance."
               },
               "name": {
-                "type": "string"
+                "type": "string",
+                "description": "Display name of the instance."
               },
               "status": {
-                "type": "string"
+                "type": "string",
+                "description": "Lifecycle phase of the instance: `pending`, `provisioning`, `running`, `stopped` or `terminated`."
               },
               "desired_status": {
-                "type": "string"
+                "type": "string",
+                "description": "Lifecycle phase the instance is being driven toward: `running`, `stopped` or `terminated`."
               },
               "connectivity": {
-                "type": "string"
+                "type": "string",
+                "description": "Reachability of the instance's agent: `unknown`, `online` or `offline`."
               }
             },
             "required": [
@@ -11076,10 +11215,12 @@
               "desired_status",
               "connectivity"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "description": "Current status of the instance."
           },
           "operation": {
-            "$ref": "#/components/schemas/RuntimeOperationSummary"
+            "$ref": "#/components/schemas/RuntimeOperationSummary",
+            "description": "Lifecycle operation that this response reports on."
           }
         },
         "required": [
@@ -11092,10 +11233,12 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "New display name, 1 to 128 characters, without leading or trailing whitespace. Send `name`, `llm` or both."
           },
           "llm": {
-            "$ref": "#/components/schemas/RuntimeLLM"
+            "$ref": "#/components/schemas/RuntimeLLM",
+            "description": "Replacement model providers and models. It replaces the whole existing llm block. Provider API keys are write-only. When `name` is also sent, the llm block is replaced first."
           }
         },
         "required": [],
@@ -11259,37 +11402,46 @@
             "type": "object",
             "properties": {
               "url": {
-                "type": "string"
+                "type": "string",
+                "description": "URL to connect to. For `browser` it is the browser viewer URL; for `acp` it is a WebSocket URL that already carries the access ticket as a query parameter."
               },
               "mode": {
-                "type": "string"
+                "type": "string",
+                "description": "Connection mode: `browser-runtime` for `browser`, `service-websocket` for `acp`."
               },
               "token": {
-                "type": "string"
+                "type": "string",
+                "description": "Short-lived access token for the browser viewer. Not returned for `acp`."
               },
               "service": {
-                "type": "string"
+                "type": "string",
+                "description": "Service the URL connects to: `browser` or `acp`."
               },
               "connectivity": {
-                "type": "string"
+                "type": "string",
+                "description": "Reachability of the instance: `unknown`, `online` or `offline`."
               },
               "stream_session_id": {
-                "type": "string"
+                "type": "string",
+                "description": "ID of the viewing client session, the `client_id` sent in the request. Not returned for `acp`."
               },
               "browser": {
                 "type": "object",
                 "properties": {
                   "grant_id": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "ID of the browser access grant."
                   },
                   "generation": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Generation of the browser the grant is bound to. When `generation` was sent in the request, it equals that value."
                   },
                   "expires_at": {
                     "type": "string"
                   },
                   "role": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Access role of the grant: `viewer` or `controller`."
                   }
                 },
                 "required": [
@@ -11298,7 +11450,8 @@
                   "expires_at",
                   "role"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "description": "Browser access grant. Returned only for `browser`."
               }
             },
             "required": [
@@ -11309,7 +11462,8 @@
               "connectivity",
               "stream_session_id"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "description": "Connection details for the requested service."
           }
         },
         "required": [
@@ -11858,13 +12012,16 @@
         "type": "object",
         "properties": {
           "alg": {
-            "type": "string"
+            "type": "string",
+            "description": "Signature algorithm of the ticket: `RS256`."
           },
           "typ": {
-            "type": "string"
+            "type": "string",
+            "description": "Token type: `JWT`."
           },
           "kid": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the key that signed the ticket."
           }
         },
         "required": [
@@ -11878,37 +12035,48 @@
         "type": "object",
         "properties": {
           "iss": {
-            "type": "string"
+            "type": "string",
+            "description": "Issuer of the ticket."
           },
           "aud": {
-            "type": "string"
+            "type": "string",
+            "description": "Audience the ticket is intended for: the terminal service."
           },
           "sub": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the external user the ticket was issued for, from the `X-BeeOS-External-User-ID` header."
           },
           "jti": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique ID of the ticket."
           },
           "instance_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the instance the terminal belongs to."
           },
           "platform_agent_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the agent the terminal session is for, the `platformAgentId` of the request."
           },
           "client_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID generated for this terminal client connection."
           },
           "conversation_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the conversation the terminal is attached to. Present only when the request sent `conversationId`."
           },
           "resume_terminal_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the terminal to resume. Present only when the request sent `resumeTerminalId`."
           },
           "iat": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Time the ticket was issued, in Unix seconds."
           },
           "exp": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Time the ticket expires, in Unix seconds."
           }
         },
         "required": [
@@ -11928,49 +12096,63 @@
         "type": "object",
         "properties": {
           "iss": {
-            "type": "string"
+            "type": "string",
+            "description": "Issuer of the ticket."
           },
           "sub": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the external user the ticket was issued for, from the `X-BeeOS-External-User-ID` header."
           },
           "jti": {
-            "type": "string"
+            "type": "string",
+            "description": "Unique ID of the ticket."
           },
           "purpose": {
-            "type": "string"
+            "type": "string",
+            "description": "Purpose of the ticket: always `canvas_session`."
           },
           "instance_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the instance the canvas belongs to."
           },
           "platform_agent_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the agent the canvas session is for, the `platformAgentId` of the request."
           },
           "client_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID generated for this relay client connection."
           },
           "conversation_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the conversation the canvas belongs to, the `conversationId` of the request."
           },
           "canvas_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the canvas the ticket grants access to."
           },
           "role": {
-            "type": "string"
+            "type": "string",
+            "description": "Access role granted on the canvas: `viewer` or `editor`."
           },
           "session_id": {
-            "type": "string"
+            "type": "string",
+            "description": "ID of the realtime session created for this ticket."
           },
           "aud": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "description": "Audiences the ticket is intended for: the canvas relay."
           },
           "iat": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Time the ticket was issued, in Unix seconds."
           },
           "exp": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Time the ticket expires, in Unix seconds."
           }
         },
         "required": [
@@ -11995,30 +12177,38 @@
         "type": "object",
         "properties": {
           "transport": {
-            "type": "string"
+            "type": "string",
+            "description": "How the ticket connects: always `service-websocket`."
           },
           "protocolVersion": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Version of the ticket protocol. Currently 1."
           },
           "header": {
-            "$ref": "#/components/schemas/RealtimeTicketHeader"
+            "$ref": "#/components/schemas/RealtimeTicketHeader",
+            "description": "Header of the signed ticket."
           },
           "websocketUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "WebSocket URL to open the terminal connection on. It already carries the ticket as a query parameter."
           },
           "ticket": {
-            "type": "string"
+            "type": "string",
+            "description": "Signed single-use ticket (a JWT) that authorizes one terminal connection. It is valid for 60 seconds."
           },
           "issuedAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time the ticket was issued, as an RFC 3339 timestamp."
           },
           "expiresAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time the ticket expires, as an RFC 3339 timestamp. Tickets are valid for 60 seconds."
           },
           "claims": {
-            "$ref": "#/components/schemas/TerminalTicketClaims"
+            "$ref": "#/components/schemas/TerminalTicketClaims",
+            "description": "Claims contained in the signed ticket."
           }
         },
         "required": [
@@ -12037,30 +12227,38 @@
         "type": "object",
         "properties": {
           "transport": {
-            "type": "string"
+            "type": "string",
+            "description": "How the ticket connects: always `relay`."
           },
           "protocolVersion": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Version of the ticket protocol. Currently 1."
           },
           "header": {
-            "$ref": "#/components/schemas/RealtimeTicketHeader"
+            "$ref": "#/components/schemas/RealtimeTicketHeader",
+            "description": "Header of the signed ticket."
           },
           "relayUrl": {
-            "type": "string"
+            "type": "string",
+            "description": "WebSocket URL of the canvas relay for the canvas, ending in `/ws/{canvasId}`."
           },
           "ticket": {
-            "type": "string"
+            "type": "string",
+            "description": "Signed single-use ticket (a JWT) that authorizes one relay connection. It is valid for 60 seconds."
           },
           "issuedAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time the ticket was issued, as an RFC 3339 timestamp."
           },
           "expiresAt": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Time the ticket expires, as an RFC 3339 timestamp. Tickets are valid for 60 seconds."
           },
           "claims": {
-            "$ref": "#/components/schemas/CanvasTicketClaims"
+            "$ref": "#/components/schemas/CanvasTicketClaims",
+            "description": "Claims contained in the signed ticket."
           }
         },
         "required": [
@@ -12172,5 +12370,5 @@
     }
   },
   "x-producer-repository": "beeos-ai/beeos-cloud-backend",
-  "x-producer-revision": "6bb929deda3911266d9caa14a7edaf9ccdeb8cd8"
+  "x-producer-revision": "fc99d057112be3ae9393c54e7734e7fe7678231d"
 }

@@ -1520,23 +1520,40 @@ export interface components {
         InstanceSummary: {
             /** @description Whether authoritative instance state history has ever reached running. */
             has_ever_run: boolean;
+            /** @description Unique ID of the instance. */
             id: string;
+            /** @description ID of the organization that owns the instance. */
             organization_id: string;
+            /** @description ID of the app the instance belongs to. */
             app_id: string;
+            /** @description ID of the developer account the instance was created under. */
             developer_id: string;
+            /** @description Display name of the instance. */
             name: string;
             /** @description Product harness name (for example `openclaw`), not a UHP `harness_id` (`chrn_*`). */
             harness: string;
+            /** @description ID of the provider that hosts the instance. */
             provider_id: string;
+            /** @description Region the instance is deployed in. */
             region: string;
+            /** @description Operating system of the instance: `linux`, `windows`, `android` or `macos`. */
             os_type: string;
+            /** @description Lifecycle phase of the instance: `pending`, `provisioning`, `running`, `stopped` or `terminated`. */
             status: string;
+            /** @description Lifecycle phase the instance is being driven toward: `running`, `stopped` or `terminated`. */
             desired_status: string;
+            /** @description Reachability of the instance's agent: `unknown`, `online` or `offline`. */
             connectivity: string;
+            /** @description Status of the instance's message-channel connection: `unknown`, `connecting`, `connected`, `reconnecting`, `disconnected` or `failed`. It is reported independently of connectivity and is `unknown` while the instance is stopped or terminated, or has not reported recently. */
             ms_connection_status: string;
+            /** @description Time the instance was created, as an RFC 3339 UTC timestamp. */
             created_at: string;
+            /** @description Time the instance was last updated, as an RFC 3339 UTC timestamp. */
             updated_at: string;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description Version of the instance record, starting at 1. Send it in the `If-Match` header of write requests so concurrent changes are detected.
+             */
             resource_version: number;
             /** @description Variant trait. Key into the Runtime execution image map. Not a container repository name. */
             image_slot?: string;
@@ -1558,7 +1575,9 @@ export interface components {
             cloud_provider?: string;
         };
         InstancePage: {
+            /** @description Instances on this page, newest first. */
             data: components["schemas"]["InstanceSummary"][];
+            /** @description Total number of instances that match the filters, across all pages. */
             total: number;
         };
         ProviderCapabilities: {
@@ -1785,8 +1804,11 @@ export interface components {
             data: components["schemas"]["ApprovalModeResult"];
         };
         ErrorResponse: {
+            /** @description Stable machine-readable error code, for example `invalid_request`, `version_mismatch` or `instance_not_found`. */
             code: string;
+            /** @description Human-readable description of the error. Use `code`, not this text, to branch in code. */
             message: string;
+            /** @description ID of the request, for support and tracing. */
             request_id: string;
         };
         UHPDiscovery: {
@@ -2431,41 +2453,77 @@ export interface components {
             [key: string]: JSONValue;
         };
         RuntimeInstanceSummary: {
+            /** @description Unique ID of the instance. */
             id: string;
+            /** @description ID of the organization that owns the instance. */
             organization_id: string;
+            /** @description ID of the app the instance belongs to. */
             app_id: string;
+            /** @description ID of the developer account the instance was created under. */
             developer_id: string;
+            /** @description Display name of the instance. */
             name: string;
+            /** @description Product harness name (for example `openclaw`), not a UHP `harness_id` (`chrn_*`). */
             harness: string;
+            /** @description ID of the provider that hosts the instance. */
             provider_id: string;
+            /** @description Region the instance is deployed in. */
             region: string;
+            /** @description Operating system of the instance: `linux`, `windows`, `android` or `macos`. */
             os_type: string;
+            /** @description Lifecycle phase of the instance: `pending`, `provisioning`, `running`, `stopped` or `terminated`. */
             status: string;
+            /** @description Lifecycle phase the instance is being driven toward: `running`, `stopped` or `terminated`. */
             desired_status: string;
+            /** @description Reachability of the instance's agent: `unknown`, `online` or `offline`. */
             connectivity: string;
+            /** @description Stable code describing a failure or degraded state reported with a lifecycle result, for example `quota_exceeded`, `capacity_pending`, `provision_failed` or `stop_failed`. Raw provider errors are never exported. */
             error_code?: string;
+            /** @description Status of the instance's message-channel connection: `unknown`, `connecting`, `connected`, `reconnecting`, `disconnected` or `failed`. It is reported independently of connectivity and is `unknown` while the instance is stopped or terminated, or has not reported recently. */
             ms_connection_status: string;
+            /** @description ID of the platform image the instance runs. */
             image_id?: string;
+            /** @description ID of the platform image version the instance runs. */
             image_version_id?: string;
+            /** @description Version label of the platform image the instance runs. */
             image_version?: string;
+            /** @description Pinned public image reference. Provider configuration is never included. */
             image_ref?: string;
+            /** @description Primary model configured for the instance. */
             model_primary?: string;
+            /** @description Models configured for the instance. */
             models?: string[];
+            /** @description Model providers and models supplied for the instance, with API keys removed. */
             llm?: components["schemas"]["RuntimeLLMView"] | null;
+            /** @description Where the instance is hosted: `cloud` or `selfhosted`. */
             hosting_type?: string;
+            /** @description `agentbay`, `beeos`, or empty when self-hosted. */
             cloud_provider?: string;
+            /** @description Variant trait. Key that selects the execution image for the instance. Not a container repository name. */
             image_slot?: string;
+            /** @description Variant trait. AgentBay worker image. Never the platform `image_id`. */
             worker_image_id?: string;
+            /** @description Variant trait. `served` when Cloud answers model-list and reasoning-level requests, `none` when it answers neither. Empty and unknown values behave as `none`. */
             model_catalog?: string;
+            /** @description Variant trait. Key into the monthly fee table that prices the instance. */
             billing_slot?: string;
+            /** @description Variant trait. UI icon selector. Clients must not derive it from `harness`. */
             icon_key?: string;
+            /** @description Variant trait. Whether the instance accepts device-control commands. False means those commands are rejected. */
             device_control: boolean;
+            /** @description Variant trait. Profile of the agent runtime the instance uses. Known values are `openclaw`, `hermes` and `beeos-browser`. */
             runtime_profile?: string;
+            /** @description Variant trait. Whether the free plan allows the instance's variant. False means the free plan does not allow it. */
             free_plan: boolean;
+            /** @description Version of the instance record, starting at 1. Send it in the `If-Match` header of write requests so concurrent changes are detected. */
             resource_version: number;
+            /** @description Whether the instance has ever reached the running state. False means it has never delivered a running service. */
             has_ever_run: boolean;
+            /** @description Time the instance was created, as an RFC 3339 UTC timestamp. */
             created_at: string;
+            /** @description Time the instance was last updated, as an RFC 3339 UTC timestamp. */
             updated_at: string;
+            /** @description Capabilities declared for the instance when it was provisioned, as flags such as `computer`, `mobile`, `device` and `terminal`. An empty object means none were declared. */
             capabilities: {
                 computer?: boolean;
                 mobile?: boolean;
@@ -2474,54 +2532,88 @@ export interface components {
             };
         };
         RuntimeOperationSummary: {
+            /** @description Unique ID of the operation. */
             id: string;
+            /** @description Kind of operation: `create`, `start`, `stop`, `delete` or `image_upgrade`. */
             kind: string;
+            /** @description Phase of the operation: `intent`, `reserved`, `admitted`, `provisioning`, `running`, `cleanup_pending`, `failed`, `stop_pending`, `stopped`, `delete_pending`, `deleted`, `upgrade_pending` or `rollback_pending`. It describes durable work, not observed instance health. */
             phase: string;
+            /** @description Stable failure code, the same value as the instance `error_code`. Raw provider errors are never exported. */
             error_code?: string;
         };
         RuntimeInstanceResult: {
+            /** @description The instance as of this response. */
             data: components["schemas"]["RuntimeInstanceSummary"];
+            /** @description Lifecycle operation that this response reports on. */
             operation: components["schemas"]["RuntimeOperationSummary"];
         };
         RuntimeExecResult: {
+            /** @description Exit code of the command. */
             exit_code: number;
+            /** @description Standard output of the command, at most 64 KiB. */
             stdout: string;
+            /** @description Standard error of the command, at most 64 KiB. */
             stderr: string;
+            /** @description Whether the output was truncated. */
             truncated: boolean;
         };
         RuntimeLLM: {
+            /** @description Model provider endpoints, 1 to 8 entries. Every provider must be referenced by at least one model. */
             providers: components["schemas"]["RuntimeLLMProvider"][];
+            /** @description Selectable models, 1 to 256 entries. Exactly one has the `default` role. */
             models: components["schemas"]["RuntimeLLMModel"][];
         };
         RuntimeLLMView: {
+            /** @description Model provider endpoints, without API keys. */
             providers: components["schemas"]["RuntimeLLMProviderView"][];
+            /** @description Selectable models. */
             models: components["schemas"]["RuntimeLLMModel"][];
         };
         RuntimeLLMProvider: {
+            /** @description Caller-chosen ID that models refer to. It is unique within the request, 1 to 64 characters from `A-Z`, `a-z`, `0-9`, `_` and `-`. */
             id: string;
-            /** @enum {string} */
+            /**
+             * @description API protocol the endpoint speaks: `openai` or `anthropic`.
+             * @enum {string}
+             */
             protocol: "openai" | "anthropic";
+            /** @description HTTPS base URL of the provider API, at most 512 characters. It must not contain credentials, a query string or a fragment. */
             base_url: string;
+            /** @description API key for the provider, 1 to 4096 characters without whitespace. It is write-only and never returned. */
             api_key?: string;
         };
         RuntimeLLMProviderView: {
+            /** @description ID of the provider, as referenced by models. */
             id: string;
+            /** @description API protocol the endpoint speaks: `openai` or `anthropic`. */
             protocol: string;
+            /** @description HTTPS base URL of the provider API. */
             base_url: string;
         };
         RuntimeLLMModel: {
+            /** @description ID of the provider that serves the model. */
             provider_id: string;
+            /** @description Model name as the provider API expects it. It is unique per provider. */
             model: string;
+            /** @description Role of the model: `default`, `fallback` or `available`. Exactly one model is `default`. Automatic failover uses only `fallback` models. */
             role: string;
+            /** @description Position of the model, unique across all models. The `default` model has order 0; `fallback` and `available` models have order 1 or more. */
             order: number;
         };
         RuntimeUpgradeJob: {
+            /** @description Unique ID of the upgrade job. */
             job_id: string;
+            /** @description ID of the instance being upgraded. */
             instance_id: string;
+            /** @description Status of the job: `upgrade_pending`, `rollback_pending`, `failed` or `succeeded`. */
             status: string;
+            /** @description Image version the instance is being upgraded to. */
             target: string;
+            /** @description Time the job was created, as an RFC 3339 UTC timestamp. */
             created_at: string;
+            /** @description Time the job finished, as an RFC 3339 UTC timestamp. Omitted while the job is not finished. */
             completed_at?: string | null;
+            /** @description Stable failure code. Omitted unless the job failed. */
             error?: string | null;
         };
         FileFile: {
@@ -2751,10 +2843,16 @@ export interface components {
             resource_version?: number;
         };
         CreateServerInstanceInput: {
+            /** @description Display name of the instance, 1 to 128 bytes, without leading or trailing whitespace. */
             name: string;
+            /** @description ID of the catalog variant to create the instance from, at most 128 characters. See the instance template catalog for available variants. An unknown ID returns 404 `variant_not_found`. */
             variant_id?: string;
-            /** @enum {string} */
+            /**
+             * @description Harness to run in the instance. Only `openclaw` is accepted.
+             * @enum {string}
+             */
             harness?: "openclaw";
+            /** @description Model providers and models the instance uses. Required when the variant or harness needs caller-supplied models; omit it for variants that supply their own models. Provider API keys are write-only. */
             llm?: components["schemas"]["RuntimeLLM"] | null;
         };
         ServerUsageSummary: {
@@ -2771,17 +2869,26 @@ export interface components {
             };
         };
         RuntimeInstanceStatusResult: {
+            /** @description Current status of the instance. */
             data: {
+                /** @description Unique ID of the instance. */
                 id: string;
+                /** @description Display name of the instance. */
                 name: string;
+                /** @description Lifecycle phase of the instance: `pending`, `provisioning`, `running`, `stopped` or `terminated`. */
                 status: string;
+                /** @description Lifecycle phase the instance is being driven toward: `running`, `stopped` or `terminated`. */
                 desired_status: string;
+                /** @description Reachability of the instance's agent: `unknown`, `online` or `offline`. */
                 connectivity: string;
             };
+            /** @description Lifecycle operation that this response reports on. */
             operation: components["schemas"]["RuntimeOperationSummary"];
         };
         UpdateServerInstanceInput: {
+            /** @description New display name, 1 to 128 characters, without leading or trailing whitespace. Send `name`, `llm` or both. */
             name?: string;
+            /** @description Replacement model providers and models. It replaces the whole existing llm block. Provider API keys are write-only. When `name` is also sent, the llm block is replaced first. */
             llm?: components["schemas"]["RuntimeLLM"];
         };
         FileShareResponse: {
@@ -2821,17 +2928,28 @@ export interface components {
             };
         };
         ConnectURLResponse: {
+            /** @description Connection details for the requested service. */
             data: {
+                /** @description URL to connect to. For `browser` it is the browser viewer URL; for `acp` it is a WebSocket URL that already carries the access ticket as a query parameter. */
                 url: string;
+                /** @description Connection mode: `browser-runtime` for `browser`, `service-websocket` for `acp`. */
                 mode: string;
+                /** @description Short-lived access token for the browser viewer. Not returned for `acp`. */
                 token: string;
+                /** @description Service the URL connects to: `browser` or `acp`. */
                 service: string;
+                /** @description Reachability of the instance: `unknown`, `online` or `offline`. */
                 connectivity: string;
+                /** @description ID of the viewing client session, the `client_id` sent in the request. Not returned for `acp`. */
                 stream_session_id: string;
+                /** @description Browser access grant. Returned only for `browser`. */
                 browser?: {
+                    /** @description ID of the browser access grant. */
                     grant_id: string;
+                    /** @description Generation of the browser the grant is bound to. When `generation` was sent in the request, it equals that value. */
                     generation: string;
                     expires_at: string;
+                    /** @description Access role of the grant: `viewer` or `controller`. */
                     role: string;
                 };
             };
@@ -2998,61 +3116,113 @@ export interface components {
         };
         A2AOutputPart: components["schemas"]["A2ATextPartOut"] | components["schemas"]["A2AFilePartOut"] | components["schemas"]["A2ADataPartOut"];
         RealtimeTicketHeader: {
+            /** @description Signature algorithm of the ticket: `RS256`. */
             alg: string;
+            /** @description Token type: `JWT`. */
             typ: string;
+            /** @description ID of the key that signed the ticket. */
             kid: string;
         };
         TerminalTicketClaims: {
+            /** @description Issuer of the ticket. */
             iss: string;
+            /** @description Audience the ticket is intended for: the terminal service. */
             aud: string;
+            /** @description ID of the external user the ticket was issued for, from the `X-BeeOS-External-User-ID` header. */
             sub: string;
+            /** @description Unique ID of the ticket. */
             jti: string;
+            /** @description ID of the instance the terminal belongs to. */
             instance_id: string;
+            /** @description ID of the agent the terminal session is for, the `platformAgentId` of the request. */
             platform_agent_id: string;
+            /** @description ID generated for this terminal client connection. */
             client_id: string;
+            /** @description ID of the conversation the terminal is attached to. Present only when the request sent `conversationId`. */
             conversation_id?: string;
+            /** @description ID of the terminal to resume. Present only when the request sent `resumeTerminalId`. */
             resume_terminal_id?: string;
+            /** @description Time the ticket was issued, in Unix seconds. */
             iat: number;
+            /** @description Time the ticket expires, in Unix seconds. */
             exp: number;
         };
         CanvasTicketClaims: {
+            /** @description Issuer of the ticket. */
             iss: string;
+            /** @description ID of the external user the ticket was issued for, from the `X-BeeOS-External-User-ID` header. */
             sub: string;
+            /** @description Unique ID of the ticket. */
             jti: string;
+            /** @description Purpose of the ticket: always `canvas_session`. */
             purpose: string;
+            /** @description ID of the instance the canvas belongs to. */
             instance_id: string;
+            /** @description ID of the agent the canvas session is for, the `platformAgentId` of the request. */
             platform_agent_id: string;
+            /** @description ID generated for this relay client connection. */
             client_id: string;
+            /** @description ID of the conversation the canvas belongs to, the `conversationId` of the request. */
             conversation_id: string;
+            /** @description ID of the canvas the ticket grants access to. */
             canvas_id: string;
+            /** @description Access role granted on the canvas: `viewer` or `editor`. */
             role: string;
+            /** @description ID of the realtime session created for this ticket. */
             session_id: string;
+            /** @description Audiences the ticket is intended for: the canvas relay. */
             aud: string[];
+            /** @description Time the ticket was issued, in Unix seconds. */
             iat: number;
+            /** @description Time the ticket expires, in Unix seconds. */
             exp: number;
         };
         TerminalSessionDocument: {
+            /** @description How the ticket connects: always `service-websocket`. */
             transport: string;
+            /** @description Version of the ticket protocol. Currently 1. */
             protocolVersion: number;
+            /** @description Header of the signed ticket. */
             header: components["schemas"]["RealtimeTicketHeader"];
+            /** @description WebSocket URL to open the terminal connection on. It already carries the ticket as a query parameter. */
             websocketUrl: string;
+            /** @description Signed single-use ticket (a JWT) that authorizes one terminal connection. It is valid for 60 seconds. */
             ticket: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Time the ticket was issued, as an RFC 3339 timestamp.
+             */
             issuedAt: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Time the ticket expires, as an RFC 3339 timestamp. Tickets are valid for 60 seconds.
+             */
             expiresAt: string;
+            /** @description Claims contained in the signed ticket. */
             claims: components["schemas"]["TerminalTicketClaims"];
         };
         CanvasSessionDocument: {
+            /** @description How the ticket connects: always `relay`. */
             transport: string;
+            /** @description Version of the ticket protocol. Currently 1. */
             protocolVersion: number;
+            /** @description Header of the signed ticket. */
             header: components["schemas"]["RealtimeTicketHeader"];
+            /** @description WebSocket URL of the canvas relay for the canvas, ending in `/ws/{canvasId}`. */
             relayUrl: string;
+            /** @description Signed single-use ticket (a JWT) that authorizes one relay connection. It is valid for 60 seconds. */
             ticket: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Time the ticket was issued, as an RFC 3339 timestamp.
+             */
             issuedAt: string;
-            /** Format: date-time */
+            /**
+             * Format: date-time
+             * @description Time the ticket expires, as an RFC 3339 timestamp. Tickets are valid for 60 seconds.
+             */
             expiresAt: string;
+            /** @description Claims contained in the signed ticket. */
             claims: components["schemas"]["CanvasTicketClaims"];
         };
         DeviceBindingErrorResponse: {
@@ -3680,12 +3850,19 @@ export interface operations {
     listInstances: {
         parameters: {
             query?: {
+                /** @description 1-based page number, from 1 to 1000000. Defaults to 1. */
                 page?: number;
+                /** @description Number of instances per page, from 1 to 100. Defaults to 20. */
                 page_size?: number;
+                /** @description Return only instances in this lifecycle phase: `pending`, `provisioning`, `running`, `stopped` or `terminated`. When omitted, terminated instances are not returned. */
                 status?: string;
+                /** @description Return only instances hosted by this provider, at most 128 characters. */
                 provider_id?: string;
+                /** @description Return only instances that run this product harness (for example `openclaw`), at most 128 characters. */
                 harness?: string;
+                /** @description Return only instances deployed to this cluster, at most 128 characters. */
                 cluster_id?: string;
+                /** @description Case-insensitive substring match on the instance name or ID, at most 200 characters. */
                 search?: string;
             };
             header?: never;
@@ -3718,6 +3895,7 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
             };
             path?: never;
@@ -3754,6 +3932,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -3784,10 +3963,13 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
+                /** @description Version of the instance the request applies to: the `resource_version` of the representation you last read, optionally in quotes. A stale version returns 412 `version_mismatch`; a missing or invalid one returns 428 `precondition_required`. */
                 "If-Match": string;
             };
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -3818,9 +4000,11 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Version of the instance the request applies to: the `resource_version` of the representation you last read, optionally in quotes. A stale version returns 412 `version_mismatch`; a missing or invalid one returns 428 `precondition_required`. */
                 "If-Match": string;
             };
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -3858,6 +4042,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -3888,10 +4073,13 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
+                /** @description Version of the instance the request applies to: the `resource_version` of the representation you last read, optionally in quotes. A stale version returns 412 `version_mismatch`; a missing or invalid one returns 428 `precondition_required`. */
                 "If-Match": string;
             };
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -3922,10 +4110,13 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
+                /** @description Version of the instance the request applies to: the `resource_version` of the representation you last read, optionally in quotes. A stale version returns 412 `version_mismatch`; a missing or invalid one returns 428 `precondition_required`. */
                 "If-Match": string;
             };
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -3956,9 +4147,11 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Key that makes the request safe to retry, 1 to 256 bytes without leading or trailing whitespace. Repeating a request with the same key and body replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
             };
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -3966,8 +4159,11 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ID of the published platform image to upgrade to. Send at least one of `image_id`, `image_ref` and `target_version`; they select among published platform images only. */
                     image_id?: string;
+                    /** @description Pinned public reference of the published platform image to upgrade to. */
                     image_ref?: string;
+                    /** @description Version of the published platform image to upgrade to. */
                     target_version?: string;
                 };
             };
@@ -3998,7 +4194,9 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
+                /** @description ID of the upgrade job, the `job_id` returned when the upgrade was started. */
                 jobId: string;
             };
             cookie?: never;
@@ -4533,6 +4731,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -4620,6 +4819,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -4707,6 +4907,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -4714,7 +4915,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Program and arguments as an argument vector; it is never passed through a shell. 1 to 64 entries of at most 4096 bytes each and 16 KiB in total. The first entry must not be blank. */
                     argv: string[];
+                    /** @description Maximum run time in seconds, from 1 to 30. */
                     timeout_seconds?: number;
                 };
             };
@@ -5286,13 +5489,18 @@ export interface operations {
     getInstanceConnectURL: {
         parameters: {
             query?: {
+                /** @description Service to connect to: `browser` for a browser viewer or `acp` for an agent connection. Required. */
                 service?: string;
+                /** @description ID you choose for the viewing client session, 1 to 128 characters (letters, digits, `_`, `.`, `:` and `-`, starting with a letter or digit). Required when `service` is `browser`; not accepted for `acp`. */
                 client_id?: string;
+                /** @description Access role to request: `viewer` or `controller`. Required when `service` is `browser`; not accepted for `acp`. */
                 role?: string;
+                /** @description Browser generation the access grant must be bound to, in the same format as `client_id`. The request fails when the browser's current generation differs. Only for `browser`. */
                 generation?: string;
             };
             header?: never;
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
@@ -5322,12 +5530,16 @@ export interface operations {
     getInstanceStreamURL: {
         parameters: {
             query?: {
+                /** @description Viewport width in pixels, greater than 0 and below 100000. */
                 viewportWidth?: number;
+                /** @description Viewport height in pixels, greater than 0 and below 100000. */
                 viewportHeight?: number;
+                /** @description Device pixel ratio, greater than 0 and below 16. */
                 dpr?: number;
             };
             header?: never;
             path: {
+                /** @description ID of the instance. */
                 instanceId: string;
             };
             cookie?: never;
