@@ -402,9 +402,12 @@ def describe(props,path,text,where):
   if props is None:raise SystemExit('field description names no property: '+where+' '+path)
  if last not in props:raise SystemExit('field description names no property: '+where+' '+path)
  if 'description' not in props[last]:props[last]={**props[last],'description':text}
+# A commented field must exist in the schema built from its struct. The one allowed gap is an
+# aliased vendored App schema, which is a subset of the producer struct (see DOC_ALIAS).
 for name,schema in S.items():
  for key,text in docs.get(DOC_ALIAS.get(name,name),{}).items():
   if key in schema.get('properties',{}):describe(schema['properties'],key,text,name)
+  elif name not in DOC_ALIAS:raise SystemExit('struct field comment names no property: '+name+' '+key)
 for name,notes in FIELD_DOCS['schemas'].items():
  if name not in S or 'properties' not in S[name]:raise SystemExit('field description names no schema: '+name)
  for path,text in notes.items():describe(S[name]['properties'],path,text,name)
