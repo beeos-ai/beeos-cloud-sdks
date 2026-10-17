@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### BREAKING
+
+- Public clients no longer send `X-BeeOS-External-User-ID`. Removed
+  `BeeOSClient.withExternalUser`, `BeeOSClient.with_external_user`, and
+  `BeeOSClient.WithExternalUser`. Organization and app come from the server key.
+  Usage summary no longer accepts an `external_user_id` query.
+
 ### Docs
 
 - The Server API spec now carries field and parameter descriptions for the instances

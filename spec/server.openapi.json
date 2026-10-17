@@ -49,18 +49,6 @@
               "pattern": "^\"[1-9][0-9]*\"$"
             },
             "description": "Version of the conversation the change is based on: its `resource_version` in double quotes, for example `\"3\"`. A different current version returns 412 `resource_version_conflict`; a missing header returns 428 `precondition_required`."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "requestBody": {
@@ -136,18 +124,6 @@
               "pattern": "^\"[1-9][0-9]*\"$"
             },
             "description": "Version of the conversation the change is based on: its `resource_version` in double quotes, for example `\"3\"`. A different current version returns 412 `resource_version_conflict`; a missing header returns 428 `precondition_required`."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "requestBody": {
@@ -198,16 +174,6 @@
         "x-stage": "M8B",
         "x-idempotency": "required",
         "parameters": [
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ExternalUserID"
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. For a session operation it must be the user the session was created for."
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -276,16 +242,6 @@
               "type": "string"
             },
             "description": "ID of the client session, the `session_id` returned when it was created."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ExternalUserID"
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. For a session operation it must be the user the session was created for."
           },
           {
             "name": "Idempotency-Key",
@@ -373,16 +329,6 @@
             "description": "ID of the client session, the `session_id` returned when it was created."
           },
           {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/ExternalUserID"
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. For a session operation it must be the user the session was created for."
-          },
-          {
             "name": "Idempotency-Key",
             "in": "header",
             "required": true,
@@ -431,7 +377,7 @@
             "schema": {
               "$ref": "#/components/schemas/ExternalUserID"
             },
-            "description": "ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. If `X-BeeOS-External-User-ID` is also sent, both must be equal."
+            "description": "ID of the end user whose stored data is deleted. 1 to 128 characters; `.` and `..` are rejected. This is the path resource id, not a request header."
           },
           {
             "name": "Idempotency-Key",
@@ -489,7 +435,7 @@
             "schema": {
               "$ref": "#/components/schemas/ExternalUserID"
             },
-            "description": "ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. If `X-BeeOS-External-User-ID` is also sent, both must be equal."
+            "description": "ID of the end user whose stored data is deleted. 1 to 128 characters; `.` and `..` are rejected. This is the path resource id, not a request header."
           },
           {
             "name": "deletionId",
@@ -1771,18 +1717,6 @@
               "maxLength": 128
             },
             "description": "Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "requestBody": {
@@ -1838,18 +1772,6 @@
               "type": "string"
             },
             "description": "ID of the agent, the `id` returned by the agents API."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           },
           {
             "name": "cursor",
@@ -1937,18 +1859,6 @@
               "type": "string"
             },
             "description": "ID of the conversation, as returned when it was created or listed."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "responses": {
@@ -2013,18 +1923,6 @@
               "pattern": "^\"[1-9][0-9]*\"$"
             },
             "description": "Version of the conversation the change is based on: its `resource_version` in double quotes, for example `\"3\"`. A different current version returns 412 `resource_version_conflict`; a missing header returns 428 `precondition_required`."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "requestBody": {
@@ -2100,18 +1998,6 @@
               "maxLength": 128
             },
             "description": "Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "responses": {
@@ -2161,18 +2047,6 @@
               "type": "string"
             },
             "description": "ID of the conversation, as returned when it was created or listed."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           },
           {
             "name": "cursor",
@@ -2256,18 +2130,6 @@
               "type": "string"
             },
             "description": "ID of the message."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "responses": {
@@ -2335,18 +2197,6 @@
               "maxLength": 128
             },
             "description": "Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "requestBody": {
@@ -2424,18 +2274,6 @@
               "maxLength": 128
             },
             "description": "Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "responses": {
@@ -2502,18 +2340,6 @@
               "pattern": "^\"[1-9][0-9]*\"$"
             },
             "description": "Version of the conversation the change is based on: its `resource_version` in double quotes, for example `\"3\"`. A different current version returns 412 `resource_version_conflict`; a missing header returns 428 `precondition_required`."
-          },
-          {
-            "name": "X-BeeOS-External-User-ID",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            "x-sdk-client-option": "externalUserId",
-            "description": "ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible."
           }
         ],
         "requestBody": {
@@ -2576,15 +2402,6 @@
               ]
             },
             "description": "Length of the reporting window, which ends now: `day` for the last 24 hours (default), `week` for the last 7 days or `month` for the last 30 days. The window moves with the current time and does not follow calendar days."
-          },
-          {
-            "name": "external_user_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Only count usage of this end user, as an ID from your own system. Omit it to count all end users of the app. When it is omitted, the `X-BeeOS-External-User-ID` header is used if sent."
           },
           {
             "name": "category",
@@ -7472,8 +7289,8 @@
             "description": "ID of the app the session belongs to."
           },
           "external_user_id": {
-            "$ref": "#/components/schemas/ExternalUserID",
-            "description": "ID of your end user in your own system that the session acts for, as sent in `X-BeeOS-External-User-ID`."
+            "type": "string",
+            "description": "Unused. Cloud does not accept an external user id. Stored sessions leave this empty."
           },
           "capabilities": {
             "type": "array",
@@ -8478,7 +8295,7 @@
           },
           "sender": {
             "type": "string",
-            "description": "Identity that sent the message. A message sent by the end user named in the `X-BeeOS-External-User-ID` header is shown as `user:<external user ID>`. Other senders appear as their own identity ID."
+            "description": "Identity that sent the message. Other senders appear as their own identity ID."
           },
           "reply_to": {
             "type": "string",
@@ -8673,7 +8490,7 @@
           },
           "sender": {
             "type": "string",
-            "description": "Identity that sent the message. A message sent by the end user named in the `X-BeeOS-External-User-ID` header is shown as `user:<external user ID>`. Other senders appear as their own identity ID."
+            "description": "Identity that sent the message. Other senders appear as their own identity ID."
           },
           "reply_to": {
             "type": "string",
@@ -11209,6 +11026,9 @@
             "type": "string",
             "description": "Unique ID of the upgrade job."
           },
+          "image_version_id": {
+            "type": "string"
+          },
           "instance_id": {
             "type": "string",
             "description": "ID of the instance being upgraded."
@@ -11501,7 +11321,7 @@
                 "type": "null"
               }
             ],
-            "description": "Ties the upload to an instance and optionally an agent. Requires the `X-BeeOS-External-User-ID` header. Omit it for a plain upload."
+            "description": "Ties the upload to an instance and optionally an agent. The credential's organization and app own the file. Omit the context for a plain upload."
           },
           "filename": {
             "type": "string",
@@ -12034,7 +11854,7 @@
           },
           "caller_owner_id": {
             "type": "string",
-            "description": "ID of the owner of the submitting side. For tasks sent through this API it identifies your end user, the `X-BeeOS-External-User-ID` of the request."
+            "description": "ID of the owner of the submitting side. Cloud derives it from the credential's organization and app. Callers do not send an end-user id."
           },
           "target_principal_id": {
             "type": "string",
@@ -13501,7 +13321,7 @@
           },
           "sub": {
             "type": "string",
-            "description": "ID of the external user the ticket was issued for, from the `X-BeeOS-External-User-ID` header."
+            "description": "Unused. Cloud does not accept an external user id, so this claim is empty."
           },
           "jti": {
             "type": "string",
@@ -13558,7 +13378,7 @@
           },
           "sub": {
             "type": "string",
-            "description": "ID of the external user the ticket was issued for, from the `X-BeeOS-External-User-ID` header."
+            "description": "Unused. Cloud does not accept an external user id, so this claim is empty."
           },
           "jti": {
             "type": "string",
@@ -14903,5 +14723,5 @@
     }
   },
   "x-producer-repository": "beeos-ai/beeos-cloud-backend",
-  "x-producer-revision": "b9dfe76a9f2a2c8523b63a1a817661840efb63d0"
+  "x-producer-revision": "f54b78340340f1b280816978a6fd350848930fea"
 }

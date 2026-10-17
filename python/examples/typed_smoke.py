@@ -20,7 +20,7 @@ def typed_usage(client: BeeOSClient) -> tuple[RuntimeInstanceResult, UHPResponse
             "models": [{"provider_id": "custom", "model": "example-model", "role": "primary", "order": 0}],
         },
     }
-    instance = client.with_external_user("customer-42").instances.create(instance_input, {"Idempotency-Key": "example-operation-42"})
+    instance = client.instances.create(instance_input, {"Idempotency-Key": "example-operation-42"})
     response_input: UHPCreateResponseJSONRequest = {"input": "Hello", "stream": False, "metadata": UHPCreateResponseJSONRequestMetadataOpen(harness_id="harness-1", trace_id="trace-1")}
     response = client.responses.create(response_input)
     client.responses.get(response["id"])

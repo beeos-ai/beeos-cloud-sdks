@@ -28,7 +28,7 @@ func testClient(t *testing.T, send roundTripFunc) *BeeOSClient {
 	return client
 }
 
-func TestCreateKeepsVariantLLMAndExternalUser(t *testing.T) {
+func TestCreateKeepsVariantLLMAndOmitsExternalUser(t *testing.T) {
 	variant, key := "variant-1", "provided-at-runtime"
 	client := testClient(t, func(request *http.Request) (*http.Response, error) {
 		if request.URL.String() != "https://cloud.example/v1/instances" {
@@ -37,8 +37,8 @@ func TestCreateKeepsVariantLLMAndExternalUser(t *testing.T) {
 		if request.Header.Get("Authorization") != "Bearer provided-at-runtime" {
 			t.Fatal("authorization missing")
 		}
-		if request.Header.Get("X-BeeOS-External-User-ID") != "user-1" {
-			t.Fatal("external user missing")
+		if request.Header.Get("X-BeeOS-External-User-ID") != "" {
+			t.Fatal("external user header was sent")
 		}
 		var body CreateServerInstanceInput
 		if err := json.NewDecoder(request.Body).Decode(&body); err != nil {
@@ -48,7 +48,7 @@ func TestCreateKeepsVariantLLMAndExternalUser(t *testing.T) {
 			t.Fatal("variant or BYOK payload dropped")
 		}
 		return mockResponse(201, `{"data":{"id":"instance-1"},"operation":{"id":"op-1","kind":"create","phase":"queued"}}`), nil
-	}).WithExternalUser("user-1")
+	})
 	result, err := client.Instances.Create(context.Background(), CreateServerInstanceInput{Name: "example", VariantID: &variant, LLM: &RuntimeLLM{Providers: []RuntimeLLMProvider{{ID: "custom", Protocol: RuntimeLLMProviderProtocolOpenai, BaseURL: "https://provider.example/v1", APIKey: &key}}, Models: []RuntimeLLMModel{}}}, InstanceCreateOptions{IdempotencyKey: "operation-1"})
 	if err != nil {
 		t.Fatal(err)
@@ -155,13 +155,13 @@ func TestBooleanQueryUsesLowercase(t *testing.T) {
 	}
 }
 
-func TestScopedClientSessionDoesNotRepeatActorInOptions(t *testing.T) {
+func TestClientSessionOmitsExternalUserHeader(t *testing.T) {
 	client := testClient(t, func(request *http.Request) (*http.Response, error) {
-		if request.Header.Get("X-BeeOS-External-User-ID") != "user-1" {
-			t.Fatal("scoped actor missing")
+		if request.Header.Get("X-BeeOS-External-User-ID") != "" {
+			t.Fatal("external user header was sent")
 		}
 		return mockResponse(201, `{}`), nil
-	}).WithExternalUser("user-1")
+	})
 	if _, err := client.Identity.CreateClientSession(context.Background(), ClientSessionInput{ClientType: "web", RequestedCapabilities: []string{}}, CreateClientSessionOptions{IdempotencyKey: "operation-1"}); err != nil {
 		t.Fatal(err)
 	}
@@ -236,7 +236,7 @@ func TestOptionalRefreshClientSessionBodyCanBeOmitted(t *testing.T) {
 			t.Fatalf("optional body was not omitted: %v", err)
 		}
 		return mockResponse(202, `{}`), nil
-	}).WithExternalUser("user-1")
+	})
 	if _, err := client.Identity.RefreshClientSession(context.Background(), "session-1", nil, RefreshClientSessionOptions{IdempotencyKey: "operation-1"}); err != nil {
 		t.Fatal(err)
 	}

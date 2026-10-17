@@ -39,7 +39,7 @@ ClientSessionResponse = TypedDict("ClientSessionResponse", {
     "expires_at": "Required[str]",
     "session_id": "Required[str]",
     "app_id": "Required[str]",
-    "external_user_id": "Required[ExternalUserID]",
+    "external_user_id": "Required[str]",
     "capabilities": "Required[list[str]]",
     "binding": "Required[Binding]",
 })
@@ -713,6 +713,7 @@ RuntimeLLMModel = TypedDict("RuntimeLLMModel", {
 
 RuntimeUpgradeJob = TypedDict("RuntimeUpgradeJob", {
     "job_id": "Required[str]",
+    "image_version_id": "NotRequired[str]",
     "instance_id": "Required[str]",
     "status": "Required[str]",
     "target": "Required[str]",
@@ -1371,7 +1372,6 @@ SetConversationModelOptions = TypedDict("SetConversationModelOptions", {
 
 GetUsageSummaryOptions = TypedDict("GetUsageSummaryOptions", {
     "period": "NotRequired[Literal[\"day\", \"week\", \"month\"]]",
-    "external_user_id": "NotRequired[str]",
     "category": "NotRequired[str]",
 })
 
@@ -1919,10 +1919,9 @@ class APIError(Exception):
         super().__init__(f"BeeOS API returned HTTP {status}")
 
 class BeeOSClient:
-    def __init__(self, base_url: str, api_key: str | Callable[[], str], *, external_user_id: str | None = None, timeout: float = 30.0) -> None:
+    def __init__(self, base_url: str, api_key: str | Callable[[], str], *, timeout: float = 30.0) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
-        self.external_user_id = external_user_id
         self.timeout = timeout
         self.conversations = ConversationsResource(self)
         self.identity = IdentityResource(self)
@@ -1940,9 +1939,6 @@ class BeeOSClient:
         self.harnesses = HarnessesResource(self)
         self.responses = ResponsesResource(self)
 
-    def with_external_user(self, external_user_id: str) -> BeeOSClient:
-        return BeeOSClient(self.base_url, self.api_key, external_user_id=external_user_id, timeout=self.timeout)
-
     def _request(self, operation: str, method: str, path: str, base_path: str, query: dict[str, str], headers: dict[str, str], body: bytes | None, content_type: str) -> bytes:
         base = self.base_url
         if base_path:
@@ -1953,8 +1949,7 @@ class BeeOSClient:
             target += "?" + urlencode(query)
         key = self.api_key() if callable(self.api_key) else self.api_key
         headers["Authorization"] = "Bearer " + key
-        if self.external_user_id is not None:
-            headers["X-BeeOS-External-User-ID"] = self.external_user_id
+        headers.pop("X-BeeOS-External-User-ID", None)
         if content_type:
             headers["Content-Type"] = content_type
         request = URLRequest(target, data=body, headers=headers, method=method)
@@ -2000,8 +1995,7 @@ class BeeOSClient:
         headers["Authorization"] = "Bearer " + key
         if content_type:
             headers["Content-Type"] = content_type
-        if self.external_user_id is not None:
-            headers["X-BeeOS-External-User-ID"] = self.external_user_id
+        headers.pop("X-BeeOS-External-User-ID", None)
         request = URLRequest(target, data=body, headers=headers, method=method)
         with self._open(request, operation) as response:
             data: list[str] = []
@@ -2548,8 +2542,6 @@ class UsageResource:
         opts = options if options is not None else {}
         if "period" in opts:
             query["period"] = str(opts["period"])
-        if "external_user_id" in opts:
-            query["external_user_id"] = str(opts["external_user_id"])
         if "category" in opts:
             query["category"] = str(opts["category"])
         payload = self._client._request("getUsageSummary", "GET", path, "", query, headers, None, "")

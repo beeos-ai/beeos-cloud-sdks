@@ -16,7 +16,7 @@ async function typedSmoke(client: BeeOSClient): Promise<string> {
   void [harnesses, discovery, retrieved, items, events];
   return created.data.id;
 }
-const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: () => 'example-api-key' }).withExternalUser('example-user');
+const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: () => 'example-api-key' });
 void typedSmoke;
 void client;
 

@@ -24,7 +24,6 @@ export interface BeeOSClientOptions {
   baseURL: string;
   apiKey: string | (() => string);
   fetch?: typeof fetch;
-  externalUserId?: string;
 }
 
 type Query = Record<string, string | number | boolean | undefined>;
@@ -51,11 +50,6 @@ export class BeeOSClient {
     this.files = new FilesModule(this);
   }
 
-  withExternalUser(id: string): BeeOSClient {
-    if (!id || id.trim() !== id || id === "." || id === "..") throw new Error("invalid external user id");
-    return new BeeOSClient({ ...this.options, externalUserId: id });
-  }
-
   async request(method: string, path: string, init: { query?: Query; json?: unknown; idempotencyKey?: string; headers?: Record<string, string> } = {}): Promise<unknown> {
     const url = new URL(path.replace(/^\//, ""), this.options.baseURL.endsWith("/") ? this.options.baseURL : this.options.baseURL + "/");
     for (const [key, value] of Object.entries(init.query ?? {})) {
@@ -66,7 +60,7 @@ export class BeeOSClient {
       Accept: "application/json",
       ...init.headers,
     };
-    if (this.options.externalUserId) headers["X-BeeOS-External-User-ID"] = this.options.externalUserId;
+    delete headers["X-BeeOS-External-User-ID"];
     if (init.idempotencyKey) headers["Idempotency-Key"] = init.idempotencyKey;
     let body: string | undefined;
     if (init.json !== undefined) {

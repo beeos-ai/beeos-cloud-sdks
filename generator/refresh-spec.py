@@ -146,7 +146,7 @@ op('/instances/{instanceId}/status','get','getInstanceStatus','instances','getSt
 for name in ['start','stop','delete']:
  op('/instances/{instanceId}'+('/'+name if name!='delete' else ''),'delete' if name=='delete' else 'post',name+'Instance','instances',name,'RuntimeInstanceResult',headers=[idem,version],status='202')
 op('/instances/{instanceId}/exec','post','execInstance','instances','exec','RuntimeExecResult',obj({'argv':arr(strs),'timeout_seconds':ints},['argv']))
-op('/usage/summary','get','getUsageSummary','usage','getSummary','ServerUsageSummary',query=[param('period',typ={'type':'string','enum':['day','week','month']}),param('external_user_id'),param('category')])
+op('/usage/summary','get','getUsageSummary','usage','getSummary','ServerUsageSummary',query=[param('period',typ={'type':'string','enum':['day','week','month']}),param('category')])
 # Files are not enveloped: exact service projections.
 for path,method,oid,name,res,body,query,headers,status in [('/files/presign-upload','post','presignFileUpload','prepareUpload','FileTransferDescriptor','FilePrepareUploadInput',None,[idem],'201'),('/files/{fileId}/confirm','post','confirmFileUpload','confirmUpload','FileFile','FileConfirmInput',None,[idem],'200'),('/files','get','listFiles','list','FilePage',None,[param(n) for n in ['content_type','since','status','file_type','category','source','q','instance_id','agent_id','sort','sort_dir']]+[param(n,typ=ints) for n in ['limit','offset']],None,'200'),('/files/{fileId}','get','getFile','get','FileResolution',None,None,None,'200'),('/files/{fileId}','patch','renameFile','rename','FileFile',obj({'title':strs}),None,None,'200'),('/files/{fileId}','delete','deleteFile','delete',None,None,None,[idem],'204')]:op(path,method,oid,'files',name,res,body,query,headers,status)
 # Existing resource mapping.
@@ -166,12 +166,10 @@ for path,ops in spec['paths'].items():
   else:resource,name=mapping.get(oid,(o.get('x-sdk-resource','runtime'),o.get('x-sdk-method',oid)))
   o['x-sdk-resource']=resource;o['x-sdk-method']=name
   o.setdefault('x-sdk-activation','live' if (method,re.sub(r'{[^}]+}','{}',path)) in live else 'not-routed')
-  # External user header comes from client.withExternalUser, not a method argument.
   params=o.get('parameters',[]);resolved=[]
   for a in params:
    if '$ref' in a and a['$ref'].startswith('#/components/parameters/'):
     a=copy.deepcopy(spec['components']['parameters'][a['$ref'].split('/')[-1]])
-   if a.get('name')=='X-BeeOS-External-User-ID':a['x-sdk-client-option']='externalUserId'
    resolved.append(a)
   o['parameters']=resolved
 # Normalize JSON Schema nullable/const and explicit open additionalProperties.
@@ -450,6 +448,10 @@ def schema_entries(entries,second):
    else:raise SystemExit('field description names no property: '+name+' '+path)
 schema_entries(FIELD_DOCS['schemas'],False)
 schema_entries(FIELD_DOCS['schemas'],True)
+# Cloud has no external-user input. Vendored fragments may still declare the header.
+for ops in spec['paths'].values():
+ for o in ops.values():
+  o['parameters']=[p for p in o.get('parameters',[]) if p.get('name')!='X-BeeOS-External-User-ID']
 operations={o['operationId']:o for ops in spec['paths'].values() for o in ops.values()}
 def describe_parameters(o,notes):
  names={a['name'] for a in o['parameters']}

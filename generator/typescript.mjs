@@ -88,7 +88,7 @@ export async function generateTypeScript(spec) {
     const args = op.parameters.filter(p=>p.in==='path').map(p=>`${p.name}: string`);
     const body = resolve(spec,op.requestBody);
     if(body) args.push(`input${body.required ? '' : '?'}: Models.${requestBodyType(spec,op)}`);
-    const headerParams = op.parameters.filter(p=>p.in==='header' && p.name !== 'X-BeeOS-External-User-ID');
+    const headerParams = op.parameters.filter(p=>p.in==='header');
     for(const p of headerParams) args.push(`${p.name==='Idempotency-Key'?'idempotencyKey':p.name==='If-Match'?'version':p.name.replace(/[^a-zA-Z0-9]/g,'')}${p.required?'':'?'}: ${p.name==='If-Match'?'number':'string'}`);
     if(op.parameters.some(p=>p.in==='query')) args.push(`query?: Models.${name}Query`);
     const path = op.path.replace(/^\//,'').replace(/\{([^}]+)\}/g,(_,n)=>'${encodeURIComponent('+n+')}');
