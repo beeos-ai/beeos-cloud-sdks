@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+
+- Agent responses expose read-only `harness_id` for UHP execution; generated
+  TypeScript, Python and Go models include the reference. Requires the matching
+  Cloud backend deployment; it does not indicate runtime readiness.
+
 ### BREAKING
 
 - Public clients no longer send `X-BeeOS-External-User-ID`. Removed

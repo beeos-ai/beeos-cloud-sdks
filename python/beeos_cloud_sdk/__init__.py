@@ -801,6 +801,7 @@ FileSummary = TypedDict("FileSummary", {
 })
 
 AgentAgent = TypedDict("AgentAgent", {
+    "harness_id": "Required[str]",
     "id": "Required[str]",
     "instance_id": "Required[str]",
     "name": "Required[str]",

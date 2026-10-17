@@ -1995,6 +1995,7 @@ type FileSummary struct {
 }
 
 type AgentAgent struct {
+	HarnessID             string          `json:"harness_id"`
 	ID                    string          `json:"id"`
 	InstanceID            string          `json:"instance_id"`
 	Name                  string          `json:"name"`
