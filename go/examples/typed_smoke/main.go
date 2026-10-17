@@ -8,7 +8,7 @@ import (
 
 func typedUsage(ctx context.Context, client *sdk.BeeOSClient) (sdk.RuntimeInstanceResult, error) {
 	variant, providerKey := "variant-from-catalog", "provided-at-runtime"
-	instance, err := client.WithExternalUser("customer-42").Instances.Create(ctx, sdk.CreateServerInstanceInput{
+	instance, err := client.Instances.Create(ctx, sdk.CreateServerInstanceInput{
 		Name: "typed-example", VariantID: &variant,
 		LLM: &sdk.RuntimeLLM{
 			Providers: []sdk.RuntimeLLMProvider{{ID: "custom", Protocol: sdk.RuntimeLLMProviderProtocolOpenai, BaseURL: "https://provider.example/v1", APIKey: &providerKey}},

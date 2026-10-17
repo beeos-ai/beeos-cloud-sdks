@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { BeeOSAPIError, BeeOSClient } from "./index.ts";
 
 describe("BeeOSClient", () => {
-  it("sends bsk_ and scopes external user without mutating the parent", async () => {
+  it("sends bsk_ and does not send an external user header", async () => {
     const calls: Array<{ url: string; auth: string | null; user: string | null }> = [];
     const fetchImpl: typeof fetch = async (input, init) => {
       const url = String(input);
@@ -11,12 +11,11 @@ describe("BeeOSClient", () => {
       return new Response(JSON.stringify({ data: [] }), { status: 200, headers: { "Content-Type": "application/json" } });
     };
     const client = new BeeOSClient({ baseURL: "https://api.cloud.beeos.ai/v1/", apiKey: "bsk_test", fetch: fetchImpl });
-    const scoped = client.withExternalUser("user-a");
     await client.instances.list();
-    await scoped.agents.get("agt_1");
+    await client.agents.get("agt_1");
     expect(calls[0].auth).toBe("Bearer bsk_test");
     expect(calls[0].user).toBeNull();
-    expect(calls[1].user).toBe("user-a");
+    expect(calls[1].user).toBeNull();
     expect(calls[1].url).toContain("/agents/agt_1");
   });
 
@@ -118,12 +117,12 @@ describe('generated typed resources', () => {
     const client = new BeeOSClient({ baseURL: 'https://example.invalid/v1', apiKey: () => 'example-api-key', fetch: async (url, init) => {
       request = new Request(url, init);
       return Response.json({ data: { id: 'instance-example' }, operation: { id: 'operation-example' } }, { status: 202 });
-    } }).withExternalUser('example-user');
+    }});
     const result = await client.instances.create(input, 'example-idempotency-key');
     expect(result.data.id).toBe('instance-example');
     expect(await request!.json()).toEqual(input);
     expect(request!.headers.get('Authorization')).toBe('Bearer example-api-key');
-    expect(request!.headers.get('X-BeeOS-External-User-ID')).toBe('example-user');
+    expect(request!.headers.get('X-BeeOS-External-User-ID')).toBeNull();
   });
 
   it('uses the producer UHP surface and preserves typed nested errors', async () => {

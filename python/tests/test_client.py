@@ -8,18 +8,16 @@ from beeos_cloud_sdk import APIError, BeeOSClient, UHPCreateResponseJSONRequestM
 
 
 class ClientTests(unittest.TestCase):
-    def test_create_keeps_variant_llm_and_external_user(self):
+    def test_create_keeps_variant_llm_and_omits_external_user(self):
         response = io.BytesIO(b'{"data":{"id":"instance-1"},"operation":{"id":"op-1","kind":"create","phase":"queued"}}')
-        base_client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime")
-        client = base_client.with_external_user("user-1")
-        self.assertIsNone(base_client.external_user_id)
+        client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime")
         body = {"name": "example", "variant_id": "variant-1", "llm": {"providers": [{"id": "custom", "protocol": "openai", "base_url": "https://provider.example/v1", "api_key": "provided-at-runtime"}], "models": []}}
         with patch("beeos_cloud_sdk.urlopen", return_value=response) as send:
             result = client.instances.create(body, {"Idempotency-Key": "operation-1"})
             request = send.call_args.args[0]
             self.assertEqual(request.full_url, "https://cloud.example/v1/instances")
             self.assertEqual(json.loads(request.data), body)
-            self.assertEqual(request.get_header("X-beeos-external-user-id"), "user-1")
+            self.assertIsNone(request.get_header("X-beeos-external-user-id"))
             self.assertEqual(request.get_header("Authorization"), "Bearer provided-at-runtime")
             self.assertEqual(result["data"]["id"], "instance-1")
 
@@ -59,11 +57,11 @@ class ClientTests(unittest.TestCase):
             client.catalog.list_regions({"available": True})
             self.assertIn("available=true", send.call_args.args[0].full_url)
 
-    def test_scoped_client_session_does_not_repeat_actor_in_options(self):
-        client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime").with_external_user("user-1")
+    def test_client_session_omits_external_user_header(self):
+        client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime")
         with patch("beeos_cloud_sdk.urlopen", return_value=io.BytesIO(b'{}')) as send:
             client.identity.create_client_session({"client_type": "web", "requested_capabilities": []}, {"Idempotency-Key": "operation-1"})
-            self.assertEqual(send.call_args.args[0].get_header("X-beeos-external-user-id"), "user-1")
+            self.assertIsNone(send.call_args.args[0].get_header("X-beeos-external-user-id"))
 
     def test_harness_update_sends_uhp_body_with_extensions(self):
         client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime")
@@ -77,7 +75,7 @@ class ClientTests(unittest.TestCase):
             self.assertEqual(send.call_args.kwargs["timeout"], 60.0)
 
     def test_optional_refresh_client_session_body_can_be_omitted(self):
-        client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime").with_external_user("user-1")
+        client = BeeOSClient("https://cloud.example/v1", "provided-at-runtime")
         with patch("beeos_cloud_sdk.urlopen", return_value=io.BytesIO(b'{}')) as send:
             client.identity.refresh_client_session("session-1", options={"Idempotency-Key": "operation-1"})
             self.assertIsNone(send.call_args.args[0].data)
@@ -147,12 +145,12 @@ class ClientTests(unittest.TestCase):
         with patch("beeos_cloud_sdk.urlopen", return_value=io.BytesIO(b'{"data":[]}')) as send:
             client.catalog.list_regions()
             self.assertEqual(send.call_args.kwargs["timeout"], 30.0)
-        scoped = BeeOSClient("https://cloud.example/v1", "provided-at-runtime", timeout=2.5).with_external_user("user-1")
+        scoped = BeeOSClient("https://cloud.example/v1", "provided-at-runtime", timeout=2.5)
         with patch("beeos_cloud_sdk.urlopen", return_value=io.BytesIO(b'data: {"type":"response.created","sequence_number":0}\n\n')) as send:
             stream = scoped.responses.get_events("response-1")
             self.assertEqual(next(stream)["sequence_number"], 0)
             self.assertEqual(send.call_args.kwargs["timeout"], 2.5)
-            self.assertEqual(send.call_args.args[0].get_header("X-beeos-external-user-id"), "user-1")
+            self.assertIsNone(send.call_args.args[0].get_header("X-beeos-external-user-id"))
             stream.close()
 
     def test_response_events_404_retains_uhp_error_body(self):

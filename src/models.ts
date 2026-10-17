@@ -1481,8 +1481,8 @@ export interface components {
             session_id: string;
             /** @description ID of the app the session belongs to. */
             app_id: string;
-            /** @description ID of your end user in your own system that the session acts for, as sent in `X-BeeOS-External-User-ID`. */
-            external_user_id: components["schemas"]["ExternalUserID"];
+            /** @description Unused. Cloud does not accept an external user id. Stored sessions leave this empty. */
+            external_user_id: string;
             /** @description Operations the token may perform on the Client API. They are the requested capabilities, without duplicates. */
             capabilities: string[];
             /** @description How the token is bound to the client, as requested when the session was created. */
@@ -1820,7 +1820,7 @@ export interface components {
             type: string;
             /** @description Payload of the message as JSON. Its structure depends on `type`; see the variants listed for this field. For current agent replies read `body` and `parts` instead. The server removes the `metadata` and `from` keys before returning it. */
             content: JSONValue;
-            /** @description Identity that sent the message. A message sent by the end user named in the `X-BeeOS-External-User-ID` header is shown as `user:<external user ID>`. Other senders appear as their own identity ID. */
+            /** @description Identity that sent the message. Other senders appear as their own identity ID. */
             sender: string;
             /** @description ID of the message this message replies to, for example the `chat_message` an `agent_reply` answers. Omitted for messages that are not replies. */
             reply_to?: string;
@@ -1894,7 +1894,7 @@ export interface components {
             conversation_id: string;
             /** @description Kind of the message. Use it to tell the caller's prompts from the agent's replies and other messages. New kinds can be added, so ignore values you do not know. */
             type: string;
-            /** @description Identity that sent the message. A message sent by the end user named in the `X-BeeOS-External-User-ID` header is shown as `user:<external user ID>`. Other senders appear as their own identity ID. */
+            /** @description Identity that sent the message. Other senders appear as their own identity ID. */
             sender: string;
             /** @description ID of the message this message replies to, for example the `chat_message` an `agent_reply` answers. Omitted for messages that are not replies. */
             reply_to?: string;
@@ -2966,6 +2966,7 @@ export interface components {
         RuntimeUpgradeJob: {
             /** @description Unique ID of the upgrade job. */
             job_id: string;
+            image_version_id?: string;
             /** @description ID of the instance being upgraded. */
             instance_id: string;
             /** @description Status of the job: `upgrade_pending`, `rollback_pending`, `failed` or `succeeded`. */
@@ -3065,7 +3066,7 @@ export interface components {
             agent_id?: string;
         };
         FilePrepareUploadInput: {
-            /** @description Ties the upload to an instance and optionally an agent. Requires the `X-BeeOS-External-User-ID` header. Omit it for a plain upload. */
+            /** @description Ties the upload to an instance and optionally an agent. The credential's organization and app own the file. Omit the context for a plain upload. */
             upload_context?: components["schemas"]["FileChatUploadContext"] | null;
             /** @description Name of the file, 1 to 255 characters, without leading or trailing whitespace and without `/`, `\` or control characters. */
             filename: string;
@@ -3262,7 +3263,7 @@ export interface components {
             caller_principal_id: string;
             /** @description ID of the agent that submitted the task, if any. */
             caller_agent_id: string;
-            /** @description ID of the owner of the submitting side. For tasks sent through this API it identifies your end user, the `X-BeeOS-External-User-ID` of the request. */
+            /** @description ID of the owner of the submitting side. Cloud derives it from the credential's organization and app. Callers do not send an end-user id. */
             caller_owner_id: string;
             /** @description ID of the principal the task was sent to. */
             target_principal_id: string;
@@ -3840,7 +3841,7 @@ export interface components {
             iss: string;
             /** @description Audience the ticket is intended for: the terminal service. */
             aud: string;
-            /** @description ID of the external user the ticket was issued for, from the `X-BeeOS-External-User-ID` header. */
+            /** @description Unused. Cloud does not accept an external user id, so this claim is empty. */
             sub: string;
             /** @description Unique ID of the ticket. */
             jti: string;
@@ -3862,7 +3863,7 @@ export interface components {
         CanvasTicketClaims: {
             /** @description Issuer of the ticket. */
             iss: string;
-            /** @description ID of the external user the ticket was issued for, from the `X-BeeOS-External-User-ID` header. */
+            /** @description Unused. Cloud does not accept an external user id, so this claim is empty. */
             sub: string;
             /** @description Unique ID of the ticket. */
             jti: string;
@@ -4135,8 +4136,6 @@ export interface operations {
             header: {
                 /** @description Version of the conversation the change is based on: its `resource_version` in double quotes, for example `"3"`. A different current version returns 412 `resource_version_conflict`; a missing header returns 428 `precondition_required`. */
                 "If-Match": string;
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
             };
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
@@ -4178,8 +4177,6 @@ export interface operations {
             header: {
                 /** @description Version of the conversation the change is based on: its `resource_version` in double quotes, for example `"3"`. A different current version returns 412 `resource_version_conflict`; a missing header returns 428 `precondition_required`. */
                 "If-Match": string;
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
             };
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
@@ -4219,8 +4216,6 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. For a session operation it must be the user the session was created for. */
-                "X-BeeOS-External-User-ID": components["schemas"]["ExternalUserID"];
                 /** @description Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
             };
@@ -4257,8 +4252,6 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. For a session operation it must be the user the session was created for. */
-                "X-BeeOS-External-User-ID": components["schemas"]["ExternalUserID"];
                 /** @description Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
             };
@@ -4306,8 +4299,6 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
-                /** @description ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. For a session operation it must be the user the session was created for. */
-                "X-BeeOS-External-User-ID": components["schemas"]["ExternalUserID"];
                 /** @description Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
             };
@@ -4345,7 +4336,7 @@ export interface operations {
                 "Idempotency-Key": string;
             };
             path: {
-                /** @description ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. If `X-BeeOS-External-User-ID` is also sent, both must be equal. */
+                /** @description ID of the end user whose stored data is deleted. 1 to 128 characters; `.` and `..` are rejected. This is the path resource id, not a request header. */
                 externalUserId: components["schemas"]["ExternalUserID"];
             };
             cookie?: never;
@@ -4377,7 +4368,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                /** @description ID of your end user in your own system, 1 to 128 characters; `.` and `..` are rejected. If `X-BeeOS-External-User-ID` is also sent, both must be equal. */
+                /** @description ID of the end user whose stored data is deleted. 1 to 128 characters; `.` and `..` are rejected. This is the path resource id, not a request header. */
                 externalUserId: components["schemas"]["ExternalUserID"];
                 /** @description ID of the deletion, the `deletion_id` returned by the delete operation. */
                 deletionId: string;
@@ -5118,10 +5109,7 @@ export interface operations {
                 /** @description Which conversations to list: `open` for conversations that accept messages (default), `closed` for closed conversations such as deleted ones, or `all` for both. */
                 state?: "open" | "closed" | "all";
             };
-            header: {
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
-            };
+            header?: never;
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
@@ -5156,8 +5144,6 @@ export interface operations {
             header: {
                 /** @description Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
             };
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
@@ -5194,10 +5180,7 @@ export interface operations {
     getConversation: {
         parameters: {
             query?: never;
-            header: {
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
-            };
+            header?: never;
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
@@ -5234,8 +5217,6 @@ export interface operations {
             header: {
                 /** @description Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
             };
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
@@ -5271,8 +5252,6 @@ export interface operations {
             header: {
                 /** @description Version of the conversation the change is based on: its `resource_version` in double quotes, for example `"3"`. A different current version returns 412 `resource_version_conflict`; a missing header returns 428 `precondition_required`. */
                 "If-Match": string;
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
             };
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
@@ -5316,10 +5295,7 @@ export interface operations {
                 /** @description Maximum number of messages to return in one page. Defaults to 50. The server accepts values from 1 to 200. */
                 limit?: number;
             };
-            header: {
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
-            };
+            header?: never;
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
@@ -5353,10 +5329,7 @@ export interface operations {
     getConversationMessage: {
         parameters: {
             query?: never;
-            header: {
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
-            };
+            header?: never;
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
                 agentId: string;
@@ -5395,8 +5368,6 @@ export interface operations {
             header: {
                 /** @description Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
             };
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
@@ -5438,8 +5409,6 @@ export interface operations {
             header: {
                 /** @description Key that makes retries of this request safe, 8 to 128 characters without leading or trailing whitespace. Retrying with the same key and the same content returns the original result; reusing the key with different content returns 409 `idempotency_conflict`. */
                 "Idempotency-Key": string;
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
             };
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
@@ -5477,8 +5446,6 @@ export interface operations {
             header: {
                 /** @description Version of the conversation the change is based on: its `resource_version` in double quotes, for example `"3"`. A different current version returns 412 `resource_version_conflict`; a missing header returns 428 `precondition_required`. */
                 "If-Match": string;
-                /** @description ID of your end user in your own system, on whose behalf the request is made. 1 to 128 characters; `.` and `..` are rejected. Only conversations of this user are visible. */
-                "X-BeeOS-External-User-ID": string;
             };
             path: {
                 /** @description ID of the agent, the `id` returned by the agents API. */
@@ -5519,8 +5486,6 @@ export interface operations {
             query?: {
                 /** @description Length of the reporting window, which ends now: `day` for the last 24 hours (default), `week` for the last 7 days or `month` for the last 30 days. The window moves with the current time and does not follow calendar days. */
                 period?: "day" | "week" | "month";
-                /** @description Only count usage of this end user, as an ID from your own system. Omit it to count all end users of the app. When it is omitted, the `X-BeeOS-External-User-ID` header is used if sent. */
-                external_user_id?: string;
                 /** @description Only count usage of this category, one of the keys that appear in `by_category`. Omit it to count all categories. */
                 category?: string;
             };

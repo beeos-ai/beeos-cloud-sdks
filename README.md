@@ -11,7 +11,7 @@ import { BeeOSClient } from '@beeos-ai/cloud-sdk';
 const client = new BeeOSClient({
   baseURL: 'https://api.cloud.beeos.ai/v1',
   apiKey: () => process.env.BEEOS_API_KEY!,
-}).withExternalUser('customer-42');
+});
 const instance = await client.instances.create({
   name: 'example', variant_id: 'variant-from-catalog',
 }, 'example-operation-42');
@@ -21,9 +21,10 @@ const response = await client.responses.create({
 console.log(instance.data.id, response.id);
 ```
 
-Python uses `BeeOSClient(base_url, api_key).with_external_user(id)`. Go uses
-`NewBeeOSClient(baseURL, keyProvider, transport)` and `WithExternalUser(id)`.
-Both expose the same spec operations through typed resources. Compile-only
+Python uses `BeeOSClient(base_url, api_key)`. Go uses
+`NewBeeOSClient(baseURL, keyProvider, transport)`.
+Both expose the same spec operations through typed resources. Organization and
+app come from the server key. Compile-only
 examples are in `examples/typescript.ts`, `python/examples/typed_smoke.py`, and
 `go/examples/typed_smoke/main.go`.
 
@@ -37,8 +38,7 @@ use `responses.create` / `Responses.Create`; streaming uses `createStream`,
 uses multipart upload. HTTP errors expose typed wire bodies; every failed HTTP response raises a typed API error with its original status.
 Malformed or unrecognized error bodies use `invalid_response` and retain raw
 diagnostics; transport failures without an HTTP response remain transport errors.
-Python uses a 30-second default timeout, configurable with `timeout=...` and
-preserved by `with_external_user`.
+Python uses a 30-second default timeout, configurable with `timeout=...`.
 
 ### Harness management (UHP)
 

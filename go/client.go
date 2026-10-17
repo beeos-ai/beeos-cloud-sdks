@@ -36,7 +36,7 @@ type ClientSessionResponse struct {
 	ExpiresAt      string                            `json:"expires_at"`
 	SessionID      string                            `json:"session_id"`
 	AppID          string                            `json:"app_id"`
-	ExternalUserID ExternalUserID                    `json:"external_user_id"`
+	ExternalUserID string                            `json:"external_user_id"`
 	Capabilities   []string                          `json:"capabilities"`
 	Binding        Binding                           `json:"binding"`
 }
@@ -1906,13 +1906,14 @@ type RuntimeLLMModel struct {
 }
 
 type RuntimeUpgradeJob struct {
-	JobID       string  `json:"job_id"`
-	InstanceID  string  `json:"instance_id"`
-	Status      string  `json:"status"`
-	Target      string  `json:"target"`
-	CreatedAt   string  `json:"created_at"`
-	CompletedAt *string `json:"completed_at,omitempty"`
-	Error       *string `json:"error,omitempty"`
+	JobID          string  `json:"job_id"`
+	ImageVersionID *string `json:"image_version_id,omitempty"`
+	InstanceID     string  `json:"instance_id"`
+	Status         string  `json:"status"`
+	Target         string  `json:"target"`
+	CreatedAt      string  `json:"created_at"`
+	CompletedAt    *string `json:"completed_at,omitempty"`
+	Error          *string `json:"error,omitempty"`
 }
 
 type FileFile struct {
@@ -2675,9 +2676,8 @@ type SetConversationModelOptions struct {
 }
 
 type GetUsageSummaryOptions struct {
-	Period         *GetUsageSummaryOptionsPeriod `json:"period,omitempty"`
-	ExternalUserID *string                       `json:"external_user_id,omitempty"`
-	Category       *string                       `json:"category,omitempty"`
+	Period   *GetUsageSummaryOptionsPeriod `json:"period,omitempty"`
+	Category *string                       `json:"category,omitempty"`
 }
 
 type CreateTerminalSessionRequest struct {
@@ -3896,7 +3896,6 @@ type BeeOSClient struct {
 	baseURL        string
 	apiKey         func() string
 	transport      *http.Client
-	externalUserID string
 	Conversations  *ConversationsResource
 	Identity       *IdentityResource
 	Catalog        *CatalogResource
@@ -3939,13 +3938,6 @@ func (c *BeeOSClient) initResources() {
 	c.Harnesses = &HarnessesResource{client: c}
 	c.Responses = &ResponsesResource{client: c}
 }
-func (c *BeeOSClient) WithExternalUser(externalUserID string) *BeeOSClient {
-	copy := *c
-	copy.externalUserID = externalUserID
-	copy.initResources()
-	return &copy
-}
-
 func (c *BeeOSClient) send(ctx context.Context, operation, method, path, basePath string, query url.Values, headers http.Header, body []byte, contentType string) (*http.Response, error) {
 	base := c.baseURL
 	if basePath != "" {
@@ -3966,9 +3958,7 @@ func (c *BeeOSClient) send(ctx context.Context, operation, method, path, basePat
 	}
 	request.Header = headers
 	request.Header.Set("Authorization", "Bearer "+c.apiKey())
-	if c.externalUserID != "" {
-		request.Header.Set("X-BeeOS-External-User-ID", c.externalUserID)
-	}
+	request.Header.Del("X-BeeOS-External-User-ID")
 	if contentType != "" {
 		request.Header.Set("Content-Type", contentType)
 	}
@@ -4950,9 +4940,6 @@ func (r *UsageResource) GetSummary(ctx context.Context, options GetUsageSummaryO
 	var output ServerUsageSummary
 	if options.Period != nil {
 		query.Set("period", fmt.Sprint(*options.Period))
-	}
-	if options.ExternalUserID != nil {
-		query.Set("external_user_id", fmt.Sprint(*options.ExternalUserID))
 	}
 	if options.Category != nil {
 		query.Set("category", fmt.Sprint(*options.Category))
