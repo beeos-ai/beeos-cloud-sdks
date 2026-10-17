@@ -3133,6 +3133,8 @@ export interface components {
             }[];
         };
         AgentAgent: {
+            /** @description HarnessID is the read-only UHP reference derived by the public HTTP adapter. It identifies this agent; it does not assert runtime availability. */
+            readonly harness_id: string;
             /** @description ID of the agent. */
             id: string;
             /** @description ID of the instance the agent runs on. */

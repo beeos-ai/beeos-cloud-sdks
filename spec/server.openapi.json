@@ -11503,6 +11503,11 @@
       "AgentAgent": {
         "type": "object",
         "properties": {
+          "harness_id": {
+            "type": "string",
+            "readOnly": true,
+            "description": "HarnessID is the read-only UHP reference derived by the public HTTP adapter. It identifies this agent; it does not assert runtime availability."
+          },
           "id": {
             "type": "string",
             "description": "ID of the agent."
@@ -11592,6 +11597,7 @@
           }
         },
         "required": [
+          "harness_id",
           "id",
           "instance_id",
           "name",
@@ -14723,5 +14729,5 @@
     }
   },
   "x-producer-repository": "beeos-ai/beeos-cloud-backend",
-  "x-producer-revision": "297287235bc763fd9bab6892920d8a8eaaacdbcf"
+  "x-producer-revision": "3d8e4233ce428d42710722a04d784b2a6928d3ea"
 }

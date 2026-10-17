@@ -211,3 +211,13 @@ needs no package-registry secret. These tags and registry writes require the
 separate release authorization.
 
 Go subdirectory tag rules follow the [Go Modules Reference](https://go.dev/ref/mod#vcs-version).
+
+### Agent execution references
+
+Agent list, get and update responses include a read-only `harness_id`. Use the
+agent `id` for conversation APIs and the returned `harness_id` in UHP
+`metadata.harness_id`. Both identify the same agent; clients must not construct
+the reference from a name, list position or ID prefix. The reference does not
+assert that the instance is online or execution is authorized. Older deployments
+may not return this field; wait for the matching backend rollout before relying
+on it. UHP request parameters are unchanged.

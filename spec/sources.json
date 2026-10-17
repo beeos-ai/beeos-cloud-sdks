@@ -2,7 +2,7 @@
   "spec": "server.openapi.json",
   "producer": {
     "repository": "beeos-ai/beeos-cloud-backend",
-    "revision": "297287235bc763fd9bab6892920d8a8eaaacdbcf",
+    "revision": "3d8e4233ce428d42710722a04d784b2a6928d3ea",
     "read_method": "git ls-tree / git show at <revision> for every input (producer checkout and working tree never read or modified)"
   },
   "app_sdk": {
@@ -79,7 +79,7 @@
     "producer/pkg/a2a/jsonrpc_params.go": "a6e8926316f1fd9ce0d5acd71e97c762105a628d1aaa38386c6d1fd1b17fa61e",
     "producer/pkg/a2a/protocol.go": "90462ca9b68f6002dc166819635b8f37f3671cebcf70557fd41ed9c6f7764224",
     "producer/pkg/a2a/renderer.go": "5ea9f0b1c1d4110896c2122cee857b0f5a704b0083fa6adfdce30c9900f3bf0a",
-    "producer/pkg/beeoscloudagent/contract.go": "4a6d173158aa577ad882f55f8fae8d4cba06725605be148a70542dc31474047a",
+    "producer/pkg/beeoscloudagent/contract.go": "0099facf27b9573894037be6c40a69c583cde1a4752797e9326279451508da51",
     "producer/pkg/beeoscloudagent/grpc.go": "9648fdf25bec3b114d77bd9f25ef9b53809e12af2b9a9a99fd1ee8005b083d71",
     "producer/pkg/beeoscloudagent/invocation.go": "69230aa7fe4095e51f9d6927eda997e3310a7c24f79e620b94e24358e6e88e93",
     "producer/pkg/beeoscloudfiles/file.go": "67fcf5062336554d08cdfa9b3b7e9222b87689bff01db609d9b7e7d31a8dbce9",
@@ -150,7 +150,7 @@
     "producer/services/openapi-gateway/internal/beeoscloud/a2a.go": "53f0ebf013727c24df6119483a8ece33cce627db41091e626acf933c402cbe50",
     "producer/services/openapi-gateway/internal/beeoscloud/a2a_tasks.go": "6cacf18adc28d930ada5e062c30de67121950766d5fdf8cc67539296441d6817",
     "producer/services/openapi-gateway/internal/beeoscloud/agent_templates.go": "17f88cd390e9ef3428a56d396a437f8bffddcf46f428095f6a10b3c27c09af06",
-    "producer/services/openapi-gateway/internal/beeoscloud/agents.go": "d5269e421862859e664d4916423923fc8750cf1d7ab03ec663cf51c3d343de60",
+    "producer/services/openapi-gateway/internal/beeoscloud/agents.go": "f6c4e8c4af070a5350e9a46eea156941a0140d1f03684d3122d9a20cce851587",
     "producer/services/openapi-gateway/internal/beeoscloud/api_key_ratelimit.go": "75f3ee193fa3af5dde0505aaf71cd0c692d66b58892d72fdabb8d55362081ca7",
     "producer/services/openapi-gateway/internal/beeoscloud/audio.go": "fac156705072d1f99233b9188a1c2a0e694cc78911c327ae1a1282b8de3635c0",
     "producer/services/openapi-gateway/internal/beeoscloud/automations.go": "93b72f3c25e886277b46b5cd6d0b9d3080ecdb4df3272e0a48b6719ca834bd87",

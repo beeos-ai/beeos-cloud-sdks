@@ -125,6 +125,7 @@ for n,(fields,prefix,body) in models.items():
   k=tag.split(',')[0];props[k]=go_type(typ,prefix)
   if 'omitempty' not in tag:req.append(k)
  S[n]=obj(props,req)
+S['AgentAgent']['properties']['harness_id']['readOnly']=True
 # Embedded File request base (untagged embed is flattened on JSON wire).
 S['FilePrepareUploadInput']['properties'].update(S['FilePrepareInput']['properties']);S['FilePrepareUploadInput']['required']+=S['FilePrepareInput']['required']
 S['CreateServerInstanceInput']=obj({'name':strs,'variant_id':strs,'harness':{'type':'string','enum':['openclaw']},'llm':{'anyOf':[ref('RuntimeLLM'),{'type':'null'}]}},['name'])
