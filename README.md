@@ -198,6 +198,18 @@ the generator snapshot test. The TypeScript schema generator is pinned in
 resource interfaces. Generation requires Node and Go (`gofmt`). The Python development extra pins
 `mypy==2.4.0`.
 
+## Import a skill ZIP by URL
+
+Use `client.files.importURL(input, idempotencyKey)` in TypeScript,
+`client.files.import_url(...)` in Python, or `client.Files.ImportURL(...)` in Go.
+Supply `source_url`, `filename`, `content_type: application/zip`, and
+`checksum_sha256`; `size_bytes` is optional. The URL must be short-lived public
+HTTPS on port 443. Cloud verifies the ZIP and returns a confirmed File; pass its
+`file_id` to UHP as `blob`. A file import does not itself install the skill.
+Configure the client transport timeout to at least 65 seconds. Do not log the
+input URL or signatures. The backend route must be deployed before use;
+generating this SDK does not publish a new package.
+
 ## Release
 
 No package is published by regeneration. The existing **Publish

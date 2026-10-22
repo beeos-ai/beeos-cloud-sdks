@@ -800,6 +800,14 @@ FileSummary = TypedDict("FileSummary", {
     "instances": "Required[list[FileSummaryInstancesItem]]",
 })
 
+FileImportURLInput = TypedDict("FileImportURLInput", {
+    "source_url": "Required[str]",
+    "filename": "Required[str]",
+    "content_type": "Required[str]",
+    "checksum_sha256": "Required[str]",
+    "size_bytes": "NotRequired[int | None]",
+})
+
 AgentAgent = TypedDict("AgentAgent", {
     "harness_id": "Required[str]",
     "id": "Required[str]",
@@ -944,6 +952,7 @@ CreateServerInstanceInput = TypedDict("CreateServerInstanceInput", {
     "variant_id": "NotRequired[str]",
     "harness": "NotRequired[Literal[\"openclaw\"]]",
     "llm": "NotRequired[RuntimeLLM | None]",
+    "tools": "NotRequired[CreateServerInstanceInputTools]",
 })
 
 ServerUsageSummary = TypedDict("ServerUsageSummary", {
@@ -1393,6 +1402,10 @@ ExecInstanceRequest = TypedDict("ExecInstanceRequest", {
     "timeout_seconds": "NotRequired[int]",
 })
 
+ImportFileURLOptions = TypedDict("ImportFileURLOptions", {
+    "Idempotency-Key": "Required[str]",
+})
+
 PresignFileUploadOptions = TypedDict("PresignFileUploadOptions", {
     "Idempotency-Key": "Required[str]",
 })
@@ -1768,6 +1781,10 @@ FileSummaryInstancesItem = TypedDict("FileSummaryInstancesItem", {
     "count": "Required[int]",
 })
 
+CreateServerInstanceInputTools = TypedDict("CreateServerInstanceInputTools", {
+    "exec": "Required[CreateServerInstanceInputToolsExec]",
+})
+
 RuntimeInstanceStatusResultData = TypedDict("RuntimeInstanceStatusResultData", {
     "id": "Required[str]",
     "name": "Required[str]",
@@ -1847,6 +1864,10 @@ GetCanvasSessionResponseDataVariant1 = TypedDict("GetCanvasSessionResponseDataVa
     "role": "Required[str]",
 })
 
+CreateServerInstanceInputToolsExec = TypedDict("CreateServerInstanceInputToolsExec", {
+    "mode": "Required[Literal[\"deny\", \"allowlist\", \"ask\", \"auto\", \"full\"]]",
+})
+
 ReplyShareResponseDataAgent = TypedDict("ReplyShareResponseDataAgent", {
     "name": "Required[str]",
     "avatar_url": "Required[str]",
@@ -1898,7 +1919,7 @@ class InvalidResponseBody(TypedDict):
     raw_body: bytes
     reason: str
 
-_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"setConversationApprovalMode":{"default":"ErrorResponse"},"setConversationReasoning":{"default":"ErrorResponse"},"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createHarness":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"updateHarness":{"400":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteHarness":{"404":"UHPErrorEnvelope","422":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
+_ERROR_SCHEMAS: dict[str, dict[str, str]] = {"setConversationApprovalMode":{"default":"ErrorResponse"},"setConversationReasoning":{"default":"ErrorResponse"},"createClientSession":{"default":"ErrorResponse"},"refreshClientSession":{"default":"ErrorResponse"},"revokeClientSession":{"default":"ErrorResponse"},"deleteExternalUser":{"default":"ErrorResponse"},"getExternalUserDeletion":{"default":"ErrorResponse"},"listProviders":{"default":"ErrorResponse"},"listDeployRegions":{"default":"ErrorResponse"},"listDeployModels":{"default":"ErrorResponse"},"listInstanceTemplates":{"default":"ErrorResponse"},"getInstanceTemplate":{"default":"ErrorResponse"},"listAgentTemplates":{"default":"ErrorResponse"},"listInstances":{"default":"ErrorResponse"},"instanceCreate":{"default":"ErrorResponse"},"getInstance":{"default":"ErrorResponse"},"updateInstanceMetadata":{"default":"ErrorResponse"},"deleteInstance":{"default":"ErrorResponse"},"getInstanceStatus":{"default":"ErrorResponse"},"startInstance":{"default":"ErrorResponse"},"stopInstance":{"default":"ErrorResponse"},"upgradeInstance":{"default":"ErrorResponse"},"getInstanceUpgrade":{"default":"ErrorResponse"},"listAgents":{"default":"ErrorResponse"},"getAgent":{"default":"ErrorResponse"},"updateAgent":{"default":"ErrorResponse"},"createAgentConversation":{"default":"ErrorResponse"},"listAgentConversations":{"default":"ErrorResponse"},"getConversation":{"default":"ErrorResponse"},"updateConversation":{"default":"ErrorResponse"},"deleteConversation":{"default":"ErrorResponse"},"listConversationMessages":{"default":"ErrorResponse"},"getConversationMessage":{"default":"ErrorResponse"},"cancelConversation":{"default":"ErrorResponse"},"clearConversation":{"default":"ErrorResponse"},"setConversationModel":{"default":"ErrorResponse"},"getUsageSummary":{"default":"ErrorResponse"},"createTerminalSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"createCanvasSession":{"400":"ErrorResponse","401":"ErrorResponse","404":"ErrorResponse","429":"ErrorResponse","5XX":"ErrorResponse","default":"ErrorResponse"},"execInstance":{"default":"ErrorResponse"},"importFileURL":{"default":"ErrorResponse"},"presignFileUpload":{"default":"ErrorResponse"},"confirmFileUpload":{"default":"ErrorResponse"},"listFiles":{"default":"ErrorResponse"},"getFile":{"default":"ErrorResponse"},"renameFile":{"default":"ErrorResponse"},"deleteFile":{"default":"ErrorResponse"},"getAgentTemplate":{"default":"ErrorResponse"},"createShareFileShare":{"default":"ErrorResponse"},"getShareFileShare":{"default":"ErrorResponse"},"revokeShareFileShare":{"default":"ErrorResponse"},"resolveFileShare":{"default":"ErrorResponse"},"getFilesSummary":{"default":"ErrorResponse"},"createShareReply":{"default":"ErrorResponse"},"getShareReply":{"default":"ErrorResponse"},"revokeShareReply":{"default":"ErrorResponse"},"resolveReplyShare":{"default":"ErrorResponse"},"getInstanceConnectURL":{"default":"ErrorResponse"},"getInstanceStreamURL":{"default":"ErrorResponse"},"resumeConversation":{"default":"ErrorResponse"},"createAutomation":{"default":"ErrorResponse"},"listAutomations":{"default":"ErrorResponse"},"getAutomation":{"default":"ErrorResponse"},"updateAutomation":{"default":"ErrorResponse"},"deleteAutomation":{"default":"ErrorResponse"},"pauseAutomation":{"default":"ErrorResponse"},"resumeAutomation":{"default":"ErrorResponse"},"createAutomationRun":{"default":"ErrorResponse"},"listAutomationRuns":{"default":"ErrorResponse"},"getAutomationRun":{"default":"ErrorResponse"},"createWebhookAutomation":{"default":"ErrorResponse"},"transcribeAudio":{"default":"ErrorResponse"},"getShareCanvas":{"default":"ErrorResponse"},"createShareCanvas":{"default":"ErrorResponse"},"deleteShareCanvas":{"default":"ErrorResponse"},"listCanvasSnapshots":{"default":"ErrorResponse"},"restoreCanvasSnapshot":{"default":"ErrorResponse"},"getCanvasSession":{"default":"ErrorResponse"},"getAgentBindDetails":{"default":"DeviceBindingErrorResponse"},"confirmAgentBind":{"default":"DeviceBindingErrorResponse"},"createPortalBind":{"default":"DeviceBindingErrorResponse"},"getPortalBind":{"default":"DeviceBindingErrorResponse"},"revokePortalBind":{"default":"DeviceBindingErrorResponse"},"resolvePortalBind":{"default":"DeviceBindingErrorResponse"},"invokeA2A":{"default":"ErrorResponse"},"getA2AAgentCard":{"default":"ErrorResponse"},"getA2AAgentCardLegacy":{"default":"ErrorResponse"},"listA2ATasks":{"default":"ErrorResponse"},"getA2ATask":{"default":"ErrorResponse"},"cancelA2ATask":{"default":"ErrorResponse"},"getDiscovery":{"default":"UHPErrorEnvelope"},"listHarnesses":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createHarness":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getHarness":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"updateHarness":{"400":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","413":"UHPErrorEnvelope","422":"UHPErrorEnvelope","502":"UHPErrorEnvelope","503":"UHPErrorEnvelope","504":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteHarness":{"404":"UHPErrorEnvelope","422":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listModels":{"401":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"listHarnessModels":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"createResponse":{"400":"UHPErrorEnvelope","401":"UHPErrorEnvelope","404":"UHPErrorEnvelope","409":"UHPErrorEnvelope","422":"UHPErrorEnvelope","429":"UHPErrorEnvelope","503":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"deleteResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseInputItems":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"cancelResponse":{"404":"UHPErrorEnvelope","default":"UHPErrorEnvelope"},"getResponseEvents":{"default":"UHPErrorEnvelope"}}
 
 def _matches_error_body(schema: str | None, value: JSONValue) -> bool:
     if not isinstance(value, dict):
@@ -2552,6 +2573,16 @@ class UsageResource:
 class FilesResource:
     def __init__(self, client: BeeOSClient) -> None:
         self._client = client
+
+    def import_url(self, input: FileImportURLInput, options: ImportFileURLOptions) -> FileFile:
+        path = f"/files/import-url"
+        query: dict[str, str] = {}
+        headers: dict[str, str] = {}
+        opts = options
+        if "Idempotency-Key" in opts:
+            headers["Idempotency-Key"] = str(opts["Idempotency-Key"])
+        payload = self._client._request("importFileURL", "POST", path, "", query, headers, json.dumps(input).encode(), "application/json")
+        return cast("FileFile", json.loads(payload))
 
     def prepare_upload(self, input: FilePrepareUploadInput, options: PresignFileUploadOptions) -> FileTransferDescriptor:
         path = f"/files/presign-upload"

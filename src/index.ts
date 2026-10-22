@@ -308,6 +308,9 @@ class MessagesModule {
 }
 
 class FilesModule {
+  importURL(input: Models.FileImportURLInput, idempotencyKey: string): Promise<Models.ImportFileURLResponse> {
+    return this.client.request<Models.ImportFileURLResponse>("POST", `files/import-url`, { json: input, idempotencyKey });
+  }
   rename(fileId: string, input: Models.RenameFileRequest): Promise<Models.RenameFileResponse> {
     return this.client.request<Models.RenameFileResponse>("PATCH", `files/${encodeURIComponent(fileId)}`, { json: input });
   }

@@ -576,6 +576,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/files/import-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import a skill ZIP from a download URL */
+        post: operations["importFileURL"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/files/presign-upload": {
         parameters: {
             query?: never;
@@ -3132,6 +3149,18 @@ export interface components {
                 count: number;
             }[];
         };
+        FileImportURLInput: {
+            /** @description Short-lived HTTPS download URL. Only public addresses on port 443 are allowed; at most three redirects. The URL is not retained in the File or idempotency record. */
+            source_url: string;
+            /** @description Filename of the imported skill ZIP, without a path. */
+            filename: string;
+            /** @description Must be application/zip. The ZIP must contain a nonempty root SKILL.md. */
+            content_type: string;
+            /** @description Required lowercase SHA-256 of the original ZIP bytes. A mismatch fails with checksum_mismatch. */
+            checksum_sha256: string;
+            /** @description Optional expected ZIP size. When supplied it must match exactly. Imports are limited to 16 MiB compressed and 64 MiB expanded. */
+            size_bytes?: number | null;
+        };
         AgentAgent: {
             /** @description HarnessID is the read-only UHP reference derived by the public HTTP adapter. It identifies this agent; it does not assert runtime availability. */
             readonly harness_id: string;
@@ -3390,6 +3419,13 @@ export interface components {
             harness?: "openclaw";
             /** @description Model providers and models the instance uses. Required when the variant or harness needs caller-supplied models; omit it for variants that supply their own models. Provider API keys are write-only. */
             llm?: components["schemas"]["RuntimeLLM"] | null;
+            /** @description Optional managed OpenClaw policy: {exec:{mode:deny|allowlist|ask|auto|full}}. Omission preserves ask. Full skips ordinary native exec approval prompts. Other harnesses reject this field; null, missing children, unknown fields and all are invalid. */
+            tools?: {
+                exec: {
+                    /** @enum {string} */
+                    mode: "deny" | "allowlist" | "ask" | "auto" | "full";
+                };
+            };
         };
         ServerUsageSummary: {
             /** @description Total charge in the period, in BC micros (millionths of a BeeOS Credit, BC), as a decimal string. For example `1500000` is 1.5 BC. */
@@ -5736,6 +5772,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RuntimeExecResult"];
+                };
+            };
+            /** @description Cloud Server error */
+            default: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    importFileURL: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Key that makes the request safe to retry, 8 to 128 characters without leading or trailing whitespace. Repeating a request with the same key and parameters replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`. */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FileImportURLInput"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            201: {
+                headers: {
+                    [name: string]: JSONValue | undefined;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileFile"];
                 };
             };
             /** @description Cloud Server error */
@@ -8391,6 +8463,7 @@ export type FileConfirmInput = components["schemas"]["FileConfirmInput"];
 export type FilePage = components["schemas"]["FilePage"];
 export type FileResolution = components["schemas"]["FileResolution"];
 export type FileSummary = components["schemas"]["FileSummary"];
+export type FileImportURLInput = components["schemas"]["FileImportURLInput"];
 export type AgentAgent = components["schemas"]["AgentAgent"];
 export type A2AMessage = components["schemas"]["A2AMessage"];
 export type A2ATaskStatus = components["schemas"]["A2ATaskStatus"];
@@ -8490,6 +8563,7 @@ export type CreateCanvasSessionResponse = operations["createCanvasSession"]["res
 export type CreateCanvasSessionRequest = NonNullable<operations["createCanvasSession"]["requestBody"]>["content"]["application/json"];
 export type ExecInstanceResponse = operations["execInstance"]["responses"][200]["content"]["application/json"];
 export type ExecInstanceRequest = NonNullable<operations["execInstance"]["requestBody"]>["content"]["application/json"];
+export type ImportFileURLResponse = operations["importFileURL"]["responses"][201]["content"]["application/json"];
 export type PresignFileUploadResponse = operations["presignFileUpload"]["responses"][201]["content"]["application/json"];
 export type ConfirmFileUploadResponse = operations["confirmFileUpload"]["responses"][200]["content"]["application/json"];
 export type ListFilesResponse = operations["listFiles"]["responses"][200]["content"]["application/json"];
