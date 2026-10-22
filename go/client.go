@@ -1994,6 +1994,14 @@ type FileSummary struct {
 	Instances        []FileSummaryInstancesItem `json:"instances"`
 }
 
+type FileImportURLInput struct {
+	SourceURL      string `json:"source_url"`
+	Filename       string `json:"filename"`
+	ContentType    string `json:"content_type"`
+	ChecksumSha256 string `json:"checksum_sha256"`
+	SizeBytes      *int64 `json:"size_bytes,omitempty"`
+}
+
 type AgentAgent struct {
 	HarnessID             string          `json:"harness_id"`
 	ID                    string          `json:"id"`
@@ -2138,6 +2146,7 @@ type CreateServerInstanceInput struct {
 	VariantID *string                           `json:"variant_id,omitempty"`
 	Harness   *CreateServerInstanceInputHarness `json:"harness,omitempty"`
 	LLM       *RuntimeLLM                       `json:"llm,omitempty"`
+	Tools     *CreateServerInstanceInputTools   `json:"tools,omitempty"`
 }
 
 type ServerUsageSummary struct {
@@ -2696,6 +2705,10 @@ type CreateCanvasSessionRequest struct {
 type ExecInstanceRequest struct {
 	Argv           []string `json:"argv"`
 	TimeoutSeconds *int64   `json:"timeout_seconds,omitempty"`
+}
+
+type ImportFileURLOptions struct {
+	IdempotencyKey string `json:"Idempotency-Key"`
 }
 
 type PresignFileUploadOptions struct {
@@ -3435,6 +3448,10 @@ const (
 	CreateServerInstanceInputHarnessOpenclaw CreateServerInstanceInputHarness = "openclaw"
 )
 
+type CreateServerInstanceInputTools struct {
+	Exec CreateServerInstanceInputToolsExec `json:"exec"`
+}
+
 type RuntimeInstanceStatusResultData struct {
 	ID            string `json:"id"`
 	Name          string `json:"name"`
@@ -3682,6 +3699,10 @@ const (
 	GetResponseInputItemsResponseObjectList GetResponseInputItemsResponseObject = "list"
 )
 
+type CreateServerInstanceInputToolsExec struct {
+	Mode CreateServerInstanceInputToolsExecMode `json:"mode"`
+}
+
 type ReplyShareResponseDataAgent struct {
 	Name      string `json:"name"`
 	AvatarURL string `json:"avatar_url"`
@@ -3711,6 +3732,16 @@ type ConnectURLResponseDataBrowser struct {
 	ExpiresAt  string `json:"expires_at"`
 	Role       string `json:"role"`
 }
+
+type CreateServerInstanceInputToolsExecMode string
+
+const (
+	CreateServerInstanceInputToolsExecModeDeny      CreateServerInstanceInputToolsExecMode = "deny"
+	CreateServerInstanceInputToolsExecModeAllowlist CreateServerInstanceInputToolsExecMode = "allowlist"
+	CreateServerInstanceInputToolsExecModeAsk       CreateServerInstanceInputToolsExecMode = "ask"
+	CreateServerInstanceInputToolsExecModeAuto      CreateServerInstanceInputToolsExecMode = "auto"
+	CreateServerInstanceInputToolsExecModeFull      CreateServerInstanceInputToolsExecMode = "full"
+)
 
 type ReplyShareResponseDataReplyPartsItem struct {
 	Type string `json:"type"`
@@ -3766,7 +3797,7 @@ func decodeErrorBody[T APIErrorBody](schema string, payload []byte) (APIErrorBod
 }
 func decodeAPIError(operation string, status int, payload []byte) (APIErrorBody, error) {
 	switch operation {
-	case "setConversationApprovalMode", "setConversationReasoning", "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "getUsageSummary", "execInstance", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
+	case "setConversationApprovalMode", "setConversationReasoning", "createClientSession", "refreshClientSession", "revokeClientSession", "deleteExternalUser", "getExternalUserDeletion", "listProviders", "listDeployRegions", "listDeployModels", "listInstanceTemplates", "getInstanceTemplate", "listAgentTemplates", "listInstances", "instanceCreate", "getInstance", "updateInstanceMetadata", "deleteInstance", "getInstanceStatus", "startInstance", "stopInstance", "upgradeInstance", "getInstanceUpgrade", "listAgents", "getAgent", "updateAgent", "createAgentConversation", "listAgentConversations", "getConversation", "updateConversation", "deleteConversation", "listConversationMessages", "getConversationMessage", "cancelConversation", "clearConversation", "setConversationModel", "getUsageSummary", "execInstance", "importFileURL", "presignFileUpload", "confirmFileUpload", "listFiles", "getFile", "renameFile", "deleteFile", "getAgentTemplate", "createShareFileShare", "getShareFileShare", "revokeShareFileShare", "resolveFileShare", "getFilesSummary", "createShareReply", "getShareReply", "revokeShareReply", "resolveReplyShare", "getInstanceConnectURL", "getInstanceStreamURL", "resumeConversation", "createAutomation", "listAutomations", "getAutomation", "updateAutomation", "deleteAutomation", "pauseAutomation", "resumeAutomation", "createAutomationRun", "listAutomationRuns", "getAutomationRun", "createWebhookAutomation", "transcribeAudio", "getShareCanvas", "createShareCanvas", "deleteShareCanvas", "listCanvasSnapshots", "restoreCanvasSnapshot", "getCanvasSession", "invokeA2A", "getA2AAgentCard", "getA2AAgentCardLegacy", "listA2ATasks", "getA2ATask", "cancelA2ATask":
 
 		return decodeErrorBody[ErrorResponse]("ErrorResponse", payload)
 	case "createTerminalSession", "createCanvasSession":
@@ -4955,6 +4986,26 @@ func (r *UsageResource) GetSummary(ctx context.Context, options GetUsageSummaryO
 }
 
 type FilesResource struct{ client *BeeOSClient }
+
+func (r *FilesResource) ImportURL(ctx context.Context, input FileImportURLInput, options ImportFileURLOptions) (FileFile, error) {
+	path := "/files/import-url"
+	query := url.Values{}
+	headers := http.Header{}
+	var output FileFile
+	headers.Set("Idempotency-Key", fmt.Sprint(options.IdempotencyKey))
+	var body []byte
+	encoded, err := json.Marshal(input)
+	if err != nil {
+		return output, err
+	}
+	body = encoded
+	payload, err := r.client.request(ctx, "importFileURL", "POST", path, "", query, headers, body, "application/json")
+	if err != nil {
+		return output, err
+	}
+	err = json.Unmarshal(payload, &output)
+	return output, err
+}
 
 func (r *FilesResource) PrepareUpload(ctx context.Context, input FilePrepareUploadInput, options PresignFileUploadOptions) (FileTransferDescriptor, error) {
 	path := "/files/presign-upload"

@@ -2757,6 +2757,59 @@
         "summary": "Run a command in an instance"
       }
     },
+    "/files/import-url": {
+      "post": {
+        "operationId": "importFileURL",
+        "x-sdk-resource": "files",
+        "x-sdk-method": "importURL",
+        "x-sdk-activation": "live",
+        "x-sdk-provenance": "services/openapi-gateway/internal/beeoscloud",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Key that makes the request safe to retry, 8 to 128 characters without leading or trailing whitespace. Repeating a request with the same key and parameters replays the original result; reusing the key for a different request returns 409 `idempotency_conflict`."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileFile"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Cloud Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FileImportURLInput"
+              }
+            }
+          }
+        },
+        "summary": "Import a skill ZIP from a download URL"
+      }
+    },
     "/files/presign-upload": {
       "post": {
         "operationId": "presignFileUpload",
@@ -10810,11 +10863,11 @@
               "reserved": "The create request was accepted and its resources are reserved.",
               "admitted": "The create request was admitted and is waiting to be provisioned.",
               "provisioning": "The instance is being provisioned or started.",
-              "running": "Final phase of a successful create, start or image upgrade.",
+              "running": "Final phase of a successful create, start or upgrade of a running instance.",
               "cleanup_pending": "A create failed and the resources it reserved are being cleaned up.",
               "failed": "Final phase of a failed operation. See `error_code`.",
               "stop_pending": "The instance is being stopped.",
-              "stopped": "Final phase of a successful stop.",
+              "stopped": "Final phase of a successful stop or upgrade of a stopped instance.",
               "delete_pending": "The instance is being deleted.",
               "deleted": "Final phase of a successful delete.",
               "upgrade_pending": "The image upgrade is being applied.",
@@ -11040,7 +11093,7 @@
               "upgrade_pending": "The image upgrade is being applied.",
               "rollback_pending": "The image upgrade failed and the instance is being rolled back to its previous image.",
               "failed": "The image upgrade failed. See `error`.",
-              "succeeded": "The image upgrade finished and the instance runs the target version."
+              "succeeded": "The image upgrade finished. A running instance serves the target version; a stopped instance retains the target template without starting."
             }
           },
           "target": {
@@ -11497,6 +11550,45 @@
           "video_count",
           "document_count",
           "instances"
+        ],
+        "additionalProperties": false
+      },
+      "FileImportURLInput": {
+        "type": "object",
+        "properties": {
+          "source_url": {
+            "type": "string",
+            "description": "Short-lived HTTPS download URL. Only public addresses on port 443 are allowed; at most three redirects. The URL is not retained in the File or idempotency record."
+          },
+          "filename": {
+            "type": "string",
+            "description": "Filename of the imported skill ZIP, without a path."
+          },
+          "content_type": {
+            "type": "string",
+            "description": "Must be application/zip. The ZIP must contain a nonempty root SKILL.md."
+          },
+          "checksum_sha256": {
+            "type": "string",
+            "description": "Required lowercase SHA-256 of the original ZIP bytes. A mismatch fails with checksum_mismatch."
+          },
+          "size_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional expected ZIP size. When supplied it must match exactly. Imports are limited to 16 MiB compressed and 64 MiB expanded."
+          }
+        },
+        "required": [
+          "source_url",
+          "filename",
+          "content_type",
+          "checksum_sha256"
         ],
         "additionalProperties": false
       },
@@ -12201,6 +12293,35 @@
               }
             ],
             "description": "Model providers and models the instance uses. Required when the variant or harness needs caller-supplied models; omit it for variants that supply their own models. Provider API keys are write-only."
+          },
+          "tools": {
+            "type": "object",
+            "properties": {
+              "exec": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "deny",
+                      "allowlist",
+                      "ask",
+                      "auto",
+                      "full"
+                    ]
+                  }
+                },
+                "required": [
+                  "mode"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "exec"
+            ],
+            "additionalProperties": false,
+            "description": "Optional managed OpenClaw policy: {exec:{mode:deny|allowlist|ask|auto|full}}. Omission preserves ask. Full skips ordinary native exec approval prompts. Other harnesses reject this field; null, missing children, unknown fields and all are invalid."
           }
         },
         "required": [
@@ -14729,5 +14850,5 @@
     }
   },
   "x-producer-repository": "beeos-ai/beeos-cloud-backend",
-  "x-producer-revision": "3d8e4233ce428d42710722a04d784b2a6928d3ea"
+  "x-producer-revision": "6402817b8d8c03ef0ff87a66615a9d088cbe0f31"
 }
