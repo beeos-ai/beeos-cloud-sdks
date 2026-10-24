@@ -9,7 +9,8 @@ describe('single spec generation', () => {
   it('reproduces every committed language artifact', async () => {
     const { generate } = await import('./generate.mjs');
     const spec = JSON.parse(await fs.readFile('spec/server.openapi.json', 'utf8'));
-    const files = await generate(spec);
+    const nativeSpec = JSON.parse(await fs.readFile('spec/native.openapi.json', 'utf8'));
+    const files = await generate(spec, nativeSpec);
     for (const [name, content] of Object.entries(files)) {
       expect(content, name).toBe(await fs.readFile(path.resolve(name), 'utf8'));
     }
@@ -50,7 +51,7 @@ it('preserves schema string literals when replacing open schema types', async ()
 it('generates only the live v3 operation set with correct UHP servers and errors', async () => {
   const spec = JSON.parse(await fs.readFile('spec/server.openapi.json', 'utf8'));
   const ops = Object.entries(spec.paths).flatMap(([route, item]) => Object.values(item as Record<string, {operationId?: string; [key: string]: unknown}>).filter(op => op.operationId).map(op => ({route, op})));
-  expect(spec.info.version).toBe('3.1.0');
+  expect(spec.info.version).toBe('4.0.0');
   expect(ops).toHaveLength(104);
   expect(ops.every(({op}) => op['x-sdk-activation'] === 'live')).toBe(true);
   for (const {route, op} of ops.filter(({op}) => op.servers)) {

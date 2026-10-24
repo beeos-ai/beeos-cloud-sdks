@@ -4,9 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "beeos-cloud-sdk"
-version = "3.1.0"
+version = "4.0.0"
 description = "Typed BeeOS Cloud Server API client"
 requires-python = ">=3.11"
+dependencies = ["httpx>=0.28.1,<0.29", "websockets>=16.0,<17"]
 license = "MIT"
 authors = [{name = "BeeOS"}]
 readme = {text = "Typed BeeOS Cloud Server SDK. BeeOSClient(base_url, api_key, timeout=30.0) uses a 30-second timeout. Development: install the dev extra (mypy==2.4.0); run mypy --strict --python-version 3.11 beeos_cloud_sdk examples/typed_smoke.py. No request retries.", content-type = "text/markdown"}

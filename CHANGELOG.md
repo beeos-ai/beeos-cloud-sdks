@@ -2,7 +2,19 @@
 
 ## Unreleased
 
+## 4.0.0 (2026-10-25) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v4`
+
+MAJOR: the entries under BREAKING below were already on `main` unreleased; the
+public clients lose APIs. `@beeos-ai/cloud-agent-sdk` is unchanged (1.0.0). The
+Go module path moves to `github.com/beeos-ai/beeos-cloud-sdks/go/v4` (required by
+Go for a `v4` tag); change the import path when upgrading.
+
 ### Added
+
+- Native Sandbox v1 client for TypeScript (`@beeos-ai/cloud-sdk/native`, with SSE
+  streams), Python (`beeos_cloud_sdk.native`) and Go (`go/native`), generated from
+  `spec/native.openapi.json` by `generator/native-{typescript,python,go}.mjs`.
+  Python now declares `httpx` and `websockets` dependencies.
 
 - Agent responses expose read-only `harness_id` for UHP execution; generated
   TypeScript, Python and Go models include the reference. Requires the matching

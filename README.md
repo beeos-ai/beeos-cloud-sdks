@@ -1,9 +1,9 @@
 # BeeOS Cloud Server SDKs
 
 The TypeScript package `@beeos-ai/cloud-sdk`, Python distribution
-`beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v3` share
+`beeos-cloud-sdk`, and Go module `github.com/beeos-ai/beeos-cloud-sdks/go/v4` share
 one contract: [`spec/server.openapi.json`](spec/server.openapi.json). Version
-3.1.0 generates typed request, response, query, and error models for the 103
+4.0.0 generates typed request, response, query, and error models for the 103
 registered Server operations. Inactive API methods and their models are removed.
 
 ```ts
@@ -214,11 +214,11 @@ generating this SDK does not publish a new package.
 
 No package is published by regeneration. The existing **Publish
 @beeos-ai/cloud-sdk** workflow (`.github/workflows/publish.yml`) publishes the root
-npm package only when a matching `v3.1.0` tag is pushed; it uses GitHub secret
+npm package only when a matching `v4.0.0` tag is pushed; it uses GitHub secret
 `NPM_TOKEN`. The Python package is published by
-`.github/workflows/publish-python.yml` when a matching `python/v3.1.0` tag is
+`.github/workflows/publish-python.yml` when a matching `python/v4.0.0` tag is
 pushed. The Go module resides in `go/`, so its module release tag is
-`go/v3.1.0`. The import path is `github.com/beeos-ai/beeos-cloud-sdks/go/v3`. Go discovery
+`go/v4.0.0`. The import path is `github.com/beeos-ai/beeos-cloud-sdks/go/v4`. Go discovery
 needs no package-registry secret. These tags and registry writes require the
 separate release authorization.
 

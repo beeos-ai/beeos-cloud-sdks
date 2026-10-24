@@ -550,3 +550,6 @@ async function* readEvents(response: Response): AsyncGenerator<JSONValue> {
     reader.releaseLock();
   }
 }
+
+export * as native from "./native.js";
+export { NativeBeeOSClient, NativeBeeOSAPIError, SDKWaitTimeout, SDKRequestTimeout, SDKCancelled, SDKPublicationSuperseded, SDKOperationFailed } from "./native.js";
