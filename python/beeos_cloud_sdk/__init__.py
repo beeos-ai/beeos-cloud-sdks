@@ -3118,3 +3118,5 @@ class ResponsesResource:
             headers.update({key: str(value) for key, value in options.items()})
         return cast(Iterator[UHPEvent], self._client._stream("createResponse", "POST", "/responses", "/uhp/v1", {}, headers, json.dumps(body).encode(), "application/json"))
 
+
+from .native import NativeBeeOSClient as NativeBeeOSClient, AsyncNativeBeeOSClient as AsyncNativeBeeOSClient, SDKTransportError as SDKTransportError, SDKRequestTimeout as SDKRequestTimeout

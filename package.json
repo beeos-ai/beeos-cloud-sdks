@@ -1,11 +1,15 @@
 {
   "name": "@beeos-ai/cloud-sdk",
-  "version": "3.1.0",
+  "version": "4.0.0",
   "description": "BeeOS Cloud server SDK for ISV backends. Credential is bsk_ only.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./native": {
+      "types": "./dist/native.d.ts",
+      "import": "./dist/native.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
