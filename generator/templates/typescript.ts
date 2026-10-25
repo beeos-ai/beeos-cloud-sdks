@@ -5,6 +5,18 @@ export type {
   NativeResponseTerminalWebhookEvent, NativeSessionWebhookData, NativeSessionWebhookEvent, NativeSessionWebhookScope, NativeWebhookEvent,
   WebhookHeaders, WebhookVerificationOptions, WebhookVerificationReason,
 } from "./webhooks.js";
+export type {
+  AgentDeletedWebhookSnapshot,
+  AgentPublicationWebhookState,
+  AgentWebhookEvent,
+  AgentWebhookSnapshot,
+  AgentWebhookType,
+  SandboxAgentWebhookEvent,
+  SandboxWebhookEvent,
+  SandboxWebhookSnapshot,
+  SandboxWebhookStatus,
+  SandboxWebhookType,
+} from "./webhook-events.js";
 
 export type JSONValue = null | boolean | number | string | JSONValue[] | { [key: string]: JSONValue };
 
