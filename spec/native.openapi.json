@@ -3771,7 +3771,7 @@
       "patch": {
         "operationId": "updateNativeSession",
         "summary": "updateNativeSession",
-        "description": "Manual rename with strong resource_version CAS (If-Match). The name is trimmed. A manual name is never replaced by the automatic first-turn name; a read-only Session cannot be renamed. The same Idempotency-Key replays its original rename.",
+        "description": "Manual rename and/or approval_mode override with strong resource_version CAS (If-Match). The name is trimmed. A manual name is never replaced by the automatic first-turn name; a read-only Session cannot be updated. approval_mode null restores the Agent default. The same Idempotency-Key replays its original update.",
         "tags": [
           "sessions"
         ],
@@ -3942,7 +3942,7 @@
       "post": {
         "operationId": "createNativeResponse",
         "summary": "createNativeResponse",
-        "description": "Explicit session_id required. Optional previous_response_id must be same Session current head. Idempotent acceptance; config resolves once at execution admission. CT-1 first execution claims ready unused compute for a recipe, or reuses its usable Binding; reads/Agent/Session/Memory management do not allocate. Exposes this Response sandbox_id separately from stable agent_id/session_id.",
+        "description": "Explicit session_id required. Optional previous_response_id must be same Session current head. Idempotent acceptance; config resolves once at execution admission. CT-1 first execution claims ready unused compute for a recipe, or reuses its usable Binding; reads/Agent/Session/Memory management do not allocate. Exposes this Response sandbox_id separately from stable agent_id/session_id. A model_id absent from GET /v2/agents/{agent_id}/models for the Session's Agent, or listed there as unavailable, is rejected synchronously with 400 model_unavailable (details.reason model_not_offered_for_agent or model_unavailable_for_agent) before acceptance (U-1024-51).",
         "tags": [
           "responses"
         ],
@@ -7896,6 +7896,17 @@
         "x-owner-observation": "../agent-runtime/schemas/agent-runtime.schema.json#/$defs/BindingPreparationObservation",
         "description": "Public projection only. prepared_config_revision comes from preparation.prepared_config.revision; credential_activation_revision from preparation.credential_activation.config.revision, which may remain older for unchanged valid materials. Server verifies exact publication/target/Host/fence before reporting ready; private evidence is never returned."
       },
+      "ApprovalMode": {
+        "type": "string",
+        "enum": [
+          "ask",
+          "workspace",
+          "full"
+        ],
+        "default": "ask",
+        "description": "Tool-call approval mode (U-1024-57), the existing conversation approval-mode value set plus workspace. `ask`: every tool call waits for a user approval Interaction (asking the user a question is not a tool call that needs approval). `workspace`: file reads/writes and commands that stay inside the agent workspace (the working directory and the agent home) run without asking; paths outside it, network access, privilege escalation and destructive or otherwise unclassified tool calls raise an approval Interaction. `full`: no approval Interaction; the engine's fixed hard safety floors still apply. Questions (kind=question) are asked in every mode.",
+        "x-sdk-model-name": "ApprovalMode"
+      },
       "NativeAgentCreate": {
         "type": "object",
         "properties": {
@@ -7952,6 +7963,9 @@
           },
           "target": {
             "$ref": "#/components/schemas/BeeosTarget"
+          },
+          "approval_mode": {
+            "$ref": "#/components/schemas/ApprovalMode"
           },
           "credentials": {
             "$ref": "#/components/schemas/CredentialBindings",
@@ -8027,6 +8041,9 @@
           "target": {
             "$ref": "#/components/schemas/BeeosTarget"
           },
+          "approval_mode": {
+            "$ref": "#/components/schemas/ApprovalMode"
+          },
           "credentials": {
             "$ref": "#/components/schemas/CredentialBindings",
             "writeOnly": true
@@ -8094,6 +8111,9 @@
           "target": {
             "$ref": "#/components/schemas/BeeosTarget"
           },
+          "approval_mode": {
+            "$ref": "#/components/schemas/ApprovalMode"
+          },
           "credential_status": {
             "$ref": "#/components/schemas/CredentialBindingStatus",
             "description": "Desired configuration slot membership, observable before compute exists. This is distinct from the actual prepared Binding slot status and credential activation revision; configured does not assert current source authorization or injection success."
@@ -8109,6 +8129,7 @@
           "disabled_tools",
           "run_timeout_seconds",
           "target",
+          "approval_mode",
           "credential_status"
         ],
         "additionalProperties": false,
@@ -8681,11 +8702,21 @@
             "minLength": 1,
             "maxLength": 128,
             "description": "The new Session name, trimmed by the owner; it must not be blank. A manual name."
+          },
+          "approval_mode": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalMode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Session override of the Agent approval_mode for Responses created after this update; null restores the Agent default. A Response keeps the mode frozen when it was created."
           }
         },
-        "required": [
-          "name"
-        ],
+        "required": [],
+        "minProperties": 1,
         "additionalProperties": false,
         "x-sdk-model-name": "NativeSessionPatch"
       },
@@ -8787,6 +8818,17 @@
           "configuration": {
             "$ref": "#/components/schemas/SessionConfigurationObservation"
           },
+          "approval_mode": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalMode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Session override of the Agent approval_mode; null means the Agent default applies."
+          },
           "head_response_id": {
             "oneOf": [
               {
@@ -8853,6 +8895,7 @@
           "name",
           "metadata",
           "configuration",
+          "approval_mode",
           "head_response_id",
           "resource_version",
           "created_at",
@@ -9108,6 +9151,17 @@
               "unavailable",
               "unknown"
             ]
+          },
+          "approval_mode": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalMode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Effective approval mode frozen in the Response selection (Session override, else Agent default) and delivered to the harness; null only for a Response selected before approval modes existed."
           }
         },
         "required": [
@@ -9129,7 +9183,8 @@
           "observation",
           "components",
           "memory_read_watermark",
-          "memory_observation"
+          "memory_observation",
+          "approval_mode"
         ],
         "additionalProperties": false,
         "x-sdk-model-name": "EffectiveConfiguration",
