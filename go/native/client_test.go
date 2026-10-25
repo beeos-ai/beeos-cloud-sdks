@@ -18,6 +18,12 @@ import (
 	"time"
 )
 
+// explicitRecipeTarget always states the template; /v2 Agent creation has no
+// template default.
+func explicitRecipeTarget() BeeosTarget {
+	return BeeosTarget{BeeosRecipeTarget: &BeeosRecipeTarget{Kind: "recipe", Template: "beeos/base"}}
+}
+
 func testClient(t *testing.T, handler http.HandlerFunc) (*Client, *httptest.Server) {
 	t.Helper()
 	server := httptest.NewServer(handler)
@@ -260,9 +266,9 @@ func TestExactPublicationDeferredSupersessionAndCredentialRevision(t *testing.T)
 		calls := 0
 		client, _ := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 			calls++
-			jsonReply(w, 201, agentJSON("deferred", "rev_new", `{"kind":"recipe"}`))
+			jsonReply(w, 201, agentJSON("deferred", "rev_new", `{"kind":"recipe","template":"beeos/base"}`))
 		})
-		_, err := client.Agents.Create(context.Background(), NativeAgentCreate{Engine: "openclaw"}, CreateNativeAgentOptions{})
+		_, err := client.Agents.Create(context.Background(), NativeAgentCreate{Engine: "openclaw", Target: explicitRecipeTarget()}, CreateNativeAgentOptions{})
 		if err != nil {
 			t.Fatal(err)
 		}

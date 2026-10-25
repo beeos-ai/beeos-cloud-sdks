@@ -37,6 +37,8 @@ from beeos_cloud_sdk.native import (
     SDKRequestTimeout,
 )
 
+RECIPE_TARGET: Any = {"kind": "recipe", "template": "beeos/base"}
+
 
 class LocalAPI:
     def __init__(self, route: Callable[..., Any]) -> None:
@@ -96,7 +98,7 @@ def reply(data: Any, status: int = 200, **headers: str) -> tuple[Any, ...]:
 
 
 def agent(revision: int = 8, state: str = "preparing", prepared: int = 7, *, kind: str = "managed", sandbox_id: str = "sb_target") -> dict[str, Any]:
-    target = {"kind": kind, "sandbox_id": sandbox_id} if kind == "managed" else {"kind": "recipe"}
+    target = {"kind": kind, "sandbox_id": sandbox_id} if kind == "managed" else RECIPE_TARGET
     return {"id": "ag_1", "desired_config_revision": revision, "configuration": {"target": target},
             "publication": {"accepted_config_revision": revision, "state": state, "changed_components": ["model"], "components": []},
             "binding": {"sandbox_id": sandbox_id, "prepared_config_revision": prepared, "credential_activation_revision": 3, "state": "ready", "persona_scope": "session"}}
@@ -275,7 +277,7 @@ class NativeSyncTests(unittest.TestCase):
             self.assertEqual(req["method"], "POST")
             return reply(agent(state="deferred", kind="recipe"), 202)
         with LocalAPI(route) as api, NativeBeeOSClient(api.url, "key") as client:
-            created = client.agents.create({"engine": "openclaw"})
+            created = client.agents.create({"engine": "openclaw", "target": RECIPE_TARGET})
             self.assertEqual(created.status, 202)
             self.assertEqual(len(api.requests), 1)
             self.assertEqual(api.requests[0]["path"], "/v2/agents")
@@ -323,7 +325,7 @@ class NativeSyncTests(unittest.TestCase):
             with self.subTest(reason=reason):
                 with LocalAPI(lambda req: reply(agent(), 202) if req["method"] == "POST" else reply(changed)) as api, NativeBeeOSClient(api.url, "key") as client:
                     with self.assertRaises(SDKWaitError) as caught:
-                        client.agents.create({"engine": "openclaw"}, {"poll_interval_seconds": 0})
+                        client.agents.create({"engine": "openclaw", "target": RECIPE_TARGET}, {"poll_interval_seconds": 0})
                     self.assertEqual(caught.exception.reason, reason)
                     self.assertEqual(caught.exception.acceptance.status, 202)
 

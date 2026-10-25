@@ -99,6 +99,6 @@ def retain_history_after_agent_delete(
 
 
 async def create_recipe_without_compute(client: AsyncNativeBeeOSClient, intent: str) -> str:
-    agent = await client.agents.create({"engine": "openclaw"}, {"idempotency_key": intent})
+    agent = await client.agents.create({"engine": "openclaw", "target": {"kind": "recipe", "template": "beeos/base"}}, {"idempotency_key": intent})
     # A deferred recipe is persisted without creating or waking a Sandbox.
     return agent.body["data"]["id"]

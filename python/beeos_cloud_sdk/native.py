@@ -390,7 +390,7 @@ NativeAgentCreate = TypedDict("NativeAgentCreate", {
     "mcp_servers": "NotRequired[list[MCPSelection]]",
     "disabled_tools": "NotRequired[list[str]]",
     "run_timeout_seconds": "NotRequired[int]",
-    "target": "NotRequired[BeeosTarget]",
+    "target": "Required[BeeosTarget]",
     "approval_mode": "NotRequired[ApprovalMode]",
     "credentials": "NotRequired[CredentialBindings]",
     "end_user_ref": "NotRequired[EndUserRef]",
@@ -1077,7 +1077,7 @@ CredentialBindingStatus = TypedDict("CredentialBindingStatus", {
 
 BeeosRecipeTarget = TypedDict("BeeosRecipeTarget", {
     "kind": "Required[Literal[\"recipe\"]]",
-    "template": "NotRequired[Literal[\"beeos/base\", \"beeos/base-4c8g\"]]",
+    "template": "Required[Literal[\"beeos/base\", \"beeos/base-4c8g\"]]",
     "timeout_seconds": "NotRequired[int]",
     "on_timeout": "NotRequired[Literal[\"terminate\"]]",
 })

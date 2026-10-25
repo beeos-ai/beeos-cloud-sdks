@@ -49,7 +49,7 @@ func TestLiveGateway(t *testing.T) {
 
 	// Stable retry key, deferred no-wake wait and changed-body conflict.
 	agentKey := intent + "-agent"
-	body := NativeAgentCreate{Engine: "openclaw", Name: Pointer(name), Instructions: Pointer("SDK live check.")}
+	body := NativeAgentCreate{Engine: "openclaw", Target: explicitRecipeTarget(), Name: Pointer(name), Instructions: Pointer("SDK live check.")}
 	created, err := client.Agents.Create(ctx, body, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: agentKey}})
 	if err != nil {
 		t.Fatal(err)
@@ -88,20 +88,20 @@ func TestLiveGateway(t *testing.T) {
 		if !check(err) || waited == nil || waited.Acceptance == nil || waited.Acceptance.IdempotencyKey != key {
 			t.Fatalf("%s: unexpected local error %T %v", label, err, err)
 		}
-		recovered, err := client.Agents.Create(ctx, NativeAgentCreate{Engine: "openclaw", Name: Pointer(name + "-" + label)}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key}})
+		recovered, err := client.Agents.Create(ctx, NativeAgentCreate{Engine: "openclaw", Target: explicitRecipeTarget(), Name: Pointer(name + "-" + label)}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key}})
 		if err != nil {
 			t.Fatalf("%s: same-key recovery failed: %v", label, err)
 		}
 		client.Agents.Delete(ctx, string(recovered.Body.Data.ID), DeleteNativeAgentOptions{RequestOptions{IdempotencyKey: key + "-delete"}})
 	}
 	recover("deadline", func(key string) error {
-		_, err := client.Agents.Create(ctx, NativeAgentCreate{Engine: "openclaw", Name: Pointer(name + "-deadline")}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key, WaitTimeoutSeconds: 0.000001}})
+		_, err := client.Agents.Create(ctx, NativeAgentCreate{Engine: "openclaw", Target: explicitRecipeTarget(), Name: Pointer(name + "-deadline")}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key, WaitTimeoutSeconds: 0.000001}})
 		return err
 	}, func(err error) bool { var c *SDKCancelled; return !errors.As(err, &c) })
 	recover("cancel", func(key string) error {
 		local, stop := context.WithCancel(ctx)
 		stop()
-		_, err := client.Agents.Create(local, NativeAgentCreate{Engine: "openclaw", Name: Pointer(name + "-cancel")}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key}})
+		_, err := client.Agents.Create(local, NativeAgentCreate{Engine: "openclaw", Target: explicitRecipeTarget(), Name: Pointer(name + "-cancel")}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key}})
 		return err
 	}, func(err error) bool { var c *SDKCancelled; return errors.As(err, &c) })
 

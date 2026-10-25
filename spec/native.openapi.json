@@ -7976,7 +7976,8 @@
           }
         },
         "required": [
-          "engine"
+          "engine",
+          "target"
         ],
         "additionalProperties": false,
         "x-sdk-model-name": "NativeAgentCreate"
@@ -11657,7 +11658,7 @@
             "$ref": "#/components/schemas/BeeosManagedTarget"
           }
         ],
-        "description": "Persistent desired placement. POST omission defaults to beeos/base/1800/terminate recipe; PUT omission preserves. Runtime Binding TargetSelector observes actual placement, never recipe.",
+        "description": "Persistent desired placement. POST requires target; recipe requires an explicit template and has no default. PUT omission preserves. Runtime Binding TargetSelector observes actual placement, never recipe.",
         "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosTarget"
       },
       "BeeosRecipeTarget": {
@@ -11673,8 +11674,7 @@
               "beeos/base",
               "beeos/base-4c8g"
             ],
-            "default": "beeos/base",
-            "description": "U-1024-23：临时沙箱基础镜像的两个固定规格，2C4G 的 beeos/base 为默认，4C8G 的 beeos/base-4c8g 按需冷启动；规格写在模板里，创建后不可改。"
+            "description": "U-1024-23：必须显式指定临时沙箱基础镜像规格，beeos/base（2C4G）或 beeos/base-4c8g（4C8G）；无默认值。规格写在模板里，创建后不可改。"
           },
           "timeout_seconds": {
             "type": "integer",
@@ -11687,7 +11687,8 @@
           }
         },
         "required": [
-          "kind"
+          "kind",
+          "template"
         ],
         "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosRecipeTarget"
       },
