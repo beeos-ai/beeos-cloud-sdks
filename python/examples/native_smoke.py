@@ -13,6 +13,18 @@ from beeos_cloud_sdk.native import (
     OperationContext,
 )
 
+# Every terminal NativeResponseEvent, including response.incomplete (deadline and
+# max-token truncation); a missing member makes the example wait forever.
+TERMINAL_EVENTS = frozenset(
+    {
+        "response.completed",
+        "response.failed",
+        "response.incomplete",
+        "response.cancelled",
+        "response.unknown",
+    }
+)
+
 
 def remember_preference(
     client: NativeBeeOSClient, agent_id: str, intent: str
@@ -56,7 +68,7 @@ def one_turn(client: NativeBeeOSClient, session_id: str, intent: str) -> NativeR
     )
     with stream.events as events:
         for event in events:
-            if event["type"] in ("response.completed", "response.failed", "response.cancelled", "response.unknown"):
+            if event["type"] in TERMINAL_EVENTS:
                 return event["response"]
     raise RuntimeError(f"Resume response {stream.response_id} events; preserve intent {intent}")
 
@@ -73,7 +85,7 @@ async def one_turn_async(
     )
     async with stream.events as events:
         async for event in events:
-            if event["type"] in ("response.completed", "response.failed", "response.cancelled", "response.unknown"):
+            if event["type"] in TERMINAL_EVENTS:
                 return event["response"]
     raise RuntimeError(f"Resume response {stream.response_id} events; preserve intent {intent}")
 
