@@ -36,6 +36,11 @@
   `agentId`/`sessionId`/`responseId`; no instance id. Examples in
   `spec/native-webhook-events.json`. Requires the matching Cloud backend producer.
 
+- Native desktop access tickets accept an optional `role` (`viewer` |
+  `controller`, default `controller`) and echo it on the ticket. A viewer only
+  receives frames; a controller holds the exclusive takeover lease (409
+  `screen_in_use` / `agent_action_in_flight`). Requires the matching Cloud
+  backend deployment.
 
 ## 4.0.0 (2026-10-25) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v4`
 

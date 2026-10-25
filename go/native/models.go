@@ -192,6 +192,7 @@ type AccessTicketCreate struct {
 	Rows    *int64  `json:"rows,omitempty"`
 	PtyID   *string `json:"pty_id,omitempty"`
 	Origin  *string `json:"origin,omitempty"`
+	Role    *string `json:"role,omitempty"`
 }
 
 type AccessTicket struct {
@@ -208,6 +209,7 @@ type AccessTicket struct {
 	ReconnectWindowSeconds *int64          `json:"reconnect_window_seconds,omitempty"`
 	Profile                string          `json:"profile"`
 	ClientID               string          `json:"client_id"`
+	Role                   *string         `json:"role,omitempty"`
 }
 
 type SandboxResult struct {
