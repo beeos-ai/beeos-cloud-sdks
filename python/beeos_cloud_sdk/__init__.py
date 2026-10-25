@@ -3123,3 +3123,4 @@ class ResponsesResource:
 
 
 from .native import NativeBeeOSClient as NativeBeeOSClient, AsyncNativeBeeOSClient as AsyncNativeBeeOSClient, SDKTransportError as SDKTransportError, SDKRequestTimeout as SDKRequestTimeout
+from .native_text import NativeResponseText as NativeResponseText

@@ -467,7 +467,7 @@ class NativeSyncTests(unittest.TestCase):
 
     def test_sync_response_events_skip_unknown_types_without_closing(self) -> None:
         def sse(handler: Any) -> None:
-            handler.wfile.write(b'id: 1\ndata: {"type":"response.output_text.delta","delta":"x"}\n\n'
+            handler.wfile.write(b'id: 1\ndata: {"type":"response.output_text.preview","delta":"x"}\n\n'
                                 b'id: 2\ndata: {"type":"response.beeos.part","kind":"assistant"}\n\n'
                                 b'id: 3\ndata: {"type":"response.output","item":{"type":"output_text","text":"done"}}\n\n'
                                 b'id: 4\ndata: {"type":"response.completed"}\n\n')
@@ -729,7 +729,7 @@ class NativeAsyncTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_async_response_events_skip_unknown_types_without_closing(self) -> None:
         def route(_req: dict[str, Any]) -> tuple[Any, ...]:
-            return 200, {"Content-Type": "text/event-stream"}, b'id: 1\ndata: {"type":"response.output_text.delta"}\n\nid: 2\ndata: {"type":"response.phase"}\n\n'
+            return 200, {"Content-Type": "text/event-stream"}, b'id: 1\ndata: {"type":"response.output_text.preview"}\n\nid: 2\ndata: {"type":"response.phase"}\n\n'
         with LocalAPI(route) as api:
             async with AsyncNativeBeeOSClient(api.url, "key") as client:
                 events = await client.responses.events("resp_1")

@@ -426,7 +426,7 @@ func TestResponseStreamAdmitsOnceAndResumesCursor(t *testing.T) {
 func TestResponseEventStreamSkipsUnknownTypesWithoutClosing(t *testing.T) {
 	client, _ := testClient(t, func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
-		fmt.Fprint(w, "id: 1\ndata: {\"type\":\"response.output_text.delta\",\"response_id\":\"response\",\"sequence\":1,\"delta\":\"x\"}\n\n"+
+		fmt.Fprint(w, "id: 1\ndata: {\"type\":\"response.output_text.preview\",\"response_id\":\"response\",\"sequence\":1,\"delta\":\"x\"}\n\n"+
 			"id: 2\ndata: {\"type\":\"response.beeos.part\",\"response_id\":\"response\",\"sequence\":2}\n\n"+
 			"id: 3\ndata: {\"type\":\"response.output\",\"response_id\":\"response\",\"sequence\":3,\"item\":{\"type\":\"output_text\",\"text\":\"done\"}}\n\n"+
 			"id: 4\ndata: {\"type\":\"response.completed\",\"response_id\":\"response\",\"sequence\":4,\"response\":{\"id\":\"response\",\"status\":\"completed\"}}\n\n")
