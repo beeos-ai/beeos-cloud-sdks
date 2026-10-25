@@ -11,6 +11,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -211,4 +212,49 @@ func VerifyTaskPushSignature(rawBody []byte, header http.Header, secret string, 
 		return rejectWebhook(WebhookInvalidHeader, taskPushSignatureHeader+" needs t and at least one v1")
 	}
 	return verifyWebhookMAC(rawBody, *timestamp, signatures, secret, newVerifyOptions(opts))
+}
+
+// NativeWebhookEvent is a /v2 chat webhook body: session.created,
+// session.updated, session.deleted or response.terminal. Scope carries public
+// /v2 identities only; there is no instance or end-user identity. Dedupe on
+// Event.EventID; delivery order is not guaranteed.
+type NativeWebhookEvent struct {
+	OrganizationID string                    `json:"organization_id"`
+	AppID          string                    `json:"app_id"`
+	Event          NativeWebhookEventPayload `json:"event"`
+}
+
+// NativeWebhookEventPayload is the event object of a NativeWebhookEvent.
+type NativeWebhookEventPayload struct {
+	SchemaVersion int                     `json:"schemaVersion"`
+	EventID       string                  `json:"eventId"`
+	Type          string                  `json:"type"`
+	Scope         NativeWebhookEventScope `json:"scope"`
+	// Data holds NativeSessionWebhookData for session.* and
+	// NativeResponseTerminalWebhookData for response.terminal.
+	Data json.RawMessage `json:"data"`
+}
+
+// NativeWebhookEventScope identifies the Agent, Session and, for
+// response.terminal, the Response.
+type NativeWebhookEventScope struct {
+	AgentID    string `json:"agentId"`
+	SessionID  string `json:"sessionId"`
+	ResponseID string `json:"responseId,omitempty"`
+}
+
+// NativeSessionWebhookData is the Session snapshot of a session.* event.
+// Response input and output are never included.
+type NativeSessionWebhookData struct {
+	Name            string            `json:"name"`
+	Metadata        map[string]string `json:"metadata"`
+	ResourceVersion string            `json:"resourceVersion"`
+}
+
+// NativeResponseTerminalWebhookData is the outcome of a response.terminal
+// event: completed, failed, cancelled or incomplete. ErrorCode is empty when
+// the Response has no error. Read the Response for its output.
+type NativeResponseTerminalWebhookData struct {
+	Status    string `json:"status"`
+	ErrorCode string `json:"errorCode,omitempty"`
 }
