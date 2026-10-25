@@ -8804,6 +8804,11 @@
             },
             "maxItems": 128
           },
+          "instructions": {
+            "type": "string",
+            "maxLength": 131072,
+            "description": "Appended after the Agent's Persona instructions for this Response only. Never stored as Agent configuration and never inherited by a later Response. Same 131072-character limit as Agent instructions."
+          },
           "model_id": {
             "$ref": "#/components/schemas/OpaqueId"
           },
@@ -9662,6 +9667,18 @@
               }
             ]
           },
+          "instructions": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 131072
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Instructions committed with this Response at admission, echoed for callers; null when none was supplied. They append to the Agent's Persona instructions for this Response only and are never inherited by a later Response."
+          },
           "previous_response_id": {
             "oneOf": [
               {
@@ -9693,6 +9710,7 @@
           "resource_version",
           "created_at",
           "completed_at",
+          "instructions",
           "previous_response_id"
         ],
         "additionalProperties": false,
