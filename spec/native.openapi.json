@@ -63,7 +63,7 @@
         ],
         "operationId": "createSandbox",
         "summary": "创建Sandbox",
-        "description": "Create explicit compute with on_timeout pause(default) or terminate. No Agent/Harness. Freeze template build; 202 acceptance; SDK defaults to waiting for running. Reject management_source or agent_id in input.",
+        "description": "Create explicit compute with on_timeout pause(default) or terminate. No Agent/Harness. Freeze template build; 202 acceptance; SDK defaults to waiting for running. Reject management_source or agent_id in input. An organization already at its Sandbox plan maximum is refused on the request itself with 429 resource_limit (details.reason compute_quota_exceeded, Retry-After 30); any admission Runtime decides after the 202 states the same code and reason in Sandbox.last_error. Platform capacity stays capacity_exhausted and is retried. A same-key replay returns the recorded outcome of that key instead of creating a second Sandbox.",
         "x-status": "proposal",
         "x-allowed-states": "资源不存在",
         "x-required-capabilities": [],
@@ -12207,7 +12207,7 @@
         }
       },
       "429": {
-        "description": "rate_limited / resource_limit",
+        "description": "rate_limited / resource_limit；resource_limit 的 details.reason 区分 compute_quota_exceeded（org 套餐上限，需释放运行中 Sandbox 或改套餐）与 prewarm_stockout（声明预热的模板就绪池为空，U-1024-27）。",
         "content": {
           "application/json": {
             "schema": {
@@ -12463,6 +12463,141 @@
     "json_integer_maximum": 9007199254740991,
     "response_wrapper": "SandboxHTTPResponse<T>",
     "body_field_style": "snake_case"
+  },
+  "x-reason-catalog": {
+    "retention_ephemeral": {
+      "code": "state_conflict",
+      "http_status": 409,
+      "surface": "request",
+      "should_retry": false,
+      "description": "对 Agent 托管的临时沙箱（management_source=agent）的公开写操作或交互访问，或 Agent managed target 指向它。调用方显式创建的 on_timeout=terminate 沙箱不在此列（CT-2）。"
+    },
+    "sandbox_already_bound": {
+      "code": "state_conflict",
+      "http_status": 409,
+      "surface": "request",
+      "should_retry": false,
+      "description": "第二个 Agent 绑定已有 Agent 的固定沙箱。"
+    },
+    "agent_unplaced": {
+      "code": "state_conflict",
+      "http_status": 409,
+      "surface": "request",
+      "should_retry": false,
+      "description": "固定目标已终止、尚未重新放置；聊天接纳前拒绝。"
+    },
+    "pause_mode_mismatch": {
+      "code": "state_conflict",
+      "http_status": 409,
+      "surface": "request",
+      "should_retry": false,
+      "description": "已暂停模式与请求不兼容。"
+    },
+    "harness_mismatch": {
+      "code": "capability_unsupported",
+      "http_status": 422,
+      "surface": "request",
+      "should_retry": false,
+      "description": "模板 supported_harnesses 不支持 Agent 所选 harness，不比较沙箱预设 harness。"
+    },
+    "native_channel_requires_persistent": {
+      "code": "capability_unsupported",
+      "http_status": 422,
+      "surface": "request",
+      "should_retry": false,
+      "description": "临时 recipe Agent 配置原生 IM，create/update 时拒绝。"
+    },
+    "surface_unsupported": {
+      "code": "capability_unsupported",
+      "http_status": 422,
+      "surface": "request",
+      "should_retry": false,
+      "description": "模板不支持 desktop 或 pty。"
+    },
+    "on_timeout_unsupported": {
+      "code": "capability_unsupported",
+      "http_status": 422,
+      "surface": "request",
+      "should_retry": false,
+      "description": "Agent recipe 的 on_timeout 只允许 terminate，传 pause 被拒。公开 createSandbox 接受 pause 与 terminate（CT-2），不返回本 reason。"
+    },
+    "full_state_unavailable": {
+      "code": "capability_unsupported",
+      "http_status": 422,
+      "surface": "request",
+      "should_retry": false,
+      "description": "RAM-1/ERASE-RESTART-1 已接受；能力、当前授权、兼容、敏感快照治理或擦除验收未通过。"
+    },
+    "compute_quota_exceeded": {
+      "code": "resource_limit",
+      "http_status": 429,
+      "surface": "request",
+      "should_retry": false,
+      "description": "org 算力不足，包括临时接管；不新增 takeover_quota code。具体是 org 套餐的运行中 Sandbox 数 / vCPU / MiB 上限： 创建请求在请求面直接得到 429 resource_limit（Retry-After 30）并落错误，异步准入（202 之后）把同一 code/reason 写入 Sandbox.last_error； 与平台容量不足的 capacity_exhausted 不同，重试不能解决，需释放运行中 Sandbox 或改套餐。"
+    },
+    "prewarm_stockout": {
+      "code": "resource_limit",
+      "http_status": 429,
+      "surface": "request",
+      "should_retry": false,
+      "description": "所选模板声明预热（prewarmed=true）且就绪池为空（U-1024-27）；不静默冷启动，调用方须显式选择冷启动路径（非预热模板或声明的冷启动）。异步创建/保证时同一 code/reason 写入 Sandbox.last_error。"
+    },
+    "sandbox_lost": {
+      "code": "runtime_error",
+      "http_status": null,
+      "surface": "accepted_response_failure",
+      "should_retry": false,
+      "description": "已接受的轮执行中沙箱意外丢失；轮失败，不自动重放。"
+    },
+    "reclaimed_while_waiting": {
+      "code": "runtime_error",
+      "http_status": null,
+      "surface": "accepted_response_failure",
+      "should_retry": false,
+      "description": "等待审批/输入算空闲，到期回收或暂停令已接受轮失败。"
+    },
+    "sandbox_terminated": {
+      "code": "runtime_error",
+      "http_status": null,
+      "surface": "accepted_response_failure",
+      "should_retry": false,
+      "description": "terminate 排空宽限结束仍在途的轮失败。"
+    },
+    "agent_deleted": {
+      "code": "runtime_error",
+      "http_status": null,
+      "surface": "accepted_response_failure",
+      "should_retry": false,
+      "description": "删除 Agent 取消在途轮。"
+    },
+    "compute_preparation_failed": {
+      "code": "runtime_error",
+      "http_status": null,
+      "surface": "accepted_response_failure",
+      "should_retry": false,
+      "description": "已接受的轮在执行开始前，Runtime 明确判定本轮算力准备失败（临时沙箱创建失败等）；轮立即失败，details.runtime_code 为 Runtime 原始错误码；不自动重放，可重试的未就绪不属此类（INT-2）。"
+    },
+    "sandbox_rotation_timeout": {
+      "code": "runtime_error",
+      "http_status": null,
+      "surface": "accepted_response_failure",
+      "should_retry": false,
+      "description": "临时沙箱24小时换新等待在途轮超过30分钟。"
+    },
+    "pty_expired": {
+      "code": "state_conflict",
+      "http_status": 409,
+      "surface": "request",
+      "should_retry": false,
+      "description": "PTY重连窗口到期或会话已撤销；不静默新建会话。"
+    },
+    "recovery_required": {
+      "code": "runtime_error",
+      "http_status": null,
+      "surface": "sandbox_last_error",
+      "should_retry": false,
+      "description": "暂停失败后无法证明重新服务；关闭/停止未知或唯一未保存来源仍需抢救，保持不服务，禁止自动回滚旧checkpoint。"
+    }
   },
   "x-owner-status": "producer/consumer changes proposed; owner directories not modified",
   "x-review-counts": {
