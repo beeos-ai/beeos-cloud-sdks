@@ -39,15 +39,16 @@ export type TemplatePage = { "data": (Template)[]; "next_cursor": string | null;
 export type NativeAgentId = AgentId;
 export type Revision = revision;
 export type SkillSelection = { "skill_id": OpaqueId; "version": revision; "digest": string; "enabled": boolean; };
-export type MCPSelection = { "server_ref": OpaqueId; "enabled": boolean; "required": boolean; "credential_slot"?: string; };
+export type MCPSelection = { "server_ref": OpaqueId; "enabled": boolean; "required": boolean; "credential_slot"?: string; "kind"?: "catalog" | "remote"; "name"?: string; "url"?: string; "transport"?: "streamable-http" | "sse"; "headers"?: { [key: string]: string; }; "credential_header"?: string; };
 export type ComponentObservation = { "component": "model" | "persona" | "tools" | "skills" | "mcp" | "credentials" | "target"; "scope": "agent" | "binding" | "session" | "response"; "scope_id": OpaqueId | null; "revision": revision | null; "state": "accepted" | "prepared" | "loaded" | "not_applied" | "deferred" | "failed" | "unknown"; "observed_at": string | null; "error": NativeErrorEnvelope | null; };
 export type Publication = { "accepted_config_revision": revision; "changed_components": ("model" | "persona" | "tools" | "skills" | "mcp" | "credentials" | "target")[]; "state": "accepted" | "preparing" | "ready" | "deferred" | "failed" | "partial" | "unknown" | "superseded"; "components": (ComponentObservation)[]; };
 export type AgentBindingObservation = { "binding_id": OpaqueId; "sandbox_id": OpaqueId; "state": string; "prepared_config_revision": revision | null; "credential_activation_revision": revision | null; "credential_status": CredentialBindingStatus; "persona_scope": "session" | "binding" | "unknown"; "components": (ComponentObservation)[]; "error": NativeErrorEnvelope | null; };
-export type NativeAgentCreate = { "name"?: string; "engine": string; "instructions"?: string; "model_id"?: OpaqueId | null; "skills"?: (SkillSelection)[]; "mcp_servers"?: (MCPSelection)[]; "disabled_tools"?: (string)[]; "run_timeout_seconds"?: number; "target"?: BeeosTarget; "credentials"?: CredentialBindings; };
+export type NativeAgentCreate = { "name"?: string; "engine": string; "instructions"?: string; "model_id"?: OpaqueId | null; "skills"?: (SkillSelection)[]; "mcp_servers"?: (MCPSelection)[]; "disabled_tools"?: (string)[]; "run_timeout_seconds"?: number; "target"?: BeeosTarget; "credentials"?: CredentialBindings; "end_user_ref"?: EndUserRef; };
+export type EndUserRef = string;
 export type NativeAgentPatch = { "name"?: string; "instructions"?: string; "model_id"?: OpaqueId | null; "skills"?: (SkillSelection)[]; "mcp_servers"?: (MCPSelection)[]; "disabled_tools"?: (string)[]; "run_timeout_seconds"?: number; "target"?: BeeosTarget; "credentials"?: CredentialBindings; };
 export type NativeAgentConfiguration = { "name": string; "engine": string; "instructions": string; "model_id": OpaqueId | null; "skills": (SkillSelection)[]; "mcp_servers": (MCPSelection)[]; "disabled_tools": (string)[]; "run_timeout_seconds": number; "target": BeeosTarget; "credential_status": CredentialBindingStatus; };
 export type AuthorizationEnforcement = { "authorization_revision": revision; "state": "enforcing" | "enforced" | "partial" | "unknown"; "affected_scopes": ({ "kind": "tool" | "mcp" | "credential" | "session" | "binding" | "sandbox"; "id": OpaqueId; "state": "pending" | "enforced" | "failed" | "unknown"; })[]; "error": NativeErrorEnvelope | null; };
-export type NativeAgent = { "id": NativeAgentId; "configuration": NativeAgentConfiguration; "desired_config_revision": Revision; "resource_version": ResourceVersion; "binding": AgentBindingObservation | null; "publication": Publication; "authorization": AuthorizationEnforcement; "default_model_id": OpaqueId; "created_at": string; "updated_at": string; };
+export type NativeAgent = { "id": NativeAgentId; "configuration": NativeAgentConfiguration; "desired_config_revision": Revision; "resource_version": ResourceVersion; "binding": AgentBindingObservation | null; "publication": Publication; "authorization": AuthorizationEnforcement; "default_model_id": OpaqueId; "end_user_ref": EndUserRef | null; "created_at": string; "updated_at": string; };
 export type AuthorizationRevoke = { "all": true; } | { "tool_ids"?: (OpaqueId)[]; "mcp_server_refs"?: (OpaqueId)[]; "credential_slots"?: (string)[]; };
 export type DeletedResult = { "id": OpaqueId; "deleted": true; "cleanup": "pending" | "complete"; "scope": string; };
 export type ModelAvailability = { "id": OpaqueId; "provider_id": OpaqueId; "model_id": string; "endpoint_ref": OpaqueId | null; "engine_support": (string)[]; "availability": "available" | "unavailable" | "unknown"; "reason": string | null; "observed_at": string | null; "default": boolean; };
@@ -59,10 +60,10 @@ export type TextInput = { "type": "input_text"; "text": string; };
 export type ResponseInput = TextInput | FileInput;
 export type ResponseInputItem = { readonly "id": OpaqueId; "content": ResponseInput; };
 export type NativeMetadata = { [key: string]: string; };
-export type NativeSessionCreate = { "agent_id": NativeAgentId; "name"?: string; "metadata"?: { [key: string]: string; }; };
+export type NativeSessionCreate = { "agent_id": NativeAgentId; "name"?: string; "metadata"?: { [key: string]: string; }; "end_user_ref"?: EndUserRef; };
 export type NativeSessionPatch = { "name": string; };
 export type SessionConfigurationObservation = { "persona_revision": revision | null; "persona_policy": "session_start" | "binding_next_turn" | "unknown"; "last_loaded_execution_revision": revision | null; "last_response_id": OpaqueId | null; "components": (ComponentObservation)[]; };
-export type NativeSession = { "id": OpaqueId; "agent_id": NativeAgentId; "state": "active" | "agent_deleted" | "deleting"; "read_only": boolean; "name": string; "metadata": { [key: string]: string; }; "configuration": SessionConfigurationObservation; "head_response_id": OpaqueId | null; "resource_version": ResourceVersion; "created_at": string; "updated_at": string; "last_activity_at": string; "continuation_available": boolean; "continuation_unavailable_reason": "agent_deleted" | "session_deleting" | "history_source_deleted" | "native_continuity_unproven" | null; };
+export type NativeSession = { "id": OpaqueId; "agent_id": NativeAgentId; "state": "active" | "agent_deleted" | "deleting"; "read_only": boolean; "name": string; "metadata": { [key: string]: string; }; "configuration": SessionConfigurationObservation; "head_response_id": OpaqueId | null; "resource_version": ResourceVersion; "created_at": string; "updated_at": string; "last_activity_at": string; "continuation_available": boolean; "continuation_unavailable_reason": "agent_deleted" | "session_deleting" | "history_source_deleted" | "native_continuity_unproven" | null; "end_user_ref": EndUserRef | null; };
 export type NativeResponseCreate = { "session_id": OpaqueId; "input": (ResponseInput)[]; "instructions"?: string; "model_id"?: OpaqueId; "previous_response_id"?: OpaqueId; "timeout_seconds"?: number; "metadata"?: NativeMetadata; };
 export type EffectiveConfiguration = { "config_revision": revision; "persona_revision": revision | null; "resolved_request_hash": string; "requested_model_id": OpaqueId | null; "loaded_model_id": OpaqueId | null; "actual_provider_id": OpaqueId | null; "actual_model_id": OpaqueId | null; "endpoint_ref": OpaqueId | null; "api_mode": string | null; "reasoning": string | null; "fallback_used": boolean | null; "skills_digest": string | null; "tool_schema_digest": string | null; "credential_activation_revision": revision | null; "authorization_revision_at_admission": AuthorizationRevision; "observation": "selected" | "loaded" | "executed" | "partial" | "unknown"; "components": (ComponentObservation)[]; "memory_read_watermark": OpaqueId | null; "memory_observation": "not_read" | "read" | "unavailable" | "unknown"; };
 export type ResponseOutputItem = { "type": "output_text"; "text": string; } | { "type": "output_file"; "file": FileMetadata; } | { "type": "tool_summary"; "tool_call_id": OpaqueId; "tool_name": string; "outcome": "succeeded" | "failed" | "unknown"; "summary": string; };
@@ -168,7 +169,7 @@ export interface WriteSandboxFileOptions extends NativeRequestOptions {path: str
 export interface ReadSandboxFileOptions extends NativeRequestOptions {path: string; ifMatch?: string;}
 export interface DownloadCommandArtifactOptions extends NativeRequestOptions {}
 export interface CreateNativeAgentOptions extends NativeRequestOptions {}
-export interface ListNativeAgentsOptions extends NativeRequestOptions {limit?: number; cursor?: string;}
+export interface ListNativeAgentsOptions extends NativeRequestOptions {limit?: number; cursor?: string; endUserRef?: EndUserRef;}
 export interface GetNativeAgentOptions extends NativeRequestOptions {}
 export interface UpdateNativeAgentOptions extends NativeRequestOptions {ifMatch: string;}
 export interface DeleteNativeAgentOptions extends NativeRequestOptions {}
@@ -177,7 +178,7 @@ export interface GetNativeAgentSkillFilesOptions extends NativeRequestOptions {}
 export interface RevokeNativeAgentAuthorizationsOptions extends NativeRequestOptions {}
 export interface ListNativeModelsOptions extends NativeRequestOptions {limit?: number; cursor?: string;}
 export interface CreateNativeSessionOptions extends NativeRequestOptions {}
-export interface ListNativeSessionsOptions extends NativeRequestOptions {limit?: number; cursor?: string; agentId?: NativeAgentId; order?: "asc" | "desc"; state?: "active" | "agent_deleted" | "deleting";}
+export interface ListNativeSessionsOptions extends NativeRequestOptions {limit?: number; cursor?: string; agentId?: NativeAgentId; order?: "asc" | "desc"; state?: "active" | "agent_deleted" | "deleting"; endUserRef?: EndUserRef;}
 export interface GetNativeSessionOptions extends NativeRequestOptions {}
 export interface UpdateNativeSessionOptions extends NativeRequestOptions {ifMatch: string;}
 export interface DeleteNativeSessionOptions extends NativeRequestOptions {}
@@ -1176,6 +1177,12 @@ const nativeOperations = {
         "in": "query",
         "required": false,
         "option": "cursor"
+      },
+      {
+        "name": "end_user_ref",
+        "in": "query",
+        "required": false,
+        "option": "endUserRef"
       }
     ],
     "responseType": "json",
@@ -1386,6 +1393,12 @@ const nativeOperations = {
         "in": "query",
         "required": false,
         "option": "state"
+      },
+      {
+        "name": "end_user_ref",
+        "in": "query",
+        "required": false,
+        "option": "endUserRef"
       }
     ],
     "responseType": "json",

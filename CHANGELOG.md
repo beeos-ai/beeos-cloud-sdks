@@ -44,6 +44,15 @@
   `screen_in_use` / `agent_action_in_flight`). Requires the matching Cloud
   backend deployment.
 
+- Native `MCPSelection` accepts `kind: "remote"` endpoints (`name`, `url`,
+  `transport`, non-secret `headers`, `credential_slot` + `credential_header`) so
+  App MCP Hub servers can be configured on `/v2` Agents; the credential is an
+  Agent credential slot bound by reference, never a configuration value.
+- Native Agents and Sessions carry an opaque `end_user_ref`: written at create,
+  returned on reads, and accepted as a `listNativeAgents` / `listNativeSessions`
+  filter (TypeScript, Python and Go options). Requires the matching backend.
+
+
 ## 4.0.0 (2026-10-25) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v4`
 
 MAJOR: the entries under BREAKING below were already on `main` unreleased; the

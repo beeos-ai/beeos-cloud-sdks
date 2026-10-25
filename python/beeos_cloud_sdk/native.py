@@ -344,6 +344,12 @@ MCPSelection = TypedDict("MCPSelection", {
     "enabled": "Required[bool]",
     "required": "Required[bool]",
     "credential_slot": "NotRequired[str]",
+    "kind": "NotRequired[Literal[\"catalog\", \"remote\"]]",
+    "name": "NotRequired[str]",
+    "url": "NotRequired[str]",
+    "transport": "NotRequired[Literal[\"streamable-http\", \"sse\"]]",
+    "headers": "NotRequired[dict[str, str]]",
+    "credential_header": "NotRequired[str]",
 })
 
 ComponentObservation = TypedDict("ComponentObservation", {
@@ -386,6 +392,7 @@ NativeAgentCreate = TypedDict("NativeAgentCreate", {
     "run_timeout_seconds": "NotRequired[int]",
     "target": "NotRequired[BeeosTarget]",
     "credentials": "NotRequired[CredentialBindings]",
+    "end_user_ref": "NotRequired[EndUserRef]",
 })
 
 NativeAgentPatch = TypedDict("NativeAgentPatch", {
@@ -435,6 +442,7 @@ NativeAgent = TypedDict("NativeAgent", {
     "publication": "Required[Publication]",
     "authorization": "Required[AuthorizationEnforcement]",
     "default_model_id": "Required[OpaqueId]",
+    "end_user_ref": "Required[EndUserRef | None]",
     "created_at": "Required[str]",
     "updated_at": "Required[str]",
 })
@@ -516,6 +524,7 @@ NativeSessionCreate = TypedDict("NativeSessionCreate", {
     "agent_id": "Required[NativeAgentId]",
     "name": "NotRequired[str]",
     "metadata": "NotRequired[dict[str, str]]",
+    "end_user_ref": "NotRequired[EndUserRef]",
 })
 
 NativeSessionPatch = TypedDict("NativeSessionPatch", {
@@ -545,6 +554,7 @@ NativeSession = TypedDict("NativeSession", {
     "last_activity_at": "Required[str]",
     "continuation_available": "Required[bool]",
     "continuation_unavailable_reason": "Required[Literal[\"agent_deleted\", \"session_deleting\", \"history_source_deleted\", \"native_continuity_unproven\"] | None]",
+    "end_user_ref": "Required[EndUserRef | None]",
 })
 
 NativeResponseCreate = TypedDict("NativeResponseCreate", {
@@ -1222,6 +1232,7 @@ class CreateNativeAgentOptions(NativeRequestOptions, total=False):
 class ListNativeAgentsOptions(NativeRequestOptions, total=False):
     limit: NotRequired[int]
     cursor: NotRequired[str]
+    end_user_ref: NotRequired[EndUserRef]
 
 class GetNativeAgentOptions(NativeRequestOptions, total=False):
     pass
@@ -1255,6 +1266,7 @@ class ListNativeSessionsOptions(NativeRequestOptions, total=False):
     agent_id: NotRequired[NativeAgentId]
     order: NotRequired[Literal["asc", "desc"]]
     state: NotRequired[Literal["active", "agent_deleted", "deleting"]]
+    end_user_ref: NotRequired[EndUserRef]
 
 class GetNativeSessionOptions(NativeRequestOptions, total=False):
     pass
@@ -1351,6 +1363,8 @@ class RestoreNativeCanvasSnapshotOptions(NativeRequestOptions, total=False):
     pass
 
 CanvasId: TypeAlias = str
+
+EndUserRef: TypeAlias = str
 
 AuthorizationRevoke: TypeAlias = AuthorizationRevokeValueVariant1 | AuthorizationRevokeValueVariant2
 
@@ -1498,7 +1512,7 @@ _OPERATIONS: dict[str, _Operation] = {
     "readSandboxFile": _Operation("readSandboxFile", "GET", "/v1/sandboxes/{sandbox_id}/files", "", "application/octet-stream", False, (("path", "path", "query", True), ("if_match", "If-Match", "header", False))),
     "downloadCommandArtifact": _Operation("downloadCommandArtifact", "GET", "/v1/sandboxes/{sandbox_id}/commands/{command_id}/artifacts/{artifact_id}", "", "application/octet-stream", False, ()),
     "createNativeAgent": _Operation("createNativeAgent", "POST", "/v2/agents", "application/json", "application/json", True, (("idempotency_key", "Idempotency-Key", "header", True),)),
-    "listNativeAgents": _Operation("listNativeAgents", "GET", "/v2/agents", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False))),
+    "listNativeAgents": _Operation("listNativeAgents", "GET", "/v2/agents", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False), ("end_user_ref", "end_user_ref", "query", False))),
     "getNativeAgent": _Operation("getNativeAgent", "GET", "/v2/agents/{agent_id}", "", "application/json", False, ()),
     "updateNativeAgent": _Operation("updateNativeAgent", "PATCH", "/v2/agents/{agent_id}", "application/json", "application/json", True, (("if_match", "If-Match", "header", True), ("idempotency_key", "Idempotency-Key", "header", True))),
     "deleteNativeAgent": _Operation("deleteNativeAgent", "DELETE", "/v2/agents/{agent_id}", "", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
@@ -1507,7 +1521,7 @@ _OPERATIONS: dict[str, _Operation] = {
     "getNativeAgentSkillFiles": _Operation("getNativeAgentSkillFiles", "GET", "/v2/agents/{agent_id}/skills/{skill_id}/files", "", "application/json", False, ()),
     "revokeNativeAgentAuthorizations": _Operation("revokeNativeAgentAuthorizations", "POST", "/v2/agents/{agent_id}/authorizations/revoke", "application/json", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
     "createNativeSession": _Operation("createNativeSession", "POST", "/v2/sessions", "application/json", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
-    "listNativeSessions": _Operation("listNativeSessions", "GET", "/v2/sessions", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False), ("agent_id", "agent_id", "query", False), ("order", "order", "query", False), ("state", "state", "query", False))),
+    "listNativeSessions": _Operation("listNativeSessions", "GET", "/v2/sessions", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False), ("agent_id", "agent_id", "query", False), ("order", "order", "query", False), ("state", "state", "query", False), ("end_user_ref", "end_user_ref", "query", False))),
     "getNativeSession": _Operation("getNativeSession", "GET", "/v2/sessions/{session_id}", "", "application/json", False, ()),
     "updateNativeSession": _Operation("updateNativeSession", "PATCH", "/v2/sessions/{session_id}", "application/json", "application/json", False, (("if_match", "If-Match", "header", True), ("idempotency_key", "Idempotency-Key", "header", True))),
     "deleteNativeSession": _Operation("deleteNativeSession", "DELETE", "/v2/sessions/{session_id}", "", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
