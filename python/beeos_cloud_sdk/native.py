@@ -391,6 +391,7 @@ NativeAgentCreate = TypedDict("NativeAgentCreate", {
     "disabled_tools": "NotRequired[list[str]]",
     "run_timeout_seconds": "NotRequired[int]",
     "target": "NotRequired[BeeosTarget]",
+    "approval_mode": "NotRequired[ApprovalMode]",
     "credentials": "NotRequired[CredentialBindings]",
     "end_user_ref": "NotRequired[EndUserRef]",
 })
@@ -404,6 +405,7 @@ NativeAgentPatch = TypedDict("NativeAgentPatch", {
     "disabled_tools": "NotRequired[list[str]]",
     "run_timeout_seconds": "NotRequired[int]",
     "target": "NotRequired[BeeosTarget]",
+    "approval_mode": "NotRequired[ApprovalMode]",
     "credentials": "NotRequired[CredentialBindings]",
 })
 
@@ -417,6 +419,7 @@ NativeAgentConfiguration = TypedDict("NativeAgentConfiguration", {
     "disabled_tools": "Required[list[str]]",
     "run_timeout_seconds": "Required[int]",
     "target": "Required[BeeosTarget]",
+    "approval_mode": "Required[ApprovalMode]",
     "credential_status": "Required[CredentialBindingStatus]",
 })
 
@@ -528,7 +531,8 @@ NativeSessionCreate = TypedDict("NativeSessionCreate", {
 })
 
 NativeSessionPatch = TypedDict("NativeSessionPatch", {
-    "name": "Required[str]",
+    "name": "NotRequired[str]",
+    "approval_mode": "NotRequired[ApprovalMode | None]",
 })
 
 SessionConfigurationObservation = TypedDict("SessionConfigurationObservation", {
@@ -547,6 +551,7 @@ NativeSession = TypedDict("NativeSession", {
     "name": "Required[str]",
     "metadata": "Required[dict[str, str]]",
     "configuration": "Required[SessionConfigurationObservation]",
+    "approval_mode": "Required[ApprovalMode | None]",
     "head_response_id": "Required[OpaqueId | None]",
     "resource_version": "Required[ResourceVersion]",
     "created_at": "Required[str]",
@@ -587,6 +592,7 @@ EffectiveConfiguration = TypedDict("EffectiveConfiguration", {
     "components": "Required[list[ComponentObservation]]",
     "memory_read_watermark": "Required[OpaqueId | None]",
     "memory_observation": "Required[Literal[\"not_read\", \"read\", \"unavailable\", \"unknown\"]]",
+    "approval_mode": "Required[ApprovalMode | None]",
 })
 
 ResponseOutputItemValueVariant1 = TypedDict("ResponseOutputItemValueVariant1", {
@@ -1363,6 +1369,8 @@ class RestoreNativeCanvasSnapshotOptions(NativeRequestOptions, total=False):
     pass
 
 CanvasId: TypeAlias = str
+
+ApprovalMode: TypeAlias = Literal["ask", "workspace", "full"]
 
 EndUserRef: TypeAlias = str
 

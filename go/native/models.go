@@ -293,6 +293,8 @@ type AgentBindingObservation struct {
 	Error                        *NativeErrorEnvelope    `json:"error"`
 }
 
+type ApprovalMode string
+
 type NativeAgentCreate struct {
 	Name              *string             `json:"name,omitempty"`
 	Engine            string              `json:"engine"`
@@ -303,6 +305,7 @@ type NativeAgentCreate struct {
 	DisabledTools     *[]string           `json:"disabled_tools,omitempty"`
 	RunTimeoutSeconds *int64              `json:"run_timeout_seconds,omitempty"`
 	Target            *BeeosTarget        `json:"target,omitempty"`
+	ApprovalMode      *ApprovalMode       `json:"approval_mode,omitempty"`
 	Credentials       *CredentialBindings `json:"credentials,omitempty"`
 	EndUserRef        *EndUserRef         `json:"end_user_ref,omitempty"`
 }
@@ -318,6 +321,7 @@ type NativeAgentPatch struct {
 	DisabledTools     *[]string           `json:"disabled_tools,omitempty"`
 	RunTimeoutSeconds *int64              `json:"run_timeout_seconds,omitempty"`
 	Target            *BeeosTarget        `json:"target,omitempty"`
+	ApprovalMode      *ApprovalMode       `json:"approval_mode,omitempty"`
 	Credentials       *CredentialBindings `json:"credentials,omitempty"`
 }
 
@@ -331,6 +335,7 @@ type NativeAgentConfiguration struct {
 	DisabledTools     []string                `json:"disabled_tools"`
 	RunTimeoutSeconds int64                   `json:"run_timeout_seconds"`
 	Target            BeeosTarget             `json:"target"`
+	ApprovalMode      ApprovalMode            `json:"approval_mode"`
 	CredentialStatus  CredentialBindingStatus `json:"credential_status"`
 }
 
@@ -522,7 +527,8 @@ type NativeSessionCreate struct {
 }
 
 type NativeSessionPatch struct {
-	Name string `json:"name"`
+	Name         *string                 `json:"name,omitempty"`
+	ApprovalMode *Nullable[ApprovalMode] `json:"approval_mode,omitempty"`
 }
 
 type SessionConfigurationObservation struct {
@@ -541,6 +547,7 @@ type NativeSession struct {
 	Name                          string                          `json:"name"`
 	Metadata                      map[string]string               `json:"metadata"`
 	Configuration                 SessionConfigurationObservation `json:"configuration"`
+	ApprovalMode                  *ApprovalMode                   `json:"approval_mode"`
 	HeadResponseID                *OpaqueID                       `json:"head_response_id"`
 	ResourceVersion               ResourceVersion                 `json:"resource_version"`
 	CreatedAt                     string                          `json:"created_at"`
@@ -581,6 +588,7 @@ type EffectiveConfiguration struct {
 	Components                       []ComponentObservation `json:"components"`
 	MemoryReadWatermark              *OpaqueID              `json:"memory_read_watermark"`
 	MemoryObservation                string                 `json:"memory_observation"`
+	ApprovalMode                     *ApprovalMode          `json:"approval_mode"`
 }
 
 type ResponseOutputItemVariant1 struct {
