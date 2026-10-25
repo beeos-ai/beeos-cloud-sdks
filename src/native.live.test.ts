@@ -32,7 +32,7 @@ describe.skipIf(!origin && !keyFile)("live Gateway (TypeScript)", () => {
     expect([missing.http_status, !!missing.code, !!missing.request_id]).toEqual([404, true, true]);
 
     const agentKey = intent + "-agent";
-    const body = {engine: "openclaw", name, instructions: "SDK live check."};
+    const body = {engine: "openclaw", target: {template_id: "beeos/base"}, name, instructions: "SDK live check."};
     const created = await client.agents.create(body, {idempotencyKey: agentKey});
     const agent = created.body.data;
     try {
@@ -48,12 +48,12 @@ describe.skipIf(!origin && !keyFile)("live Gateway (TypeScript)", () => {
         const localKey = intent + "-" + label;
         const controller = new AbortController();
         if (label === "cancel") controller.abort();
-        const failure = await client.agents.create({engine: "openclaw", name: name + "-" + label},
+        const failure = await client.agents.create({engine: "openclaw", target: {template_id: "beeos/base"}, name: name + "-" + label},
           {idempotencyKey: localKey, signal: controller.signal, waitTimeoutSeconds: label === "deadline" ? 0.000001 : undefined}).then(() => undefined, (error: unknown) => error);
         expect(failure).toBeInstanceOf(SDKWaitTimeout);
         expect(failure instanceof SDKCancelled).toBe(label === "cancel");
         expect((failure as SDKWaitTimeout).acceptance?.idempotency_key).toBe(localKey);
-        const recovered = await client.agents.create({engine: "openclaw", name: name + "-" + label}, {idempotencyKey: localKey});
+        const recovered = await client.agents.create({engine: "openclaw", target: {template_id: "beeos/base"}, name: name + "-" + label}, {idempotencyKey: localKey});
         await client.agents.delete(recovered.body.data.id, {idempotencyKey: localKey + "-delete"});
       }
 

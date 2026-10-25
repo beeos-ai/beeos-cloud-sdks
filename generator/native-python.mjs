@@ -433,17 +433,17 @@ def _wait_done(call: _Call, first: BeeOSHTTPResponse[object], current: BeeOSHTTP
         state = publication.get("state")
         if state in ("failed", "partial", "unknown", "superseded"):
             raise SDKWaitError("publication_" + str(state), call.context)
-        # Recipe/no-placement, paused managed targets and metadata-only writes stay deferred.
+        # A template target, a paused sandbox target and metadata-only writes stay deferred.
         if state == "deferred":
             return True
         if state != "ready":
             return False
-        if isinstance(target, dict) and target.get("kind") == "recipe":
+        if isinstance(target, dict) and "template_id" in target:
             return True
         binding = data.get("binding")
         if not isinstance(binding, dict) or binding.get("prepared_config_revision") != revision:
             return False
-        if isinstance(target, dict) and target.get("kind") == "managed" and binding.get("sandbox_id") != target.get("sandbox_id"):
+        if isinstance(target, dict) and "sandbox_id" in target and binding.get("sandbox_id") != target.get("sandbox_id"):
             return False
         # Ready is the server's verified publication projection. Credential revisions may
         # legitimately be older when unchanged; Session Persona revisions are independent.

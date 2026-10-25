@@ -304,7 +304,7 @@ type NativeAgentCreate struct {
 	MCPServers        *[]MCPSelection     `json:"mcp_servers,omitempty"`
 	DisabledTools     *[]string           `json:"disabled_tools,omitempty"`
 	RunTimeoutSeconds *int64              `json:"run_timeout_seconds,omitempty"`
-	Target            *BeeosTarget        `json:"target,omitempty"`
+	Target            BeeosTarget         `json:"target"`
 	ApprovalMode      *ApprovalMode       `json:"approval_mode,omitempty"`
 	Credentials       *CredentialBindings `json:"credentials,omitempty"`
 	EndUserRef        *EndUserRef         `json:"end_user_ref,omitempty"`
@@ -1427,14 +1427,14 @@ func (value BeeosTarget) MarshalJSON() ([]byte, error) {
 }
 func (value *BeeosTarget) UnmarshalJSON(data []byte) error {
 	*value = BeeosTarget{}
-	if matchesNativeVariant(data, "object", []string{"kind"}, []string{"kind", "template", "timeout_seconds", "on_timeout"}, "{\"kind\":\"recipe\",\"on_timeout\":\"terminate\"}") {
+	if matchesNativeVariant(data, "object", []string{"template_id"}, []string{"template_id", "timeout_seconds", "on_timeout"}, "{\"on_timeout\":\"terminate\"}") {
 		var candidate BeeosRecipeTarget
 		if err := json.Unmarshal(data, &candidate); err == nil {
 			value.BeeosRecipeTarget = &candidate
 			return nil
 		}
 	}
-	if matchesNativeVariant(data, "object", []string{"kind", "sandbox_id"}, []string{"kind", "sandbox_id"}, "{\"kind\":\"managed\"}") {
+	if matchesNativeVariant(data, "object", []string{"sandbox_id"}, []string{"sandbox_id"}, "{}") {
 		var candidate BeeosManagedTarget
 		if err := json.Unmarshal(data, &candidate); err == nil {
 			value.BeeosManagedTarget = &candidate
@@ -1445,15 +1445,13 @@ func (value *BeeosTarget) UnmarshalJSON(data []byte) error {
 }
 
 type BeeosRecipeTarget struct {
-	Kind           string  `json:"kind"`
-	Template       *string `json:"template,omitempty"`
+	TemplateID     string  `json:"template_id"`
 	TimeoutSeconds *int64  `json:"timeout_seconds,omitempty"`
 	OnTimeout      *string `json:"on_timeout,omitempty"`
 }
 
 type BeeosManagedTarget struct {
-	Kind      string `json:"kind"`
-	SandboxID ID     `json:"sandbox_id"`
+	SandboxID ID `json:"sandbox_id"`
 }
 
 type ID = OwnerOpaqueId2

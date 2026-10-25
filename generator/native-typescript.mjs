@@ -294,9 +294,9 @@ export class NativeBeeOSClient {
       } else if (revision !== undefined) {
         const agent = (result.body as NativeAgentResult).data;
         if (agent.desired_config_revision !== revision || agent.publication.accepted_config_revision !== revision || agent.publication.state === "superseded") throw new SDKPublicationSuperseded("Agent publication was superseded", ctx.acceptance, result);
-        if (agent.publication.state === "deferred" || target?.kind === "recipe" || agent.publication.changed_components.length === 0) return result;
+        if (agent.publication.state === "deferred" || (target !== undefined && "template_id" in target) || agent.publication.changed_components.length === 0) return result;
         if (["failed", "partial", "unknown"].includes(agent.publication.state)) throw new SDKOperationFailed("Agent publication requires inspection", ctx.acceptance, result);
-        if (agent.publication.state === "ready" && agent.binding?.prepared_config_revision === revision && target?.kind === "managed" && agent.binding.sandbox_id === target.sandbox_id) return result;
+        if (agent.publication.state === "ready" && agent.binding?.prepared_config_revision === revision && target !== undefined && "sandbox_id" in target && agent.binding.sandbox_id === target.sandbox_id) return result;
         poll = nativeOperations.getNativeAgent; args = {agent_id: agent.id};
       } else if (op.id === "runSandboxCommand") {
         const command = (result.body as CommandResultEnvelope).data;

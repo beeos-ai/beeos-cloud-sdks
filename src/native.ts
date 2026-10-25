@@ -44,7 +44,7 @@ export type ComponentObservation = { "component": "model" | "persona" | "tools" 
 export type Publication = { "accepted_config_revision": revision; "changed_components": ("model" | "persona" | "tools" | "skills" | "mcp" | "credentials" | "target")[]; "state": "accepted" | "preparing" | "ready" | "deferred" | "failed" | "partial" | "unknown" | "superseded"; "components": (ComponentObservation)[]; };
 export type AgentBindingObservation = { "binding_id": OpaqueId; "sandbox_id": OpaqueId; "state": string; "prepared_config_revision": revision | null; "credential_activation_revision": revision | null; "credential_status": CredentialBindingStatus; "persona_scope": "session" | "binding" | "unknown"; "components": (ComponentObservation)[]; "error": NativeErrorEnvelope | null; };
 export type ApprovalMode = "ask" | "workspace" | "full";
-export type NativeAgentCreate = { "name"?: string; "engine": string; "instructions"?: string; "model_id"?: OpaqueId | null; "skills"?: (SkillSelection)[]; "mcp_servers"?: (MCPSelection)[]; "disabled_tools"?: (string)[]; "run_timeout_seconds"?: number; "target"?: BeeosTarget; "approval_mode"?: ApprovalMode; "credentials"?: CredentialBindings; "end_user_ref"?: EndUserRef; };
+export type NativeAgentCreate = { "name"?: string; "engine": string; "instructions"?: string; "model_id"?: OpaqueId | null; "skills"?: (SkillSelection)[]; "mcp_servers"?: (MCPSelection)[]; "disabled_tools"?: (string)[]; "run_timeout_seconds"?: number; "target": BeeosTarget; "approval_mode"?: ApprovalMode; "credentials"?: CredentialBindings; "end_user_ref"?: EndUserRef; };
 export type EndUserRef = string;
 export type NativeAgentPatch = { "name"?: string; "instructions"?: string; "model_id"?: OpaqueId | null; "skills"?: (SkillSelection)[]; "mcp_servers"?: (MCPSelection)[]; "disabled_tools"?: (string)[]; "run_timeout_seconds"?: number; "target"?: BeeosTarget; "approval_mode"?: ApprovalMode; "credentials"?: CredentialBindings; };
 export type NativeAgentConfiguration = { "name": string; "engine": string; "instructions": string; "model_id": OpaqueId | null; "skills": (SkillSelection)[]; "mcp_servers": (MCPSelection)[]; "disabled_tools": (string)[]; "run_timeout_seconds": number; "target": BeeosTarget; "approval_mode": ApprovalMode; "credential_status": CredentialBindingStatus; };
@@ -130,8 +130,8 @@ export type revision = OwnerOpaqueId2;
 export type CredentialPublicStatus = { "slot": string; "configured": boolean; };
 export type CredentialBindingStatus = { "slots": (CredentialPublicStatus)[]; };
 export type BeeosTarget = BeeosRecipeTarget | BeeosManagedTarget;
-export type BeeosRecipeTarget = { "kind": "recipe"; "template"?: "beeos/base" | "beeos/base-4c8g"; "timeout_seconds"?: number; "on_timeout"?: "terminate"; };
-export type BeeosManagedTarget = { "kind": "managed"; "sandbox_id": Id; };
+export type BeeosRecipeTarget = { "template_id": "beeos/base" | "beeos/base-4c8g"; "timeout_seconds"?: number; "on_timeout"?: "terminate"; };
+export type BeeosManagedTarget = { "sandbox_id": Id; };
 export type Id = OwnerOpaqueId2;
 export type CredentialBindings = (CredentialBinding)[];
 export type CredentialBinding = { "slot": string; "source": CredentialReference | SealedCredential; };
@@ -446,9 +446,9 @@ export class NativeBeeOSClient {
       } else if (revision !== undefined) {
         const agent = (result.body as NativeAgentResult).data;
         if (agent.desired_config_revision !== revision || agent.publication.accepted_config_revision !== revision || agent.publication.state === "superseded") throw new SDKPublicationSuperseded("Agent publication was superseded", ctx.acceptance, result);
-        if (agent.publication.state === "deferred" || target?.kind === "recipe" || agent.publication.changed_components.length === 0) return result;
+        if (agent.publication.state === "deferred" || (target !== undefined && "template_id" in target) || agent.publication.changed_components.length === 0) return result;
         if (["failed", "partial", "unknown"].includes(agent.publication.state)) throw new SDKOperationFailed("Agent publication requires inspection", ctx.acceptance, result);
-        if (agent.publication.state === "ready" && agent.binding?.prepared_config_revision === revision && target?.kind === "managed" && agent.binding.sandbox_id === target.sandbox_id) return result;
+        if (agent.publication.state === "ready" && agent.binding?.prepared_config_revision === revision && target !== undefined && "sandbox_id" in target && agent.binding.sandbox_id === target.sandbox_id) return result;
         poll = nativeOperations.getNativeAgent; args = {agent_id: agent.id};
       } else if (op.id === "runSandboxCommand") {
         const command = (result.body as CommandResultEnvelope).data;

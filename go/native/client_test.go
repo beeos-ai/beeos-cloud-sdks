@@ -246,7 +246,7 @@ func TestExactPublicationDeferredSupersessionAndCredentialRevision(t *testing.T)
 			if calls > 1 {
 				state = "ready"
 			}
-			jsonReply(w, 200, agentJSON(state, "rev_new", `{"kind":"managed","sandbox_id":"sandbox"}`))
+			jsonReply(w, 200, agentJSON(state, "rev_new", `{"sandbox_id":"sandbox"}`))
 		})
 		result, err := client.Agents.Update(context.Background(), "agent", NativeAgentPatch{}, UpdateNativeAgentOptions{IfMatch: `"4"`, RequestOptions: RequestOptions{PollIntervalSeconds: .001}})
 		if err != nil {
@@ -260,9 +260,9 @@ func TestExactPublicationDeferredSupersessionAndCredentialRevision(t *testing.T)
 		calls := 0
 		client, _ := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 			calls++
-			jsonReply(w, 201, agentJSON("deferred", "rev_new", `{"kind":"recipe"}`))
+			jsonReply(w, 201, agentJSON("deferred", "rev_new", `{"template_id":"beeos/base"}`))
 		})
-		_, err := client.Agents.Create(context.Background(), NativeAgentCreate{Engine: "openclaw"}, CreateNativeAgentOptions{})
+		_, err := client.Agents.Create(context.Background(), NativeAgentCreate{Engine: "openclaw", Target: templateTarget()}, CreateNativeAgentOptions{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -278,7 +278,7 @@ func TestExactPublicationDeferredSupersessionAndCredentialRevision(t *testing.T)
 			if calls > 1 {
 				revision = "rev_other"
 			}
-			jsonReply(w, 200, agentJSON("preparing", revision, `{"kind":"managed","sandbox_id":"sandbox"}`))
+			jsonReply(w, 200, agentJSON("preparing", revision, `{"sandbox_id":"sandbox"}`))
 		})
 		_, err := client.Agents.Update(context.Background(), "agent", NativeAgentPatch{}, UpdateNativeAgentOptions{IfMatch: `"1"`, RequestOptions: RequestOptions{PollIntervalSeconds: .001}})
 		var superseded *SDKPublicationSuperseded
@@ -584,7 +584,7 @@ func TestAllCredentialSlotsAndExpandedMaximumRevocationScopesRoundTrip(t *testin
 		if strings.HasSuffix(r.URL.Path, "/unprepared") {
 			binding = nil
 		}
-		configuration := map[string]any{"name": "agent", "engine": "openclaw", "instructions": "", "model_id": nil, "skills": []any{}, "mcp_servers": []any{}, "disabled_tools": []string{}, "run_timeout_seconds": 600, "target": map[string]any{"kind": "managed", "sandbox_id": "sandbox"}, "credential_status": CredentialBindingStatus{Slots: desired}}
+		configuration := map[string]any{"name": "agent", "engine": "openclaw", "instructions": "", "model_id": nil, "skills": []any{}, "mcp_servers": []any{}, "disabled_tools": []string{}, "run_timeout_seconds": 600, "target": map[string]any{"sandbox_id": "sandbox"}, "credential_status": CredentialBindingStatus{Slots: desired}}
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{"data": map[string]any{"id": "agent", "desired_config_revision": "c3", "configuration": configuration, "binding": binding}})
 	})

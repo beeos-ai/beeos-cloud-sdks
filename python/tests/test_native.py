@@ -95,8 +95,8 @@ def reply(data: Any, status: int = 200, **headers: str) -> tuple[Any, ...]:
     return status, {"Content-Type": "application/json", **headers}, {"data": data}
 
 
-def agent(revision: int = 8, state: str = "preparing", prepared: int = 7, *, kind: str = "managed", sandbox_id: str = "sb_target") -> dict[str, Any]:
-    target = {"kind": kind, "sandbox_id": sandbox_id} if kind == "managed" else {"kind": "recipe"}
+def agent(revision: int = 8, state: str = "preparing", prepared: int = 7, *, kind: str = "sandbox", sandbox_id: str = "sb_target") -> dict[str, Any]:
+    target = {"sandbox_id": sandbox_id} if kind == "sandbox" else {"template_id": "beeos/base"}
     return {"id": "ag_1", "desired_config_revision": revision, "configuration": {"target": target},
             "publication": {"accepted_config_revision": revision, "state": state, "changed_components": ["model"], "components": []},
             "binding": {"sandbox_id": sandbox_id, "prepared_config_revision": prepared, "credential_activation_revision": 3, "state": "ready", "persona_scope": "session"}}
@@ -116,7 +116,7 @@ def credential_authorization_case() -> tuple[dict[str, Any], native.Authorizatio
     desired_slots = [{"slot": f"credential_{i}", "configured": False} for i in range(64)]
     observed = {
         "id": "ag_1", "resource_version": 8, "desired_config_revision": "c3",
-        "configuration": {"name": "Observed", "engine": "openclaw", "instructions": "", "model_id": None, "skills": [], "mcp_servers": [], "disabled_tools": [], "run_timeout_seconds": 300, "target": {"kind": "managed", "sandbox_id": "sb_1"}, "credential_status": {"slots": desired_slots}},
+        "configuration": {"name": "Observed", "engine": "openclaw", "instructions": "", "model_id": None, "skills": [], "mcp_servers": [], "disabled_tools": [], "run_timeout_seconds": 300, "target": {"sandbox_id": "sb_1"}, "credential_status": {"slots": desired_slots}},
         "binding": {"binding_id": "binding_1", "sandbox_id": "sb_1", "state": "ready", "prepared_config_revision": "c1", "credential_activation_revision": "c1", "credential_status": {"slots": slots}, "persona_scope": "session", "components": [], "error": None},
         "publication": {"accepted_config_revision": "c3", "changed_components": ["credentials"], "state": "preparing", "components": []},
         "authorization": {"authorization_revision": "auth_8", "state": "enforced", "affected_scopes": [], "error": None},
@@ -273,9 +273,9 @@ class NativeSyncTests(unittest.TestCase):
     def test_wait_false_and_deferred_agent_do_not_poll_or_allocate(self) -> None:
         def route(req: dict[str, Any]) -> tuple[Any, ...]:
             self.assertEqual(req["method"], "POST")
-            return reply(agent(state="deferred", kind="recipe"), 202)
+            return reply(agent(state="deferred", kind="template"), 202)
         with LocalAPI(route) as api, NativeBeeOSClient(api.url, "key") as client:
-            created = client.agents.create({"engine": "openclaw"})
+            created = client.agents.create({"engine": "openclaw", "target": {"template_id": "beeos/base"}})
             self.assertEqual(created.status, 202)
             self.assertEqual(len(api.requests), 1)
             self.assertEqual(api.requests[0]["path"], "/v2/agents")
@@ -323,7 +323,7 @@ class NativeSyncTests(unittest.TestCase):
             with self.subTest(reason=reason):
                 with LocalAPI(lambda req: reply(agent(), 202) if req["method"] == "POST" else reply(changed)) as api, NativeBeeOSClient(api.url, "key") as client:
                     with self.assertRaises(SDKWaitError) as caught:
-                        client.agents.create({"engine": "openclaw"}, {"poll_interval_seconds": 0})
+                        client.agents.create({"engine": "openclaw", "target": {"template_id": "beeos/base"}}, {"poll_interval_seconds": 0})
                     self.assertEqual(caught.exception.reason, reason)
                     self.assertEqual(caught.exception.acceptance.status, 202)
 

@@ -4,6 +4,12 @@
 
 ### Changed
 
+- Native Agent `target` no longer takes a `kind`. It names exactly one placement:
+  `template_id` (optionally with `timeout_seconds`/`on_timeout`) creates the
+  Agent's Sandbox from a reviewed template, and `sandbox_id` binds an existing
+  fixed Sandbox; both or neither is rejected. `POST /v2/agents` now requires
+  `target`. Requires the matching Cloud backend deployment.
+
 - Native Response streams (TypeScript, Python sync/async and Go) skip an event
   type the SDK does not model yet instead of failing, and keep the durable
   `Last-Event-ID` cursor at that event so a reconnect never replays or loses it.

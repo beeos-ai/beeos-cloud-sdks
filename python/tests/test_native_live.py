@@ -51,7 +51,7 @@ class LiveGatewayTest(unittest.TestCase):
                 client.agents.get("00000000-0000-4000-8000-000000000000")
             self.assertEqual((caught.exception.http_status, bool(caught.exception.code), bool(caught.exception.request_id)), (404, True, True))
             agent_key = intent + "-agent"
-            body: Any = {"engine": "openclaw", "name": name, "instructions": "SDK live check."}
+            body: Any = {"engine": "openclaw", "target": {"template_id": "beeos/base"}, "name": name, "instructions": "SDK live check."}
             created = client.agents.create(body, {"idempotency_key": agent_key})
             agent = created.body["data"]
             try:
@@ -67,9 +67,9 @@ class LiveGatewayTest(unittest.TestCase):
                 # Local deadline keeps the retry key; replaying it recovers.
                 context = OperationContext()
                 with self.assertRaises(SDKWaitTimeout) as timeout:
-                    client.agents.create(cast(Any, {"engine": "openclaw", "name": name + "-deadline"}), {"idempotency_key": intent + "-deadline", "wait_timeout_seconds": 0.000001, "context": context})
+                    client.agents.create(cast(Any, {"engine": "openclaw", "target": {"template_id": "beeos/base"}, "name": name + "-deadline"}), {"idempotency_key": intent + "-deadline", "wait_timeout_seconds": 0.000001, "context": context})
                 self.assertEqual(timeout.exception.idempotency_key, intent + "-deadline")
-                recovered = client.agents.create(cast(Any, {"engine": "openclaw", "name": name + "-deadline"}), {"idempotency_key": intent + "-deadline"})
+                recovered = client.agents.create(cast(Any, {"engine": "openclaw", "target": {"template_id": "beeos/base"}, "name": name + "-deadline"}), {"idempotency_key": intent + "-deadline"})
                 client.agents.delete(recovered.body["data"]["id"], {"idempotency_key": intent + "-deadline-delete"})
                 remembered = client.agents.memory.remember(agent["id"], {"content": name + " memory", "kind": "semantic", "source": {"kind": "explicit"}}, {"idempotency_key": intent + "-remember"})
                 self.assertIn(remembered.body["data"]["completion"], ("durable", "recallable"))
@@ -117,24 +117,24 @@ class LiveGatewayTest(unittest.TestCase):
             # Two concurrent requests on one loop prove a genuinely async transport.
             first, second = await asyncio.gather(client.agents.list(), client.sessions.list())
             self.assertEqual((first.status, second.status), (200, 200))
-            created = await client.agents.create(cast(Any, {"engine": "openclaw", "name": name}), {"idempotency_key": intent + "-agent"})
+            created = await client.agents.create(cast(Any, {"engine": "openclaw", "target": {"template_id": "beeos/base"}, "name": name}), {"idempotency_key": intent + "-agent"})
             agent = created.body["data"]
             try:
                 self.assertEqual(agent["publication"]["state"], "deferred")
                 # Local task cancellation is CancelledError, not a server cancel;
                 # the operation context retains the key for recovery.
                 context = OperationContext()
-                task = asyncio.create_task(client.agents.create(cast(Any, {"engine": "openclaw", "name": name + "-cancel"}), {"idempotency_key": intent + "-cancel", "context": context}))
+                task = asyncio.create_task(client.agents.create(cast(Any, {"engine": "openclaw", "target": {"template_id": "beeos/base"}, "name": name + "-cancel"}), {"idempotency_key": intent + "-cancel", "context": context}))
                 await asyncio.sleep(0)
                 task.cancel()
                 with self.assertRaises(asyncio.CancelledError):
                     await task
                 self.assertEqual(context.idempotency_key, intent + "-cancel")
-                recovered = await client.agents.create(cast(Any, {"engine": "openclaw", "name": name + "-cancel"}), {"idempotency_key": intent + "-cancel"})
+                recovered = await client.agents.create(cast(Any, {"engine": "openclaw", "target": {"template_id": "beeos/base"}, "name": name + "-cancel"}), {"idempotency_key": intent + "-cancel"})
                 await client.agents.delete(recovered.body["data"]["id"], {"idempotency_key": intent + "-cancel-delete"})
                 with self.assertRaises(SDKWaitTimeout):
-                    await client.agents.create(cast(Any, {"engine": "openclaw", "name": name + "-deadline"}), {"idempotency_key": intent + "-deadline", "wait_timeout_seconds": 0.000001})
-                recovered = await client.agents.create(cast(Any, {"engine": "openclaw", "name": name + "-deadline"}), {"idempotency_key": intent + "-deadline"})
+                    await client.agents.create(cast(Any, {"engine": "openclaw", "target": {"template_id": "beeos/base"}, "name": name + "-deadline"}), {"idempotency_key": intent + "-deadline", "wait_timeout_seconds": 0.000001})
+                recovered = await client.agents.create(cast(Any, {"engine": "openclaw", "target": {"template_id": "beeos/base"}, "name": name + "-deadline"}), {"idempotency_key": intent + "-deadline"})
                 await client.agents.delete(recovered.body["data"]["id"], {"idempotency_key": intent + "-deadline-delete"})
                 remembered = await client.agents.memory.remember(agent["id"], {"content": name + " memory", "kind": "semantic", "source": {"kind": "explicit"}}, {"idempotency_key": intent + "-remember"})
                 self.assertIn(remembered.body["data"]["completion"], ("durable", "recallable"))

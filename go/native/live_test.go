@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+// templateTarget states the reviewed template every live Agent must name.
+func templateTarget() BeeosTarget {
+	return BeeosTarget{BeeosRecipeTarget: &BeeosRecipeTarget{TemplateID: "beeos/base"}}
+}
+
 // TestLiveGateway (SDK-1/SDK-2) runs the generated Go client against an actually
 // running isolated public Gateway. Unconfigured is UNQUALIFIED, never a pass.
 //
@@ -60,7 +65,7 @@ func TestLiveGateway(t *testing.T) {
 		t.Fatal("create must expose acceptance key, request ID and ETag")
 	}
 	if agent.Binding != nil || agent.Publication.State != "deferred" {
-		t.Fatalf("recipe Agent wait must return deferred/no binding, got %s", agent.Publication.State)
+		t.Fatalf("template Agent wait must return deferred/no binding, got %s", agent.Publication.State)
 	}
 	replay, err := client.Agents.Create(ctx, body, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: agentKey}})
 	if err != nil || replay.Body.Data.ID != agent.ID || replay.Headers.ETag != created.Headers.ETag {
@@ -88,20 +93,20 @@ func TestLiveGateway(t *testing.T) {
 		if !check(err) || waited == nil || waited.Acceptance == nil || waited.Acceptance.IdempotencyKey != key {
 			t.Fatalf("%s: unexpected local error %T %v", label, err, err)
 		}
-		recovered, err := client.Agents.Create(ctx, NativeAgentCreate{Engine: "openclaw", Name: Pointer(name + "-" + label)}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key}})
+		recovered, err := client.Agents.Create(ctx, NativeAgentCreate{Engine: "openclaw", Target: templateTarget(), Name: Pointer(name + "-" + label)}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key}})
 		if err != nil {
 			t.Fatalf("%s: same-key recovery failed: %v", label, err)
 		}
 		client.Agents.Delete(ctx, string(recovered.Body.Data.ID), DeleteNativeAgentOptions{RequestOptions{IdempotencyKey: key + "-delete"}})
 	}
 	recover("deadline", func(key string) error {
-		_, err := client.Agents.Create(ctx, NativeAgentCreate{Engine: "openclaw", Name: Pointer(name + "-deadline")}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key, WaitTimeoutSeconds: 0.000001}})
+		_, err := client.Agents.Create(ctx, NativeAgentCreate{Engine: "openclaw", Target: templateTarget(), Name: Pointer(name + "-deadline")}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key, WaitTimeoutSeconds: 0.000001}})
 		return err
 	}, func(err error) bool { var c *SDKCancelled; return !errors.As(err, &c) })
 	recover("cancel", func(key string) error {
 		local, stop := context.WithCancel(ctx)
 		stop()
-		_, err := client.Agents.Create(local, NativeAgentCreate{Engine: "openclaw", Name: Pointer(name + "-cancel")}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key}})
+		_, err := client.Agents.Create(local, NativeAgentCreate{Engine: "openclaw", Target: templateTarget(), Name: Pointer(name + "-cancel")}, CreateNativeAgentOptions{RequestOptions{IdempotencyKey: key}})
 		return err
 	}, func(err error) bool { var c *SDKCancelled; return errors.As(err, &c) })
 

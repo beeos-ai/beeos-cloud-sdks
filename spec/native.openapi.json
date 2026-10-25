@@ -2776,7 +2776,7 @@
       "post": {
         "operationId": "createNativeAgent",
         "summary": "createNativeAgent",
-        "description": "One stable logical Agent; creation never creates or wakes compute. Recipe placement is triggered by the first authorized Response/task execution; concurrent first requests share the same placement authority. Explicit already-running managed targets may prepare this publication; paused or absent compute returns deferred.",
+        "description": "One stable logical Agent; creation never creates or wakes compute. A template target's placement is triggered by the first authorized Response/task execution; concurrent first requests share the same placement authority. An explicit sandbox_id target on already-running compute may prepare this publication; paused or absent compute returns deferred.",
         "tags": [
           "agents"
         ],
@@ -3942,7 +3942,7 @@
       "post": {
         "operationId": "createNativeResponse",
         "summary": "createNativeResponse",
-        "description": "Explicit session_id required. Optional previous_response_id must be same Session current head. Idempotent acceptance; config resolves once at execution admission. CT-1 first execution claims ready unused compute for a recipe, or reuses its usable Binding; reads/Agent/Session/Memory management do not allocate. Exposes this Response sandbox_id separately from stable agent_id/session_id. A model_id absent from GET /v2/agents/{agent_id}/models for the Session's Agent, or listed there as unavailable, is rejected synchronously with 400 model_unavailable (details.reason model_not_offered_for_agent or model_unavailable_for_agent) before acceptance (U-1024-51).",
+        "description": "Explicit session_id required. Optional previous_response_id must be same Session current head. Idempotent acceptance; config resolves once at execution admission. CT-1 first execution claims ready unused compute for a template target, or reuses its usable Binding; reads/Agent/Session/Memory management do not allocate. Exposes this Response sandbox_id separately from stable agent_id/session_id. A model_id absent from GET /v2/agents/{agent_id}/models for the Session's Agent, or listed there as unavailable, is rejected synchronously with 400 model_unavailable (details.reason model_not_offered_for_agent or model_unavailable_for_agent) before acceptance (U-1024-51).",
         "tags": [
           "responses"
         ],
@@ -6839,7 +6839,7 @@
               "agent"
             ],
             "readOnly": true,
-            "description": "Trusted creation provenance, not an end-user identity. Explicit API creates explicit; Agent recipe creates agent. Never derived from caller labels."
+            "description": "Trusted creation provenance, not an end-user identity. Explicit API creates explicit; an Agent template target creates agent. Never derived from caller labels."
           }
         },
         "required": [
@@ -7976,7 +7976,8 @@
           }
         },
         "required": [
-          "engine"
+          "engine",
+          "target"
         ],
         "additionalProperties": false,
         "x-sdk-model-name": "NativeAgentCreate"
@@ -11657,24 +11658,20 @@
             "$ref": "#/components/schemas/BeeosManagedTarget"
           }
         ],
-        "description": "Persistent desired placement. POST omission defaults to beeos/base/1800/terminate recipe; PUT omission preserves. Runtime Binding TargetSelector observes actual placement, never recipe.",
+        "description": "Persistent desired placement. POST requires target and exactly one of template_id or sandbox_id; template_id creates a Sandbox from a reviewed template, sandbox_id binds an existing fixed Sandbox. PUT omission preserves. Runtime Binding TargetSelector observes actual placement, never the desired template.",
         "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosTarget"
       },
       "BeeosRecipeTarget": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "kind": {
-            "const": "recipe"
-          },
-          "template": {
+          "template_id": {
             "type": "string",
             "enum": [
               "beeos/base",
               "beeos/base-4c8g"
             ],
-            "default": "beeos/base",
-            "description": "U-1024-23：临时沙箱基础镜像的两个固定规格，2C4G 的 beeos/base 为默认，4C8G 的 beeos/base-4c8g 按需冷启动；规格写在模板里，创建后不可改。"
+            "description": "U-1024-23：临时沙箱基础镜像的两个固定规格，2C4G 的 beeos/base 与 4C8G 的 beeos/base-4c8g；必须显式指定，无默认值。规格写在模板里，创建后不可改。"
           },
           "timeout_seconds": {
             "type": "integer",
@@ -11687,7 +11684,7 @@
           }
         },
         "required": [
-          "kind"
+          "template_id"
         ],
         "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosRecipeTarget"
       },
@@ -11695,15 +11692,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "kind": {
-            "const": "managed"
-          },
           "sandbox_id": {
             "$ref": "#/components/schemas/Id"
           }
         },
         "required": [
-          "kind",
           "sandbox_id"
         ],
         "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosManagedTarget"
@@ -12684,7 +12677,7 @@
       "http_status": 409,
       "surface": "request",
       "should_retry": false,
-      "description": "对 Agent 托管的临时沙箱（management_source=agent）的公开写操作或交互访问，或 Agent managed target 指向它。调用方显式创建的 on_timeout=terminate 沙箱不在此列（CT-2）。"
+      "description": "对 Agent 托管的临时沙箱（management_source=agent）的公开写操作或交互访问，或 Agent 的 sandbox_id target 指向它。调用方显式创建的 on_timeout=terminate 沙箱不在此列（CT-2）。"
     },
     "sandbox_already_bound": {
       "code": "state_conflict",
