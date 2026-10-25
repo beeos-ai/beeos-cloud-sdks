@@ -11,6 +11,8 @@
   appears while a typed interaction is pending, a timeout is `failed` with
   `error.code=deadline_exceeded` (there is no `timed_out`/`unknown` status), and
   the never-emitted phases were removed.
+- Native Sandbox v1 `run_timeout_seconds` and Response `timeout_seconds` now
+  accept up to 21600 seconds (6 hours), raised from 3600.
 
 ### Added
 
