@@ -47,10 +47,10 @@ export type NativeAgentCreate = { "name"?: string; "engine": string; "instructio
 export type NativeAgentPatch = { "name"?: string; "instructions"?: string; "model_id"?: OpaqueId | null; "skills"?: (SkillSelection)[]; "mcp_servers"?: (MCPSelection)[]; "disabled_tools"?: (string)[]; "run_timeout_seconds"?: number; "target"?: BeeosTarget; "credentials"?: CredentialBindings; };
 export type NativeAgentConfiguration = { "name": string; "engine": string; "instructions": string; "model_id": OpaqueId | null; "skills": (SkillSelection)[]; "mcp_servers": (MCPSelection)[]; "disabled_tools": (string)[]; "run_timeout_seconds": number; "target": BeeosTarget; "credential_status": CredentialBindingStatus; };
 export type AuthorizationEnforcement = { "authorization_revision": revision; "state": "enforcing" | "enforced" | "partial" | "unknown"; "affected_scopes": ({ "kind": "tool" | "mcp" | "credential" | "session" | "binding" | "sandbox"; "id": OpaqueId; "state": "pending" | "enforced" | "failed" | "unknown"; })[]; "error": NativeErrorEnvelope | null; };
-export type NativeAgent = { "id": NativeAgentId; "configuration": NativeAgentConfiguration; "desired_config_revision": Revision; "resource_version": ResourceVersion; "binding": AgentBindingObservation | null; "publication": Publication; "authorization": AuthorizationEnforcement; "created_at": string; "updated_at": string; };
+export type NativeAgent = { "id": NativeAgentId; "configuration": NativeAgentConfiguration; "desired_config_revision": Revision; "resource_version": ResourceVersion; "binding": AgentBindingObservation | null; "publication": Publication; "authorization": AuthorizationEnforcement; "default_model_id": OpaqueId; "created_at": string; "updated_at": string; };
 export type AuthorizationRevoke = { "all": true; } | { "tool_ids"?: (OpaqueId)[]; "mcp_server_refs"?: (OpaqueId)[]; "credential_slots"?: (string)[]; };
 export type DeletedResult = { "id": OpaqueId; "deleted": true; "cleanup": "pending" | "complete"; "scope": string; };
-export type ModelAvailability = { "id": OpaqueId; "provider_id": OpaqueId; "model_id": string; "endpoint_ref": OpaqueId | null; "engine_support": (string)[]; "availability": "available" | "unavailable" | "unknown"; "reason": string | null; "observed_at": string | null; };
+export type ModelAvailability = { "id": OpaqueId; "provider_id": OpaqueId; "model_id": string; "endpoint_ref": OpaqueId | null; "engine_support": (string)[]; "availability": "available" | "unavailable" | "unknown"; "reason": string | null; "observed_at": string | null; "default": boolean; };
 export type SkillFile = { "path": string; "file_id": OpaqueId; "size_bytes": number; "sha256": string; "media_type": string; };
 export type SkillFiles = { "skill_id": OpaqueId; "version": revision; "digest": string; "files": (SkillFile)[]; };
 export type FileMetadata = { "id": OpaqueId; "filename": string; "media_type": string; "size_bytes": number; "sha256": string; "status": "ready" | "deleted" | "revoked"; "owner_scope": "org" | "session" | "command"; "owner_id": OpaqueId | null; "created_at": string; "expires_at": string | null; };
@@ -60,6 +60,7 @@ export type ResponseInput = TextInput | FileInput;
 export type ResponseInputItem = { readonly "id": OpaqueId; "content": ResponseInput; };
 export type NativeMetadata = { [key: string]: string; };
 export type NativeSessionCreate = { "agent_id": NativeAgentId; "name"?: string; "metadata"?: { [key: string]: string; }; };
+export type NativeSessionPatch = { "name": string; };
 export type SessionConfigurationObservation = { "persona_revision": revision | null; "persona_policy": "session_start" | "binding_next_turn" | "unknown"; "last_loaded_execution_revision": revision | null; "last_response_id": OpaqueId | null; "components": (ComponentObservation)[]; };
 export type NativeSession = { "id": OpaqueId; "agent_id": NativeAgentId; "state": "active" | "agent_deleted" | "deleting"; "read_only": boolean; "name": string; "metadata": { [key: string]: string; }; "configuration": SessionConfigurationObservation; "head_response_id": OpaqueId | null; "resource_version": ResourceVersion; "created_at": string; "updated_at": string; "last_activity_at": string; "continuation_available": boolean; "continuation_unavailable_reason": "agent_deleted" | "session_deleting" | "history_source_deleted" | "native_continuity_unproven" | null; };
 export type NativeResponseCreate = { "session_id": OpaqueId; "input": (ResponseInput)[]; "model_id"?: OpaqueId; "previous_response_id"?: OpaqueId; "timeout_seconds"?: number; "metadata"?: NativeMetadata; };
@@ -178,6 +179,7 @@ export interface ListNativeModelsOptions extends NativeRequestOptions {limit?: n
 export interface CreateNativeSessionOptions extends NativeRequestOptions {}
 export interface ListNativeSessionsOptions extends NativeRequestOptions {limit?: number; cursor?: string; agentId?: NativeAgentId; order?: "asc" | "desc"; state?: "active" | "agent_deleted" | "deleting";}
 export interface GetNativeSessionOptions extends NativeRequestOptions {}
+export interface UpdateNativeSessionOptions extends NativeRequestOptions {ifMatch: string;}
 export interface DeleteNativeSessionOptions extends NativeRequestOptions {}
 export interface ListNativeSessionFilesOptions extends NativeRequestOptions {limit?: number; cursor?: string;}
 export interface ListNativeSessionResponsesOptions extends NativeRequestOptions {limit?: number; cursor?: string; order?: "asc" | "desc";}
@@ -1404,6 +1406,34 @@ const nativeOperations = {
     "responseType": "json",
     "wait": false
   },
+  "updateNativeSession": {
+    "id": "updateNativeSession",
+    "method": "PATCH",
+    "path": "/v2/sessions/{session_id}",
+    "parameters": [
+      {
+        "name": "session_id",
+        "in": "path",
+        "required": true,
+        "option": "sessionId"
+      },
+      {
+        "name": "If-Match",
+        "in": "header",
+        "required": true,
+        "option": "ifMatch"
+      },
+      {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "option": "idempotencyKey"
+      }
+    ],
+    "contentType": "application/json",
+    "responseType": "json",
+    "wait": false
+  },
   "deleteNativeSession": {
     "id": "deleteNativeSession",
     "method": "DELETE",
@@ -2046,6 +2076,7 @@ export class NativeSessionsModule {
   create(body: NativeSessionCreate, options: CreateNativeSessionOptions = {}): Promise<BeeOSHTTPResponse<NativeSessionResult>> { return this.client.call<NativeSessionResult>(nativeOperations.createNativeSession, {}, body, options); }
   list(options: ListNativeSessionsOptions = {}): Promise<BeeOSHTTPResponse<NativeSessionPage>> { return this.client.call<NativeSessionPage>(nativeOperations.listNativeSessions, {}, undefined, options); }
   get(sessionId: string, options: GetNativeSessionOptions = {}): Promise<BeeOSHTTPResponse<NativeSessionResult>> { return this.client.call<NativeSessionResult>(nativeOperations.getNativeSession, {"session_id": sessionId}, undefined, options); }
+  update(sessionId: string, body: NativeSessionPatch, options: UpdateNativeSessionOptions): Promise<BeeOSHTTPResponse<NativeSessionResult>> { return this.client.call<NativeSessionResult>(nativeOperations.updateNativeSession, {"session_id": sessionId}, body, options); }
   delete(sessionId: string, options: DeleteNativeSessionOptions = {}): Promise<BeeOSHTTPResponse<DeletedResultResult>> { return this.client.call<DeletedResultResult>(nativeOperations.deleteNativeSession, {"session_id": sessionId}, undefined, options); }
   listFiles(sessionId: string, options: ListNativeSessionFilesOptions = {}): Promise<BeeOSHTTPResponse<FileMetadataPage>> { return this.client.call<FileMetadataPage>(nativeOperations.listNativeSessionFiles, {"session_id": sessionId}, undefined, options); }
   listResponses(sessionId: string, options: ListNativeSessionResponsesOptions = {}): Promise<BeeOSHTTPResponse<NativeResponsePage>> { return this.client.call<NativeResponsePage>(nativeOperations.listNativeSessionResponses, {"session_id": sessionId}, undefined, options); }

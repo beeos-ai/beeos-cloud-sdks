@@ -11,7 +11,7 @@ const client = (fetchImpl: typeof fetch) => new NativeBeeOSClient({ baseURL: "ht
 const sandbox = (status: string) => ({ data: { id: "sbx_test", status } });
 const agent = (state: string, revision = "rev_2", target = "managed") => ({ data: { id: "agent_test", desired_config_revision: revision, configuration: { target: target === "managed" ? { kind: "managed", sandbox_id: "sbx_test" } : { kind: "recipe" }, credential_status: {slots: []} }, publication: { accepted_config_revision: revision, state, changed_components: ["model"], components: [] }, binding: { sandbox_id: "sbx_test", prepared_config_revision: revision, credential_activation_revision: "rev_1", credential_status: { slots: [{slot: "model_primary", configured: true}, {slot: "search_provider", configured: false}] } } } });
 describe("native transport and observations", () => {
-    it("performs all 57 canonical HTTP operations with versioned/encoded paths and wire options", async () => {
+    it("performs all 58 canonical HTTP operations with versioned/encoded paths and wire options", async () => {
         const spec = JSON.parse(readFileSync(new URL("../spec/native.openapi.json", import.meta.url), "utf8"));
         let count = 0;
         for (const [path, item] of Object.entries(spec.paths) as [
@@ -47,7 +47,7 @@ describe("native transport and observations", () => {
                 expect(observed).toBe(true);
                 count++;
             }
-        expect(count).toBe(57);
+        expect(count).toBe(58);
     });
     it("preserves original acceptance and final observed headers without retrying the write", async () => {
         const calls: RequestInit[] = [];

@@ -739,6 +739,10 @@ type ListNativeSessionsOptions struct {
 type GetNativeSessionOptions struct {
 	RequestOptions
 }
+type UpdateNativeSessionOptions struct {
+	RequestOptions
+	IfMatch string
+}
 type DeleteNativeSessionOptions struct {
 	RequestOptions
 }
@@ -864,6 +868,7 @@ var nativeOperations = map[string]nativeOperation{
 	"createNativeSession":             {ID: "createNativeSession", Method: "POST", Path: "/v2/sessions", ContentType: "application/json", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
 	"listNativeSessions":              {ID: "listNativeSessions", Method: "GET", Path: "/v2/sessions", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}, {Name: "agent_id", In: "query", Required: false}, {Name: "order", In: "query", Required: false}, {Name: "state", In: "query", Required: false}}},
 	"getNativeSession":                {ID: "getNativeSession", Method: "GET", Path: "/v2/sessions/{session_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{}},
+	"updateNativeSession":             {ID: "updateNativeSession", Method: "PATCH", Path: "/v2/sessions/{session_id}", ContentType: "application/json", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{{Name: "If-Match", In: "header", Required: true}}},
 	"deleteNativeSession":             {ID: "deleteNativeSession", Method: "DELETE", Path: "/v2/sessions/{session_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
 	"listNativeSessionFiles":          {ID: "listNativeSessionFiles", Method: "GET", Path: "/v2/sessions/{session_id}/files", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}}},
 	"listNativeSessionResponses":      {ID: "listNativeSessionResponses", Method: "GET", Path: "/v2/sessions/{session_id}/responses", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}, {Name: "order", In: "query", Required: false}}},
@@ -1111,6 +1116,10 @@ func (service *SessionsService) List(ctx context.Context, options ListNativeSess
 
 func (service *SessionsService) Get(ctx context.Context, sessionId string, options GetNativeSessionOptions) (BeeOSHTTPResponse[NativeSessionResult], error) {
 	return callNative[NativeSessionResult](ctx, service.client, nativeOperations["getNativeSession"], map[string]string{"session_id": sessionId}, nil, map[string]any{}, options.RequestOptions)
+}
+
+func (service *SessionsService) Update(ctx context.Context, sessionId string, body NativeSessionPatch, options UpdateNativeSessionOptions) (BeeOSHTTPResponse[NativeSessionResult], error) {
+	return callNative[NativeSessionResult](ctx, service.client, nativeOperations["updateNativeSession"], map[string]string{"session_id": sessionId}, body, map[string]any{"If-Match": options.IfMatch}, options.RequestOptions)
 }
 
 func (service *SessionsService) Delete(ctx context.Context, sessionId string, options DeleteNativeSessionOptions) (BeeOSHTTPResponse[DeletedResultResult], error) {

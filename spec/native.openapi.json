@@ -3748,6 +3748,100 @@
         "x-sdk-python-method": "get",
         "x-sdk-go-method": "Get"
       },
+      "patch": {
+        "operationId": "updateNativeSession",
+        "summary": "updateNativeSession",
+        "description": "Manual rename with strong resource_version CAS (If-Match). The name is trimmed. A manual name is never replaced by the automatic first-turn name; a read-only Session cannot be renamed. The same Idempotency-Key replays its original rename.",
+        "tags": [
+          "sessions"
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/OpaqueId"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]*\"$"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string",
+                  "maxLength": 256
+                }
+              },
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string",
+                  "maxLength": 128
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NativeSessionResult"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Cloud flat error with code/message/request_id/details.reason; no implicit side-effect retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-sdk-resource": "sessions",
+        "x-sdk-method": "update",
+        "x-status": "implemented_u_1024_44",
+        "x-required-capabilities": [],
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NativeSessionPatch"
+              }
+            }
+          }
+        },
+        "x-sdk-wait-default": false,
+        "x-sdk-python-method": "update",
+        "x-sdk-go-method": "Update"
+      },
       "delete": {
         "operationId": "deleteNativeSession",
         "summary": "deleteNativeSession",
@@ -8024,6 +8118,10 @@
           "authorization": {
             "$ref": "#/components/schemas/AuthorizationEnforcement"
           },
+          "default_model_id": {
+            "$ref": "#/components/schemas/OpaqueId",
+            "description": "The model a Response without model_id runs under the desired configuration (UHP Harness.defaultModel) - configuration.model_id when set, otherwise the engine's platform default model. It is the entry marked default in GET /v2/agents/{agent_id}/models."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -8041,6 +8139,7 @@
           "binding",
           "publication",
           "authorization",
+          "default_model_id",
           "created_at",
           "updated_at"
         ],
@@ -8185,6 +8284,10 @@
                 "type": "null"
               }
             ]
+          },
+          "default": {
+            "type": "boolean",
+            "description": "UHP Model.default. In GET /v2/models, true for an engine's platform default model (used when an Agent sets no model_id). In GET /v2/agents/{agent_id}/models, true only for that Agent's default_model_id, the model a Response without model_id runs."
           }
         },
         "required": [
@@ -8195,7 +8298,8 @@
           "engine_support",
           "availability",
           "reason",
-          "observed_at"
+          "observed_at",
+          "default"
         ],
         "additionalProperties": false,
         "x-sdk-model-name": "ModelAvailability"
@@ -8454,6 +8558,22 @@
         "additionalProperties": false,
         "x-sdk-model-name": "NativeSessionCreate"
       },
+      "NativeSessionPatch": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "The new Session name, trimmed by the owner; it must not be blank. A manual name."
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "x-sdk-model-name": "NativeSessionPatch"
+      },
       "SessionConfigurationObservation": {
         "type": "object",
         "properties": {
@@ -8538,7 +8658,8 @@
           },
           "name": {
             "type": "string",
-            "maxLength": 128
+            "maxLength": 128,
+            "description": "A Session created without a name is named by its first accepted Response from the first input_text (whitespace collapsed, at most 64 characters). A name given at creation or by PATCH is manual and is never replaced automatically."
           },
           "metadata": {
             "type": "object",

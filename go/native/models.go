@@ -342,6 +342,7 @@ type NativeAgent struct {
 	Binding               *AgentBindingObservation `json:"binding"`
 	Publication           Publication              `json:"publication"`
 	Authorization         AuthorizationEnforcement `json:"authorization"`
+	DefaultModelID        OpaqueID                 `json:"default_model_id"`
 	CreatedAt             string                   `json:"created_at"`
 	UpdatedAt             string                   `json:"updated_at"`
 }
@@ -412,6 +413,7 @@ type ModelAvailability struct {
 	Availability  string    `json:"availability"`
 	Reason        *string   `json:"reason"`
 	ObservedAt    *string   `json:"observed_at"`
+	Default       bool      `json:"default"`
 }
 
 type SkillFile struct {
@@ -504,6 +506,10 @@ type NativeSessionCreate struct {
 	AgentID  NativeAgentID      `json:"agent_id"`
 	Name     *string            `json:"name,omitempty"`
 	Metadata *map[string]string `json:"metadata,omitempty"`
+}
+
+type NativeSessionPatch struct {
+	Name string `json:"name"`
 }
 
 type SessionConfigurationObservation struct {

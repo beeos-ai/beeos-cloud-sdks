@@ -168,7 +168,7 @@ class NativeSyncTests(unittest.TestCase):
                     self.assertEqual(native._OPERATIONS[operation["operationId"]].path, path)
                     self.assertEqual(native._OPERATIONS[operation["operationId"]].method, method.upper())
                     count += 1
-                self.assertEqual(count, 57)
+                self.assertEqual(count, 58)
                 self.assertTrue(callable(sync.sandboxes.pty.connect))
                 self.assertTrue(callable(sync.sandboxes.desktop.connect))
                 self.assertTrue(callable(sync.responses.create_stream))

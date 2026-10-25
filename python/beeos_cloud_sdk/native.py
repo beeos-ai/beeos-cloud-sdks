@@ -432,6 +432,7 @@ NativeAgent = TypedDict("NativeAgent", {
     "binding": "Required[AgentBindingObservation | None]",
     "publication": "Required[Publication]",
     "authorization": "Required[AuthorizationEnforcement]",
+    "default_model_id": "Required[OpaqueId]",
     "created_at": "Required[str]",
     "updated_at": "Required[str]",
 })
@@ -462,6 +463,7 @@ ModelAvailability = TypedDict("ModelAvailability", {
     "availability": "Required[Literal[\"available\", \"unavailable\", \"unknown\"]]",
     "reason": "Required[str | None]",
     "observed_at": "Required[str | None]",
+    "default": "Required[bool]",
 })
 
 SkillFile = TypedDict("SkillFile", {
@@ -512,6 +514,10 @@ NativeSessionCreate = TypedDict("NativeSessionCreate", {
     "agent_id": "Required[NativeAgentId]",
     "name": "NotRequired[str]",
     "metadata": "NotRequired[dict[str, str]]",
+})
+
+NativeSessionPatch = TypedDict("NativeSessionPatch", {
+    "name": "Required[str]",
 })
 
 SessionConfigurationObservation = TypedDict("SessionConfigurationObservation", {
@@ -1240,6 +1246,9 @@ class ListNativeSessionsOptions(NativeRequestOptions, total=False):
 class GetNativeSessionOptions(NativeRequestOptions, total=False):
     pass
 
+class UpdateNativeSessionOptions(NativeRequestOptions, total=False):
+    if_match: Required[str]
+
 class DeleteNativeSessionOptions(NativeRequestOptions, total=False):
     pass
 
@@ -1487,6 +1496,7 @@ _OPERATIONS: dict[str, _Operation] = {
     "createNativeSession": _Operation("createNativeSession", "POST", "/v2/sessions", "application/json", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
     "listNativeSessions": _Operation("listNativeSessions", "GET", "/v2/sessions", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False), ("agent_id", "agent_id", "query", False), ("order", "order", "query", False), ("state", "state", "query", False))),
     "getNativeSession": _Operation("getNativeSession", "GET", "/v2/sessions/{session_id}", "", "application/json", False, ()),
+    "updateNativeSession": _Operation("updateNativeSession", "PATCH", "/v2/sessions/{session_id}", "application/json", "application/json", False, (("if_match", "If-Match", "header", True), ("idempotency_key", "Idempotency-Key", "header", True))),
     "deleteNativeSession": _Operation("deleteNativeSession", "DELETE", "/v2/sessions/{session_id}", "", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
     "createNativeResponse": _Operation("createNativeResponse", "POST", "/v2/responses", "application/json", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
     "getNativeResponse": _Operation("getNativeResponse", "GET", "/v2/responses/{response_id}", "", "application/json", False, ()),
@@ -2436,6 +2446,9 @@ class NativeSessionsResource:
     def get(self, session_id: str, options: GetNativeSessionOptions | None = None) -> BeeOSHTTPResponse[NativeSessionResult]:
         return cast("BeeOSHTTPResponse[NativeSessionResult]", self._client._execute(_OPERATIONS["getNativeSession"], {"session_id": session_id}, None, options))
 
+    def update(self, session_id: str, body: NativeSessionPatch, options: UpdateNativeSessionOptions) -> BeeOSHTTPResponse[NativeSessionResult]:
+        return cast("BeeOSHTTPResponse[NativeSessionResult]", self._client._execute(_OPERATIONS["updateNativeSession"], {"session_id": session_id}, body, options))
+
     def delete(self, session_id: str, options: DeleteNativeSessionOptions | None = None) -> BeeOSHTTPResponse[DeletedResultResult]:
         return cast("BeeOSHTTPResponse[DeletedResultResult]", self._client._execute(_OPERATIONS["deleteNativeSession"], {"session_id": session_id}, None, options))
 
@@ -2701,6 +2714,9 @@ class AsyncNativeSessionsResource:
 
     async def get(self, session_id: str, options: GetNativeSessionOptions | None = None) -> BeeOSHTTPResponse[NativeSessionResult]:
         return cast("BeeOSHTTPResponse[NativeSessionResult]", await self._client._execute(_OPERATIONS["getNativeSession"], {"session_id": session_id}, None, options))
+
+    async def update(self, session_id: str, body: NativeSessionPatch, options: UpdateNativeSessionOptions) -> BeeOSHTTPResponse[NativeSessionResult]:
+        return cast("BeeOSHTTPResponse[NativeSessionResult]", await self._client._execute(_OPERATIONS["updateNativeSession"], {"session_id": session_id}, body, options))
 
     async def delete(self, session_id: str, options: DeleteNativeSessionOptions | None = None) -> BeeOSHTTPResponse[DeletedResultResult]:
         return cast("BeeOSHTTPResponse[DeletedResultResult]", await self._client._execute(_OPERATIONS["deleteNativeSession"], {"session_id": session_id}, None, options))
