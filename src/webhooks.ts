@@ -105,3 +105,34 @@ export function verifyTaskPushSignature(rawBody: Uint8Array | string, headers: W
   if (timestamp === undefined || signatures.length === 0) fail("invalid_header", "X-BeeOS-Signature needs t and at least one v1");
   verifyMac(rawBody, timestamp, signatures, secret, options);
 }
+
+/** Scope of a /v2 Session webhook event. There is no instance or end-user identity. */
+export interface NativeSessionWebhookScope {
+  agentId: string;
+  sessionId: string;
+}
+
+/** Session metadata snapshot; Response input and output are never included. */
+export interface NativeSessionWebhookData {
+  /** Empty string when the Session has no name. */
+  name: string;
+  metadata: Record<string, string>;
+  /** Session `resource_version`, base-10 string. Larger means newer. */
+  resourceVersion: string;
+}
+
+interface NativeWebhookEnvelope<Type extends string, Scope, Data> {
+  organization_id: string;
+  app_id: string;
+  event: { schemaVersion: 1; eventId: string; type: Type; scope: Scope; data: Data };
+}
+
+export type NativeSessionWebhookEvent =
+  NativeWebhookEnvelope<"session.created" | "session.updated" | "session.deleted", NativeSessionWebhookScope, NativeSessionWebhookData>;
+
+/** A /v2 Response reached a terminal status; read the Response for its output. */
+export type NativeResponseTerminalWebhookEvent = NativeWebhookEnvelope<"response.terminal", NativeSessionWebhookScope & { responseId: string },
+  { status: "completed" | "failed" | "cancelled" | "incomplete"; /** Omitted when the Response has no error. */ errorCode?: string }>;
+
+/** /v2 chat webhook events. Dedupe on `event.eventId`; delivery order is not guaranteed. */
+export type NativeWebhookEvent = NativeSessionWebhookEvent | NativeResponseTerminalWebhookEvent;

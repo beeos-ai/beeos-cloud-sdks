@@ -30,6 +30,13 @@
   `ModelAvailability.default` (UHP `Harness.defaultModel` / `Model.default`)
   state the default model. Requires the matching backend producer.
 
+- Webhook payload types for the /v2 chat events `session.created`, `session.updated`,
+  `session.deleted` and `response.terminal` (TypeScript `NativeWebhookEvent`, Python
+  `NativeWebhookEvent` TypedDicts, Go `NativeWebhookEvent`). Scope is
+  `agentId`/`sessionId`/`responseId`; no instance id. Examples in
+  `spec/native-webhook-events.json`. Requires the matching Cloud backend producer.
+
+
 ## 4.0.0 (2026-10-25) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v4`
 
 MAJOR: the entries under BREAKING below were already on `main` unreleased; the

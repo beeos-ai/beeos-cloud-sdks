@@ -12,7 +12,7 @@ import hmac
 import re
 import time
 from collections.abc import Mapping
-from typing import Literal
+from typing import Literal, TypedDict
 
 WebhookVerificationReason = Literal[
     "secret_too_short",
@@ -97,3 +97,62 @@ def verify_task_push_signature(raw_body: bytes, headers: Mapping[str, str], secr
     if timestamp is None or not signatures:
         raise WebhookVerificationError("invalid_header", "X-BeeOS-Signature needs t and at least one v1")
     _verify_mac(raw_body, timestamp, signatures, secret, now, tolerance_seconds)
+
+
+class NativeSessionWebhookScope(TypedDict):
+    """Scope of a /v2 Session webhook event. There is no instance or end-user identity."""
+    agentId: str
+    sessionId: str
+
+
+class NativeSessionWebhookData(TypedDict):
+    """Session metadata snapshot; Response input and output are never included."""
+    name: str
+    metadata: dict[str, str]
+    resourceVersion: str
+
+
+class NativeSessionWebhookPayload(TypedDict):
+    schemaVersion: Literal[1]
+    eventId: str
+    type: Literal["session.created", "session.updated", "session.deleted"]
+    scope: NativeSessionWebhookScope
+    data: NativeSessionWebhookData
+
+
+class NativeSessionWebhookEvent(TypedDict):
+    organization_id: str
+    app_id: str
+    event: NativeSessionWebhookPayload
+
+
+class NativeResponseWebhookScope(NativeSessionWebhookScope):
+    responseId: str
+
+
+class _NativeResponseTerminalStatus(TypedDict):
+    status: Literal["completed", "failed", "cancelled", "incomplete"]
+
+
+class NativeResponseTerminalWebhookData(_NativeResponseTerminalStatus, total=False):
+    errorCode: str
+    """Omitted when the Response has no error."""
+
+
+class NativeResponseTerminalWebhookPayload(TypedDict):
+    schemaVersion: Literal[1]
+    eventId: str
+    type: Literal["response.terminal"]
+    scope: NativeResponseWebhookScope
+    data: NativeResponseTerminalWebhookData
+
+
+class NativeResponseTerminalWebhookEvent(TypedDict):
+    """A /v2 Response reached a terminal status; read the Response for its output."""
+    organization_id: str
+    app_id: str
+    event: NativeResponseTerminalWebhookPayload
+
+
+NativeWebhookEvent = NativeSessionWebhookEvent | NativeResponseTerminalWebhookEvent
+"""/v2 chat webhook events. Dedupe on ``event.eventId``; delivery order is not guaranteed."""

@@ -1,7 +1,10 @@
 /** Production BeeOS Cloud SDK. One install: @beeos-ai/cloud-sdk. Credential is bsk_ only. */
 
 export { WebhookVerificationError, verifyTaskPushSignature, verifyWebhookSignature } from "./webhooks.js";
-export type { WebhookHeaders, WebhookVerificationOptions, WebhookVerificationReason } from "./webhooks.js";
+export type {
+  NativeResponseTerminalWebhookEvent, NativeSessionWebhookData, NativeSessionWebhookEvent, NativeSessionWebhookScope, NativeWebhookEvent,
+  WebhookHeaders, WebhookVerificationOptions, WebhookVerificationReason,
+} from "./webhooks.js";
 
 export type JSONValue = null | boolean | number | string | JSONValue[] | { [key: string]: JSONValue };
 

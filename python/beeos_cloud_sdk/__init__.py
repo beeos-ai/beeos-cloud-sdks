@@ -10,6 +10,9 @@ from urllib.parse import quote, urlencode, urlsplit, urlunsplit
 from urllib.request import Request as URLRequest, urlopen
 from uuid import uuid4
 
+from .webhooks import NativeResponseTerminalWebhookEvent as NativeResponseTerminalWebhookEvent
+from .webhooks import NativeSessionWebhookEvent as NativeSessionWebhookEvent
+from .webhooks import NativeWebhookEvent as NativeWebhookEvent
 from .webhooks import WebhookVerificationError as WebhookVerificationError
 from .webhooks import WebhookVerificationReason as WebhookVerificationReason
 from .webhooks import verify_task_push_signature as verify_task_push_signature

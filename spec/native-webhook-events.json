@@ -1,0 +1,100 @@
+{
+  "description": "Examples of the /v2 Session and Response webhook events, copied from the backend `openapi/beeos-cloud/webhooks/cloud-webhooks-v1.schema.json` `$defs` examples.",
+  "events": [
+    {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "5d1f1d8a-3f0e-5b8e-9a51-2a4c7e0b9d13",
+        "type": "session.created",
+        "scope": {
+          "agentId": "agt_7d2c41",
+          "sessionId": "ses_51b0e3"
+        },
+        "data": {
+          "name": "",
+          "metadata": {
+            "customer": "cus_31"
+          },
+          "resourceVersion": "1"
+        }
+      }
+    },
+    {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "a7c3e915-6b2d-5f4a-8e1c-3d9b0f2a6c78",
+        "type": "session.updated",
+        "scope": {
+          "agentId": "agt_7d2c41",
+          "sessionId": "ses_51b0e3"
+        },
+        "data": {
+          "name": "Quarterly report draft",
+          "metadata": {
+            "customer": "cus_31"
+          },
+          "resourceVersion": "3"
+        }
+      }
+    },
+    {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "c2e8b4a1-9d3f-5c6e-a0b7-5f1d8e3c9a24",
+        "type": "session.deleted",
+        "scope": {
+          "agentId": "agt_7d2c41",
+          "sessionId": "ses_51b0e3"
+        },
+        "data": {
+          "name": "Quarterly report draft",
+          "metadata": {
+            "customer": "cus_31"
+          },
+          "resourceVersion": "2"
+        }
+      }
+    },
+    {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "0b8c2f4e-7a61-5e2d-8c3f-4d9a1e6b7c20",
+        "type": "response.terminal",
+        "scope": {
+          "agentId": "agt_7d2c41",
+          "sessionId": "ses_51b0e3",
+          "responseId": "resp_c4a9f2"
+        },
+        "data": {
+          "status": "completed"
+        }
+      }
+    },
+    {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "8e3a6d1b-2c4f-5a9e-b7d0-1f6c3e8a2b45",
+        "type": "response.terminal",
+        "scope": {
+          "agentId": "agt_7d2c41",
+          "sessionId": "ses_51b0e3",
+          "responseId": "resp_7e01b3"
+        },
+        "data": {
+          "status": "failed",
+          "errorCode": "deadline_exceeded"
+        }
+      }
+    }
+  ]
+}
