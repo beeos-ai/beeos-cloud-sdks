@@ -1810,7 +1810,7 @@
         ],
         "operationId": "createSandboxAccessTicket",
         "summary": "创建一次性访问票据",
-        "description": "Single existing issuer/JWKS/jti authority; explicit management_source under either idle policy. Reserve UUID client/terminal identity and selected profile; no PTY until first open. Secret is not replayable. Paused compute restores before ticket issuance.",
+        "description": "Single existing issuer/JWKS/jti authority; explicit management_source under either idle policy. Reserve UUID client/terminal identity and selected profile; no PTY until first open. Secret is not replayable. Paused compute restores before ticket issuance. A desktop controller ticket (the default role) takes the exclusive takeover lease at issuance; the lease is renewed while its connection lives and released when it closes or the ticket is revoked. While held, a second controller gets 409 screen_in_use and the bound Agent cannot start a new execution. Issuance while the bound Agent is executing returns 409 agent_action_in_flight; cancel that Response first. A viewer ticket only receives frames; its input is dropped inside the sandbox.",
         "x-status": "proposal",
         "x-allowed-states": "running；paused/resuming 自动唤醒，返回409 operation_in_progress",
         "x-required-capabilities": [],
@@ -1831,7 +1831,9 @@
             "state_conflict",
             "operation_in_progress",
             "idempotency_conflict",
-            "secret_already_issued"
+            "secret_already_issued",
+            "screen_in_use",
+            "agent_action_in_flight"
           ],
           "422": [
             "capability_unsupported"
@@ -7209,6 +7211,15 @@
             "type": "string",
             "format": "uri",
             "description": "浏览器客户端须提供精确 Origin；App 后端鉴权后转交票据。"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "viewer",
+              "controller"
+            ],
+            "default": "controller",
+            "description": "仅 desktop。viewer 只收帧、输入在沙箱内被丢弃，不占接手租约；controller 独占接手租约，持有期间绑定 Agent 不能开始新执行。"
           }
         },
         "required": [
@@ -7225,6 +7236,9 @@
               }
             },
             "then": {
+              "properties": {
+                "role": false
+              },
               "if": {
                 "required": [
                   "pty_id"
@@ -7329,6 +7343,15 @@
             "type": "string",
             "format": "uuid",
             "readOnly": true
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "viewer",
+              "controller"
+            ],
+            "readOnly": true,
+            "description": "仅 desktop，回显生效的角色。"
           }
         },
         "required": [
@@ -12277,7 +12300,7 @@
         }
       },
       "409": {
-        "description": "idempotency_conflict / operation_in_progress / state_conflict / active_work / secret_already_issued",
+        "description": "idempotency_conflict / operation_in_progress / state_conflict / active_work / secret_already_issued / screen_in_use / agent_action_in_flight",
         "content": {
           "application/json": {
             "schema": {

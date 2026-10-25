@@ -284,6 +284,7 @@ AccessTicketCreate = TypedDict("AccessTicketCreate", {
     "rows": "NotRequired[int]",
     "pty_id": "NotRequired[str]",
     "origin": "NotRequired[str]",
+    "role": "NotRequired[Literal[\"viewer\", \"controller\"]]",
 })
 
 AccessTicket = TypedDict("AccessTicket", {
@@ -300,6 +301,7 @@ AccessTicket = TypedDict("AccessTicket", {
     "reconnect_window_seconds": "NotRequired[int]",
     "profile": "Required[Literal[\"beeos-terminal-v2\", \"beeos-desktop-v1\"]]",
     "client_id": "Required[str]",
+    "role": "NotRequired[Literal[\"viewer\", \"controller\"]]",
 })
 
 SandboxResult = TypedDict("SandboxResult", {
