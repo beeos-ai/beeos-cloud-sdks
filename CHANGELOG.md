@@ -12,6 +12,19 @@
   `error.code=deadline_exceeded` (there is no `timed_out`/`unknown` status), and
   the never-emitted phases were removed.
 
+### Added
+
+- Native Sandbox v1 Session list projects `updated_at` and `last_activity_at`,
+  accepts `order=asc|desc` over recent activity, an optional `state` filter, and
+  pages with an opaque keyset cursor. Session history accepts `order=desc` with the
+  same opaque cursor, and every Response projection now carries its committed
+  `input` items (with their canonical source identity) and `metadata`, so one
+  history page assembles turns without a per-turn input-items call.
+  `createNativeResponse` accepts `metadata` (the same 32 x 1024 rule as Session
+  metadata) and the input-items page echoes it. Session list and history cursors
+  are now opaque keyset cursors; the previous numeric offset form is not accepted
+  there. Requires the matching Cloud backend deployment.
+
 ## 4.0.0 (2026-10-25) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v4`
 
 MAJOR: the entries under BREAKING below were already on `main` unreleased; the

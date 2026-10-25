@@ -498,6 +498,8 @@ type ResponseInputItem struct {
 	Content ResponseInput `json:"content"`
 }
 
+type NativeMetadata map[string]string
+
 type NativeSessionCreate struct {
 	AgentID  NativeAgentID      `json:"agent_id"`
 	Name     *string            `json:"name,omitempty"`
@@ -523,6 +525,8 @@ type NativeSession struct {
 	HeadResponseID                *OpaqueID                       `json:"head_response_id"`
 	ResourceVersion               ResourceVersion                 `json:"resource_version"`
 	CreatedAt                     string                          `json:"created_at"`
+	UpdatedAt                     string                          `json:"updated_at"`
+	LastActivityAt                string                          `json:"last_activity_at"`
 	ContinuationAvailable         bool                            `json:"continuation_available"`
 	ContinuationUnavailableReason *string                         `json:"continuation_unavailable_reason"`
 }
@@ -533,6 +537,7 @@ type NativeResponseCreate struct {
 	ModelID            *OpaqueID       `json:"model_id,omitempty"`
 	PreviousResponseID *OpaqueID       `json:"previous_response_id,omitempty"`
 	TimeoutSeconds     *int64          `json:"timeout_seconds,omitempty"`
+	Metadata           *NativeMetadata `json:"metadata,omitempty"`
 }
 
 type EffectiveConfiguration struct {
@@ -794,6 +799,8 @@ type NativeResponse struct {
 	Terminal               bool                    `json:"terminal"`
 	EffectiveConfiguration *EffectiveConfiguration `json:"effective_configuration"`
 	Output                 []ResponseOutputItem    `json:"output"`
+	Input                  []ResponseInputItem     `json:"input"`
+	Metadata               NativeMetadata          `json:"metadata"`
 	PendingInteractions    []Interaction           `json:"pending_interactions"`
 	Error                  *NativeErrorEnvelope    `json:"error"`
 	Usage                  *struct {
@@ -1090,6 +1097,7 @@ type FileMetadataPage struct {
 
 type ResponseInputPage struct {
 	Data       []ResponseInputItem `json:"data"`
+	Metadata   NativeMetadata      `json:"metadata"`
 	NextCursor *string             `json:"next_cursor"`
 	HasMore    bool                `json:"has_more"`
 }
