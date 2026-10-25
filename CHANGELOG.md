@@ -4,6 +4,10 @@
 
 ### Changed
 
+- Native Agent creation (`createNativeAgent`) now requires `target`, and a
+  recipe target requires an explicit `template` (`beeos/base` or
+  `beeos/base-4c8g`). The previous implicit `beeos/base` default is removed.
+  Requires the matching Cloud backend producer.
 - Native Response streams (TypeScript, Python sync/async and Go) skip an event
   type the SDK does not model yet instead of failing, and keep the durable
   `Last-Event-ID` cursor at that event so a reconnect never replays or loses it.
