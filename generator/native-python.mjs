@@ -427,9 +427,9 @@ def _wait_done(call: _Call, first: BeeOSHTTPResponse[object], current: BeeOSHTTP
             raise SDKWaitError("publication_superseded", call.context)
         configuration = data.get("configuration")
         initial_configuration = initial.get("configuration")
-        target = initial_configuration.get("target") if isinstance(initial_configuration, dict) else None
-        if not isinstance(configuration, dict) or configuration.get("target") != target:
-            raise SDKWaitError("target_superseded", call.context)
+        sandbox = initial_configuration.get("sandbox") if isinstance(initial_configuration, dict) else None
+        if not isinstance(configuration, dict) or configuration.get("sandbox") != sandbox:
+            raise SDKWaitError("sandbox_superseded", call.context)
         state = publication.get("state")
         if state in ("failed", "partial", "unknown", "superseded"):
             raise SDKWaitError("publication_" + str(state), call.context)
@@ -438,12 +438,12 @@ def _wait_done(call: _Call, first: BeeOSHTTPResponse[object], current: BeeOSHTTP
             return True
         if state != "ready":
             return False
-        if isinstance(target, dict) and target.get("kind") == "recipe":
+        if isinstance(sandbox, dict) and "template_id" in sandbox:
             return True
         binding = data.get("binding")
         if not isinstance(binding, dict) or binding.get("prepared_config_revision") != revision:
             return False
-        if isinstance(target, dict) and target.get("kind") == "managed" and binding.get("sandbox_id") != target.get("sandbox_id"):
+        if isinstance(sandbox, dict) and "id" in sandbox and binding.get("sandbox_id") != sandbox.get("id"):
             return False
         # Ready is the server's verified publication projection. Credential revisions may
         # legitimately be older when unchanged; Session Persona revisions are independent.

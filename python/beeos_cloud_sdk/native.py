@@ -353,7 +353,7 @@ MCPSelection = TypedDict("MCPSelection", {
 })
 
 ComponentObservation = TypedDict("ComponentObservation", {
-    "component": "Required[Literal[\"model\", \"persona\", \"tools\", \"skills\", \"mcp\", \"credentials\", \"target\"]]",
+    "component": "Required[Literal[\"model\", \"persona\", \"tools\", \"skills\", \"mcp\", \"credentials\", \"sandbox\"]]",
     "scope": "Required[Literal[\"agent\", \"binding\", \"session\", \"response\"]]",
     "scope_id": "Required[OpaqueId | None]",
     "revision": "Required[revision | None]",
@@ -364,7 +364,7 @@ ComponentObservation = TypedDict("ComponentObservation", {
 
 Publication = TypedDict("Publication", {
     "accepted_config_revision": "Required[revision]",
-    "changed_components": "Required[list[Literal[\"model\", \"persona\", \"tools\", \"skills\", \"mcp\", \"credentials\", \"target\"]]]",
+    "changed_components": "Required[list[Literal[\"model\", \"persona\", \"tools\", \"skills\", \"mcp\", \"credentials\", \"sandbox\"]]]",
     "state": "Required[Literal[\"accepted\", \"preparing\", \"ready\", \"deferred\", \"failed\", \"partial\", \"unknown\", \"superseded\"]]",
     "components": "Required[list[ComponentObservation]]",
 })
@@ -390,7 +390,7 @@ NativeAgentCreate = TypedDict("NativeAgentCreate", {
     "mcp_servers": "NotRequired[list[MCPSelection]]",
     "disabled_tools": "NotRequired[list[str]]",
     "run_timeout_seconds": "NotRequired[int]",
-    "target": "Required[BeeosTarget]",
+    "sandbox": "Required[BeeosAgentSandbox]",
     "approval_mode": "NotRequired[ApprovalMode]",
     "credentials": "NotRequired[CredentialBindings]",
     "end_user_ref": "NotRequired[EndUserRef]",
@@ -404,7 +404,7 @@ NativeAgentPatch = TypedDict("NativeAgentPatch", {
     "mcp_servers": "NotRequired[list[MCPSelection]]",
     "disabled_tools": "NotRequired[list[str]]",
     "run_timeout_seconds": "NotRequired[int]",
-    "target": "NotRequired[BeeosTarget]",
+    "sandbox": "NotRequired[BeeosAgentSandbox]",
     "approval_mode": "NotRequired[ApprovalMode]",
     "credentials": "NotRequired[CredentialBindings]",
 })
@@ -418,7 +418,7 @@ NativeAgentConfiguration = TypedDict("NativeAgentConfiguration", {
     "mcp_servers": "Required[list[MCPSelection]]",
     "disabled_tools": "Required[list[str]]",
     "run_timeout_seconds": "Required[int]",
-    "target": "Required[BeeosTarget]",
+    "sandbox": "Required[BeeosAgentSandbox]",
     "approval_mode": "Required[ApprovalMode]",
     "credential_status": "Required[CredentialBindingStatus]",
 })
@@ -1075,16 +1075,14 @@ CredentialBindingStatus = TypedDict("CredentialBindingStatus", {
     "slots": "Required[list[CredentialPublicStatus]]",
 })
 
-BeeosRecipeTarget = TypedDict("BeeosRecipeTarget", {
-    "kind": "Required[Literal[\"recipe\"]]",
-    "template": "Required[Literal[\"beeos/base\", \"beeos/base-4c8g\"]]",
+BeeosAgentSandboxTemplate = TypedDict("BeeosAgentSandboxTemplate", {
+    "template_id": "Required[Literal[\"beeos/base\", \"beeos/base-4c8g\"]]",
     "timeout_seconds": "NotRequired[int]",
     "on_timeout": "NotRequired[Literal[\"terminate\"]]",
 })
 
-BeeosManagedTarget = TypedDict("BeeosManagedTarget", {
-    "kind": "Required[Literal[\"managed\"]]",
-    "sandbox_id": "Required[Id]",
+BeeosAgentSandboxReference = TypedDict("BeeosAgentSandboxReference", {
+    "id": "Required[Id]",
 })
 
 CredentialBinding = TypedDict("CredentialBinding", {
@@ -1406,7 +1404,7 @@ AgentId: TypeAlias = str
 
 harnessartifacts: TypeAlias = list[RuntimeHarnessArtifact]
 
-BeeosTarget: TypeAlias = BeeosRecipeTarget | BeeosManagedTarget
+BeeosAgentSandbox: TypeAlias = BeeosAgentSandboxTemplate | BeeosAgentSandboxReference
 
 CredentialBindings: TypeAlias = list[CredentialBinding]
 
@@ -1674,9 +1672,9 @@ def _wait_done(call: _Call, first: BeeOSHTTPResponse[object], current: BeeOSHTTP
             raise SDKWaitError("publication_superseded", call.context)
         configuration = data.get("configuration")
         initial_configuration = initial.get("configuration")
-        target = initial_configuration.get("target") if isinstance(initial_configuration, dict) else None
-        if not isinstance(configuration, dict) or configuration.get("target") != target:
-            raise SDKWaitError("target_superseded", call.context)
+        sandbox = initial_configuration.get("sandbox") if isinstance(initial_configuration, dict) else None
+        if not isinstance(configuration, dict) or configuration.get("sandbox") != sandbox:
+            raise SDKWaitError("sandbox_superseded", call.context)
         state = publication.get("state")
         if state in ("failed", "partial", "unknown", "superseded"):
             raise SDKWaitError("publication_" + str(state), call.context)
@@ -1685,12 +1683,12 @@ def _wait_done(call: _Call, first: BeeOSHTTPResponse[object], current: BeeOSHTTP
             return True
         if state != "ready":
             return False
-        if isinstance(target, dict) and target.get("kind") == "recipe":
+        if isinstance(sandbox, dict) and "template_id" in sandbox:
             return True
         binding = data.get("binding")
         if not isinstance(binding, dict) or binding.get("prepared_config_revision") != revision:
             return False
-        if isinstance(target, dict) and target.get("kind") == "managed" and binding.get("sandbox_id") != target.get("sandbox_id"):
+        if isinstance(sandbox, dict) and "id" in sandbox and binding.get("sandbox_id") != sandbox.get("id"):
             return False
         # Ready is the server's verified publication projection. Credential revisions may
         # legitimately be older when unchanged; Session Persona revisions are independent.

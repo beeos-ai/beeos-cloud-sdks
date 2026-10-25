@@ -37,7 +37,7 @@ from beeos_cloud_sdk.native import (
     SDKRequestTimeout,
 )
 
-RECIPE_TARGET: Any = {"kind": "recipe", "template": "beeos/base"}
+RECIPE_SANDBOX: Any = {"template_id": "beeos/base", "timeout_seconds": 1800, "on_timeout": "terminate"}
 
 
 class LocalAPI:
@@ -98,8 +98,8 @@ def reply(data: Any, status: int = 200, **headers: str) -> tuple[Any, ...]:
 
 
 def agent(revision: int = 8, state: str = "preparing", prepared: int = 7, *, kind: str = "managed", sandbox_id: str = "sb_target") -> dict[str, Any]:
-    target = {"kind": kind, "sandbox_id": sandbox_id} if kind == "managed" else RECIPE_TARGET
-    return {"id": "ag_1", "desired_config_revision": revision, "configuration": {"target": target},
+    sandbox = {"id": sandbox_id} if kind == "managed" else RECIPE_SANDBOX
+    return {"id": "ag_1", "desired_config_revision": revision, "configuration": {"sandbox": sandbox},
             "publication": {"accepted_config_revision": revision, "state": state, "changed_components": ["model"], "components": []},
             "binding": {"sandbox_id": sandbox_id, "prepared_config_revision": prepared, "credential_activation_revision": 3, "state": "ready", "persona_scope": "session"}}
 
@@ -118,7 +118,7 @@ def credential_authorization_case() -> tuple[dict[str, Any], native.Authorizatio
     desired_slots = [{"slot": f"credential_{i}", "configured": False} for i in range(64)]
     observed = {
         "id": "ag_1", "resource_version": 8, "desired_config_revision": "c3",
-        "configuration": {"name": "Observed", "engine": "openclaw", "instructions": "", "model_id": None, "skills": [], "mcp_servers": [], "disabled_tools": [], "run_timeout_seconds": 300, "target": {"kind": "managed", "sandbox_id": "sb_1"}, "credential_status": {"slots": desired_slots}},
+        "configuration": {"name": "Observed", "engine": "openclaw", "instructions": "", "model_id": None, "skills": [], "mcp_servers": [], "disabled_tools": [], "run_timeout_seconds": 300, "sandbox": {"id": "sb_1"}, "credential_status": {"slots": desired_slots}},
         "binding": {"binding_id": "binding_1", "sandbox_id": "sb_1", "state": "ready", "prepared_config_revision": "c1", "credential_activation_revision": "c1", "credential_status": {"slots": slots}, "persona_scope": "session", "components": [], "error": None},
         "publication": {"accepted_config_revision": "c3", "changed_components": ["credentials"], "state": "preparing", "components": []},
         "authorization": {"authorization_revision": "auth_8", "state": "enforced", "affected_scopes": [], "error": None},
@@ -277,7 +277,7 @@ class NativeSyncTests(unittest.TestCase):
             self.assertEqual(req["method"], "POST")
             return reply(agent(state="deferred", kind="recipe"), 202)
         with LocalAPI(route) as api, NativeBeeOSClient(api.url, "key") as client:
-            created = client.agents.create({"engine": "openclaw", "target": RECIPE_TARGET})
+            created = client.agents.create({"engine": "openclaw", "sandbox": RECIPE_SANDBOX})
             self.assertEqual(created.status, 202)
             self.assertEqual(len(api.requests), 1)
             self.assertEqual(api.requests[0]["path"], "/v2/agents")
@@ -321,11 +321,11 @@ class NativeSyncTests(unittest.TestCase):
             self.assertEqual(result.body["data"]["binding"]["credential_activation_revision"], 3)
 
     def test_superseded_publication_and_target_are_visible(self) -> None:
-        for changed, reason in [(agent(revision=9), "publication_superseded"), (agent(sandbox_id="different"), "target_superseded")]:
+        for changed, reason in [(agent(revision=9), "publication_superseded"), (agent(sandbox_id="different"), "sandbox_superseded")]:
             with self.subTest(reason=reason):
                 with LocalAPI(lambda req: reply(agent(), 202) if req["method"] == "POST" else reply(changed)) as api, NativeBeeOSClient(api.url, "key") as client:
                     with self.assertRaises(SDKWaitError) as caught:
-                        client.agents.create({"engine": "openclaw", "target": RECIPE_TARGET}, {"poll_interval_seconds": 0})
+                        client.agents.create({"engine": "openclaw", "sandbox": RECIPE_SANDBOX}, {"poll_interval_seconds": 0})
                     self.assertEqual(caught.exception.reason, reason)
                     self.assertEqual(caught.exception.acceptance.status, 202)
 

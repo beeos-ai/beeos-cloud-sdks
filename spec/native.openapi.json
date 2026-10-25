@@ -2776,7 +2776,7 @@
       "post": {
         "operationId": "createNativeAgent",
         "summary": "createNativeAgent",
-        "description": "One stable logical Agent; creation never creates or wakes compute. Recipe placement is triggered by the first authorized Response/task execution; concurrent first requests share the same placement authority. Explicit already-running managed targets may prepare this publication; paused or absent compute returns deferred.",
+        "description": "One stable logical Agent; creation never creates or wakes compute. sandbox.template_id placement is triggered by the first authorized Response/task execution; concurrent first requests share the same placement authority. An explicit sandbox.id binds an existing fixed Sandbox only when it exists and is not bound to another Agent; paused or absent compute returns deferred.",
         "tags": [
           "agents"
         ],
@@ -7684,7 +7684,7 @@
               "skills",
               "mcp",
               "credentials",
-              "target"
+              "sandbox"
             ]
           },
           "scope": {
@@ -7781,7 +7781,7 @@
                 "skills",
                 "mcp",
                 "credentials",
-                "target"
+                "sandbox"
               ]
             },
             "maxItems": 7
@@ -7961,8 +7961,9 @@
             "default": 600,
             "description": "Per-run wall-clock budget in seconds, at most 21600 (6 hours)."
           },
-          "target": {
-            "$ref": "#/components/schemas/BeeosTarget"
+          "sandbox": {
+            "$ref": "#/components/schemas/BeeosAgentSandbox",
+            "description": "Required placement wrapper. Provide exactly one of sandbox.template_id or sandbox.id."
           },
           "approval_mode": {
             "$ref": "#/components/schemas/ApprovalMode"
@@ -7977,7 +7978,7 @@
         },
         "required": [
           "engine",
-          "target"
+          "sandbox"
         ],
         "additionalProperties": false,
         "x-sdk-model-name": "NativeAgentCreate"
@@ -8039,8 +8040,9 @@
             "default": 600,
             "description": "Per-run wall-clock budget in seconds, at most 21600 (6 hours)."
           },
-          "target": {
-            "$ref": "#/components/schemas/BeeosTarget"
+          "sandbox": {
+            "$ref": "#/components/schemas/BeeosAgentSandbox",
+            "description": "Omit to preserve the current placement; a present wrapper validates and replaces it, releasing the previously bound Sandbox."
           },
           "approval_mode": {
             "$ref": "#/components/schemas/ApprovalMode"
@@ -8109,8 +8111,9 @@
             "default": 600,
             "description": "Per-run wall-clock budget in seconds, at most 21600 (6 hours)."
           },
-          "target": {
-            "$ref": "#/components/schemas/BeeosTarget"
+          "sandbox": {
+            "$ref": "#/components/schemas/BeeosAgentSandbox",
+            "description": "Current desired placement, echoed in the same wrapper shape (the current template_id with its lifecycle, or the id of the bound fixed Sandbox)."
           },
           "approval_mode": {
             "$ref": "#/components/schemas/ApprovalMode"
@@ -8129,7 +8132,7 @@
           "mcp_servers",
           "disabled_tools",
           "run_timeout_seconds",
-          "target",
+          "sandbox",
           "approval_mode",
           "credential_status"
         ],
@@ -11649,65 +11652,60 @@
         "x-sdk-model-name": "CredentialBindingStatus",
         "x-owner-schema": "docs/architecture/sandbox/credential-inputs.schema.json#/$defs/CredentialBindingStatus"
       },
-      "BeeosTarget": {
+      "BeeosAgentSandbox": {
         "oneOf": [
           {
-            "$ref": "#/components/schemas/BeeosRecipeTarget"
+            "$ref": "#/components/schemas/BeeosAgentSandboxTemplate"
           },
           {
-            "$ref": "#/components/schemas/BeeosManagedTarget"
+            "$ref": "#/components/schemas/BeeosAgentSandboxReference"
           }
         ],
-        "description": "Persistent desired placement. POST requires target; recipe requires an explicit template and has no default. PUT omission preserves. Runtime Binding TargetSelector observes actual placement, never recipe.",
-        "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosTarget"
+        "description": "Persistent desired placement. Provide exactly one of sandbox.id or sandbox.template_id. POST requires sandbox; PUT/PATCH omission preserves. sandbox.template_id creates an ephemeral Sandbox on first execution; sandbox.id binds an existing fixed Sandbox and never creates or wakes compute. Readbacks use the same wrapper shape. Runtime Binding TargetSelector observes actual placement, never the template.",
+        "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosAgentSandbox"
       },
-      "BeeosRecipeTarget": {
+      "BeeosAgentSandboxTemplate": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "kind": {
-            "const": "recipe"
-          },
-          "template": {
+          "template_id": {
             "type": "string",
             "enum": [
               "beeos/base",
               "beeos/base-4c8g"
             ],
-            "description": "U-1024-23：必须显式指定临时沙箱基础镜像规格，beeos/base（2C4G）或 beeos/base-4c8g（4C8G）；无默认值。规格写在模板里，创建后不可改。"
+            "description": "临时沙箱基础镜像规格，beeos/base（2C4G）或 beeos/base-4c8g（4C8G）；无默认值，创建后不可改。"
           },
           "timeout_seconds": {
             "type": "integer",
             "minimum": 1,
-            "default": 1800
+            "default": 1800,
+            "description": "Only valid together with template_id. The ephemeral Sandbox timeout budget."
           },
           "on_timeout": {
             "const": "terminate",
-            "default": "terminate"
+            "default": "terminate",
+            "description": "Only valid together with template_id."
           }
         },
         "required": [
-          "kind",
-          "template"
+          "template_id"
         ],
-        "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosRecipeTarget"
+        "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosAgentSandboxTemplate"
       },
-      "BeeosManagedTarget": {
+      "BeeosAgentSandboxReference": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "kind": {
-            "const": "managed"
-          },
-          "sandbox_id": {
-            "$ref": "#/components/schemas/Id"
+          "id": {
+            "$ref": "#/components/schemas/Id",
+            "description": "Existing fixed Sandbox to bind. It must exist and must not be bound to another Agent; timeout_seconds and on_timeout are only accepted with template_id."
           }
         },
         "required": [
-          "kind",
-          "sandbox_id"
+          "id"
         ],
-        "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosManagedTarget"
+        "x-owner-schema": "docs/architecture/agent-runtime/schemas/agent-runtime.schema.json#/$defs/BeeosAgentSandboxReference"
       },
       "Id": {
         "description": "本专题平台自有 ID 与回执引用。规则唯一 owner：API conventions（docs/architecture/sandbox/ids.schema.json OpaqueId：1..128，^[A-Za-z0-9][A-Za-z0-9_.-]*$，不含 ':' 与 '/'，UUID 合法）。agent-state persona/native schema 引用本 Id。",
@@ -12685,7 +12683,7 @@
       "http_status": 409,
       "surface": "request",
       "should_retry": false,
-      "description": "对 Agent 托管的临时沙箱（management_source=agent）的公开写操作或交互访问，或 Agent managed target 指向它。调用方显式创建的 on_timeout=terminate 沙箱不在此列（CT-2）。"
+      "description": "对 Agent 托管的临时沙箱（management_source=agent）的公开写操作或交互访问，或 Agent sandbox.id 指向它。调用方显式创建的 on_timeout=terminate 沙箱不在此列（CT-2）。"
     },
     "sandbox_already_bound": {
       "code": "state_conflict",

@@ -485,8 +485,8 @@ func callNative[T any](ctx context.Context, client *Client, op nativeOperation, 
 	var previous string
 	if agent, ok := any(result.Body).(NativeAgentResult); ok {
 		expectedRevision = string(agent.Data.Publication.AcceptedConfigRevision)
-		if agent.Data.Configuration.Target.BeeosManagedTarget != nil {
-			expectedTarget = string(agent.Data.Configuration.Target.BeeosManagedTarget.SandboxID)
+		if ref := agent.Data.Configuration.Sandbox.BeeosAgentSandboxReference; ref != nil {
+			expectedTarget = string(ref.ID)
 		}
 	}
 	for {
@@ -517,7 +517,7 @@ func callNative[T any](ctx context.Context, client *Client, op nativeOperation, 
 			if string(value.Data.DesiredConfigRevision) != expectedRevision || string(publication.AcceptedConfigRevision) != expectedRevision || publication.State == "superseded" {
 				return result, &SDKPublicationSuperseded{&SDKWaitTimeout{Message: "Agent publication was superseded", Acceptance: operation.acceptance, LastResponse: operation.last}}
 			}
-			if publication.State == "deferred" || value.Data.Configuration.Target.BeeosRecipeTarget != nil || len(publication.ChangedComponents) == 0 {
+			if publication.State == "deferred" || value.Data.Configuration.Sandbox.BeeosAgentSandboxTemplate != nil || len(publication.ChangedComponents) == 0 {
 				done = true
 			}
 			if publication.State == "failed" || publication.State == "partial" || publication.State == "unknown" {

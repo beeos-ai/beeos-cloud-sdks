@@ -286,7 +286,7 @@ func callNative[T any](ctx context.Context,client *Client,op nativeOperation,pat
  result,err:=requestNative[T](client,op,path,body,wire,options,operation);if err!=nil{return result,err}
  if !op.Wait || (options.Wait!=nil&&!*options.Wait){return result,nil}
  var expectedRevision string;var expectedTarget string;var previous string
- if agent,ok:=any(result.Body).(NativeAgentResult);ok {expectedRevision=string(agent.Data.Publication.AcceptedConfigRevision);if agent.Data.Configuration.Target.BeeosManagedTarget!=nil {expectedTarget=string(agent.Data.Configuration.Target.BeeosManagedTarget.SandboxID)}}
+ if agent,ok:=any(result.Body).(NativeAgentResult);ok {expectedRevision=string(agent.Data.Publication.AcceptedConfigRevision);if ref:=agent.Data.Configuration.Sandbox.BeeosAgentSandboxReference;ref!=nil {expectedTarget=string(ref.ID)}}
  for {
   if operation.ctx.Err()!=nil{return result,localError(operation,operation.ctx.Err(),false)}
   observation:=fmt.Sprint(result.Status)+result.Headers.ETag+string(operation.last.Body)
@@ -299,7 +299,7 @@ func callNative[T any](ctx context.Context,client *Client,op nativeOperation,pat
   case NativeAgentResult:
    publication:=value.Data.Publication
    if string(value.Data.DesiredConfigRevision)!=expectedRevision||string(publication.AcceptedConfigRevision)!=expectedRevision||publication.State=="superseded" {return result,&SDKPublicationSuperseded{&SDKWaitTimeout{Message:"Agent publication was superseded",Acceptance:operation.acceptance,LastResponse:operation.last}}}
-   if publication.State=="deferred"||value.Data.Configuration.Target.BeeosRecipeTarget!=nil||len(publication.ChangedComponents)==0 {done=true}
+   if publication.State=="deferred"||value.Data.Configuration.Sandbox.BeeosAgentSandboxTemplate!=nil||len(publication.ChangedComponents)==0 {done=true}
    if publication.State=="failed"||publication.State=="partial"||publication.State=="unknown" {return result,&SDKOperationFailed{&SDKWaitTimeout{Message:"Agent publication requires inspection",Acceptance:operation.acceptance,LastResponse:operation.last}}}
    // publication.ready is the producer's current target/control/fence/credential-receipt verdict.
    // An unchanged valid credential injection may retain an older activation revision.

@@ -4,10 +4,14 @@
 
 ### Changed
 
-- Native Agent creation (`createNativeAgent`) now requires `target`, and a
-  recipe target requires an explicit `template` (`beeos/base` or
-  `beeos/base-4c8g`). The previous implicit `beeos/base` default is removed.
-  Requires the matching Cloud backend producer.
+- Native Agent placement is now the `sandbox` wrapper (breaking):
+  `createNativeAgent` requires it and it carries exactly one of
+  `sandbox.template_id` (with optional `timeout_seconds`/`on_timeout`, no
+  implicit template default) or `sandbox.id` for an existing fixed Sandbox.
+  `updateNativeAgent` validates and replaces only when `sandbox` is present;
+  omission preserves. Agent readbacks echo the same shape; the Python wait
+  error for a changed placement is `sandbox_superseded`. Requires the matching
+  Cloud backend producer.
 - Native Response streams (TypeScript, Python sync/async and Go) skip an event
   type the SDK does not model yet instead of failing, and keep the durable
   `Last-Event-ID` cursor at that event so a reconnect never replays or loses it.

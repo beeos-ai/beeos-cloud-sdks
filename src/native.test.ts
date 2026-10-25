@@ -9,8 +9,8 @@ afterEach(async () => { for (const server of servers.splice(0))
 const json = (body: unknown, status = 200, headers: Record<string, string> = {}) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...headers } });
 const client = (fetchImpl: typeof fetch) => new NativeBeeOSClient({ baseURL: "https://cloud.example/v1/ignored", apiKey: "bsk_test", fetch: fetchImpl });
 const sandbox = (status: string) => ({ data: { id: "sbx_test", status } });
-const recipeTarget = { kind: "recipe", template: "beeos/base" } as const;
-const agent = (state: string, revision = "rev_2", target = "managed") => ({ data: { id: "agent_test", desired_config_revision: revision, configuration: { target: target === "managed" ? { kind: "managed", sandbox_id: "sbx_test" } : recipeTarget, credential_status: {slots: []} }, publication: { accepted_config_revision: revision, state, changed_components: ["model"], components: [] }, binding: { sandbox_id: "sbx_test", prepared_config_revision: revision, credential_activation_revision: "rev_1", credential_status: { slots: [{slot: "model_primary", configured: true}, {slot: "search_provider", configured: false}] } } } });
+const recipeSandbox = { template_id: "beeos/base", timeout_seconds: 1800, on_timeout: "terminate" } as const;
+const agent = (state: string, revision = "rev_2", target = "managed") => ({ data: { id: "agent_test", desired_config_revision: revision, configuration: { sandbox: target === "managed" ? { id: "sbx_test" } : recipeSandbox, credential_status: {slots: []} }, publication: { accepted_config_revision: revision, state, changed_components: ["model"], components: [] }, binding: { sandbox_id: "sbx_test", prepared_config_revision: revision, credential_activation_revision: "rev_1", credential_status: { slots: [{slot: "model_primary", configured: true}, {slot: "search_provider", configured: false}] } } } });
 describe("native transport and observations", () => {
     it("performs all 58 canonical HTTP operations with versioned/encoded paths and wire options", async () => {
         const spec = JSON.parse(readFileSync(new URL("../spec/native.openapi.json", import.meta.url), "utf8"));
@@ -80,7 +80,7 @@ describe("native transport and observations", () => {
     it("returns deferred recipe immediately and exposes supersession", async () => {
         let calls = 0;
         const c = client(async () => { calls++; return json(agent("deferred", "rev_2", "recipe"), 201); });
-        await c.agents.create({ engine: "openclaw", target: recipeTarget });
+        await c.agents.create({ engine: "openclaw", sandbox: recipeSandbox });
         expect(calls).toBe(1);
         let otherCalls = 0;
         const other = client(async () => json(agent(++otherCalls === 1 ? "preparing" : "ready", otherCalls === 1 ? "rev_2" : "rev_3")));
@@ -333,7 +333,7 @@ it("round-trips every credential slot and all scopes from a maximum legal combin
         {kind: "session", id: "session_expanded", state: "enforced"},
     ];
     const desiredSlots = slots.map(value => ({slot: value.slot, configured: false}));
-    const configuration = {name: "agent", engine: "openclaw", instructions: "", model_id: null, skills: [], mcp_servers: [], disabled_tools: [], run_timeout_seconds: 600, target: {kind: "managed", sandbox_id: "sandbox"}, credential_status: {slots: desiredSlots}};
+    const configuration = {name: "agent", engine: "openclaw", instructions: "", model_id: null, skills: [], mcp_servers: [], disabled_tools: [], run_timeout_seconds: 600, sandbox: {id: "sandbox"}, credential_status: {slots: desiredSlots}};
     const binding = {
         binding_id: "binding", sandbox_id: "sandbox", state: "ready", prepared_config_revision: "c1", credential_activation_revision: "c1",
         credential_status: {slots}, persona_scope: "session", components: [], error: null,

@@ -304,7 +304,7 @@ type NativeAgentCreate struct {
 	MCPServers        *[]MCPSelection     `json:"mcp_servers,omitempty"`
 	DisabledTools     *[]string           `json:"disabled_tools,omitempty"`
 	RunTimeoutSeconds *int64              `json:"run_timeout_seconds,omitempty"`
-	Target            BeeosTarget         `json:"target"`
+	Sandbox           BeeosAgentSandbox   `json:"sandbox"`
 	ApprovalMode      *ApprovalMode       `json:"approval_mode,omitempty"`
 	Credentials       *CredentialBindings `json:"credentials,omitempty"`
 	EndUserRef        *EndUserRef         `json:"end_user_ref,omitempty"`
@@ -320,7 +320,7 @@ type NativeAgentPatch struct {
 	MCPServers        *[]MCPSelection     `json:"mcp_servers,omitempty"`
 	DisabledTools     *[]string           `json:"disabled_tools,omitempty"`
 	RunTimeoutSeconds *int64              `json:"run_timeout_seconds,omitempty"`
-	Target            *BeeosTarget        `json:"target,omitempty"`
+	Sandbox           *BeeosAgentSandbox  `json:"sandbox,omitempty"`
 	ApprovalMode      *ApprovalMode       `json:"approval_mode,omitempty"`
 	Credentials       *CredentialBindings `json:"credentials,omitempty"`
 }
@@ -334,7 +334,7 @@ type NativeAgentConfiguration struct {
 	MCPServers        []MCPSelection          `json:"mcp_servers"`
 	DisabledTools     []string                `json:"disabled_tools"`
 	RunTimeoutSeconds int64                   `json:"run_timeout_seconds"`
-	Target            BeeosTarget             `json:"target"`
+	Sandbox           BeeosAgentSandbox       `json:"sandbox"`
 	ApprovalMode      ApprovalMode            `json:"approval_mode"`
 	CredentialStatus  CredentialBindingStatus `json:"credential_status"`
 }
@@ -1404,56 +1404,54 @@ type CredentialBindingStatus struct {
 	Slots []CredentialPublicStatus `json:"slots"`
 }
 
-type BeeosTarget struct {
-	BeeosRecipeTarget  *BeeosRecipeTarget  `json:"-"`
-	BeeosManagedTarget *BeeosManagedTarget `json:"-"`
+type BeeosAgentSandbox struct {
+	BeeosAgentSandboxTemplate  *BeeosAgentSandboxTemplate  `json:"-"`
+	BeeosAgentSandboxReference *BeeosAgentSandboxReference `json:"-"`
 }
 
-func (value BeeosTarget) MarshalJSON() ([]byte, error) {
+func (value BeeosAgentSandbox) MarshalJSON() ([]byte, error) {
 	var selected any
 	count := 0
-	if value.BeeosRecipeTarget != nil {
-		selected = value.BeeosRecipeTarget
+	if value.BeeosAgentSandboxTemplate != nil {
+		selected = value.BeeosAgentSandboxTemplate
 		count++
 	}
-	if value.BeeosManagedTarget != nil {
-		selected = value.BeeosManagedTarget
+	if value.BeeosAgentSandboxReference != nil {
+		selected = value.BeeosAgentSandboxReference
 		count++
 	}
 	if count != 1 {
-		return nil, fmt.Errorf("BeeosTarget requires exactly one variant")
+		return nil, fmt.Errorf("BeeosAgentSandbox requires exactly one variant")
 	}
 	return json.Marshal(selected)
 }
-func (value *BeeosTarget) UnmarshalJSON(data []byte) error {
-	*value = BeeosTarget{}
-	if matchesNativeVariant(data, "object", []string{"kind", "template"}, []string{"kind", "template", "timeout_seconds", "on_timeout"}, "{\"kind\":\"recipe\",\"on_timeout\":\"terminate\"}") {
-		var candidate BeeosRecipeTarget
+func (value *BeeosAgentSandbox) UnmarshalJSON(data []byte) error {
+	*value = BeeosAgentSandbox{}
+	if matchesNativeVariant(data, "object", []string{"template_id"}, []string{"template_id", "timeout_seconds", "on_timeout"}, "{\"on_timeout\":\"terminate\"}") {
+		var candidate BeeosAgentSandboxTemplate
 		if err := json.Unmarshal(data, &candidate); err == nil {
-			value.BeeosRecipeTarget = &candidate
+			value.BeeosAgentSandboxTemplate = &candidate
 			return nil
 		}
 	}
-	if matchesNativeVariant(data, "object", []string{"kind", "sandbox_id"}, []string{"kind", "sandbox_id"}, "{\"kind\":\"managed\"}") {
-		var candidate BeeosManagedTarget
+	if matchesNativeVariant(data, "object", []string{"id"}, []string{"id"}, "{}") {
+		var candidate BeeosAgentSandboxReference
 		if err := json.Unmarshal(data, &candidate); err == nil {
-			value.BeeosManagedTarget = &candidate
+			value.BeeosAgentSandboxReference = &candidate
 			return nil
 		}
 	}
-	return fmt.Errorf("invalid BeeosTarget variant")
+	return fmt.Errorf("invalid BeeosAgentSandbox variant")
 }
 
-type BeeosRecipeTarget struct {
-	Kind           string  `json:"kind"`
-	Template       string  `json:"template"`
+type BeeosAgentSandboxTemplate struct {
+	TemplateID     string  `json:"template_id"`
 	TimeoutSeconds *int64  `json:"timeout_seconds,omitempty"`
 	OnTimeout      *string `json:"on_timeout,omitempty"`
 }
 
-type BeeosManagedTarget struct {
-	Kind      string `json:"kind"`
-	SandboxID ID     `json:"sandbox_id"`
+type BeeosAgentSandboxReference struct {
+	ID ID `json:"id"`
 }
 
 type ID = OwnerOpaqueId2
