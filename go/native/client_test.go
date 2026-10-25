@@ -423,6 +423,32 @@ func TestResponseStreamAdmitsOnceAndResumesCursor(t *testing.T) {
 		t.Fatal("response intent replayed")
 	}
 }
+func TestResponseEventStreamSkipsUnknownTypesWithoutClosing(t *testing.T) {
+	client, _ := testClient(t, func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/event-stream")
+		fmt.Fprint(w, "id: 1\ndata: {\"type\":\"response.output_text.delta\",\"response_id\":\"response\",\"sequence\":1,\"delta\":\"x\"}\n\n"+
+			"id: 2\ndata: {\"type\":\"response.beeos.part\",\"response_id\":\"response\",\"sequence\":2}\n\n"+
+			"id: 3\ndata: {\"type\":\"response.output\",\"response_id\":\"response\",\"sequence\":3,\"item\":{\"type\":\"output_text\",\"text\":\"done\"}}\n\n"+
+			"id: 4\ndata: {\"type\":\"response.completed\",\"response_id\":\"response\",\"sequence\":4,\"response\":{\"id\":\"response\",\"status\":\"completed\"}}\n\n")
+	})
+	stream, err := client.Responses.Events(context.Background(), "response", StreamNativeResponseEventsOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stream.Close()
+	first, err := stream.Receive(context.Background())
+	if err != nil || first.NativeResponseEventVariant2 == nil || stream.LastEventID != "3" {
+		t.Fatalf("first modeled event after internal events: %v %#v cursor=%s", err, first, stream.LastEventID)
+	}
+	terminal, err := stream.Receive(context.Background())
+	if err != nil || terminal.NativeResponseEventVariant4 == nil || stream.LastEventID != "4" {
+		t.Fatalf("terminal event after skipped types: %v %#v cursor=%s", err, terminal, stream.LastEventID)
+	}
+	if _, err = stream.Receive(context.Background()); !errors.Is(err, io.EOF) {
+		t.Fatalf("stream did not end cleanly after skipped types: %v", err)
+	}
+}
+
 func TestEstablishedSSEDoesNotInheritAdmissionTimeoutAndCancelsRead(t *testing.T) {
 	client, server := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")

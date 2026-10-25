@@ -69,8 +69,8 @@ export type InteractionQuestion = { "id": OpaqueId; "prompt": string; "kind": "t
 export type Interaction = { "id": OpaqueId; "response_id": OpaqueId; "attempt_ref": OpaqueId; "revision": ResourceVersion; "kind": "approval" | "question" | "resume"; "state": "pending" | "resolved" | "expired" | "cancelled"; "expires_at": string; "tool_call_id": OpaqueId | null; "tool_name": string | null; "arguments_digest": string | null; "summary": string; "options": (InteractionOption)[]; "questions": (InteractionQuestion)[]; "pause_sequence": number | null; };
 export type InteractionReply = { "attempt_ref": OpaqueId; "interaction_revision": ResourceVersion; "kind": "approval"; "option_id": OpaqueId; } | { "attempt_ref": OpaqueId; "interaction_revision": ResourceVersion; "kind": "question"; "answers": ({ "question_id": OpaqueId; "value": string | (string)[]; })[]; } | { "attempt_ref": OpaqueId; "interaction_revision": ResourceVersion; "kind": "resume"; "pause_sequence": number; };
 export type InteractionReplyResult = { "response_id": OpaqueId; "interaction_id": OpaqueId; "decision_id": OpaqueId; "accepted": true; "duplicate": boolean; };
-export type NativeResponse = { "id": OpaqueId; "session_id": OpaqueId; "sandbox_id": OpaqueId | null; "agent_id": NativeAgentId; "status": "queued" | "in_progress" | "waiting_input" | "cancelling" | "completed" | "failed" | "incomplete" | "cancelled" | "timed_out" | "unknown"; "phase": "accepted" | "preparing_compute" | "loading_session" | "admitting" | "executing" | "waiting_input" | "publishing_artifacts" | "persisting_result" | "finished"; "terminal": boolean; "effective_configuration": EffectiveConfiguration | null; "output": (ResponseOutputItem)[]; "pending_interactions": (Interaction)[]; "error": NativeErrorEnvelope | null; "usage": { "input_tokens"?: number; "output_tokens"?: number; "source": "provider" | "native" | "estimated"; "actual_model_id"?: OpaqueId | null; } | null; "stop_observation": "not_requested" | "requested" | "proven_stopped" | "fenced" | "unknown"; "checkpoint": { "state": "not_requested" | "pending" | "committed" | "failed" | "unknown"; "source_revision": revision | null; }; "resource_version": ResourceVersion; "created_at": string; "completed_at": string | null; "previous_response_id": OpaqueId | null; };
-export type NativeResponseEvent = { "type": "response.phase"; "response_id": OpaqueId; "sequence": number; "phase": "accepted" | "preparing_compute" | "loading_session" | "admitting" | "executing" | "waiting_input" | "publishing_artifacts" | "persisting_result" | "finished"; } | { "type": "response.output"; "response_id": OpaqueId; "sequence": number; "item": ResponseOutputItem; } | { "type": "response.interaction"; "response_id": OpaqueId; "sequence": number; "interaction": Interaction; } | { "type": "response.completed" | "response.failed" | "response.incomplete" | "response.cancelled" | "response.unknown"; "response_id": OpaqueId; "sequence": number; "response": NativeResponse; };
+export type NativeResponse = { "id": OpaqueId; "session_id": OpaqueId; "sandbox_id": OpaqueId | null; "agent_id": NativeAgentId; "status": "queued" | "in_progress" | "waiting_input" | "cancelling" | "completed" | "failed" | "incomplete" | "cancelled"; "phase": "accepted" | "preparing_compute" | "loading_session" | "executing" | "waiting_input" | "finished"; "terminal": boolean; "effective_configuration": EffectiveConfiguration | null; "output": (ResponseOutputItem)[]; "pending_interactions": (Interaction)[]; "error": NativeErrorEnvelope | null; "usage": { "input_tokens"?: number; "output_tokens"?: number; "source": "provider" | "native" | "estimated"; "actual_model_id"?: OpaqueId | null; } | null; "stop_observation": "not_requested" | "requested" | "proven_stopped" | "fenced" | "unknown"; "checkpoint": { "state": "not_requested" | "pending" | "committed" | "failed" | "unknown"; "source_revision": revision | null; }; "resource_version": ResourceVersion; "created_at": string; "completed_at": string | null; "previous_response_id": OpaqueId | null; };
+export type NativeResponseEvent = { "type": "response.phase"; "response_id": OpaqueId; "sequence": number; "phase": "accepted" | "preparing_compute" | "loading_session" | "executing" | "waiting_input" | "finished"; } | { "type": "response.output"; "response_id": OpaqueId; "sequence": number; "item": ResponseOutputItem; } | { "type": "response.interaction"; "response_id": OpaqueId; "sequence": number; "interaction": Interaction; } | { "type": "response.completed" | "response.failed" | "response.incomplete" | "response.cancelled" | "response.unknown"; "response_id": OpaqueId; "sequence": number; "response": NativeResponse; };
 export type CommandCreate = { "argv": (string)[]; "cwd"?: string; "env"?: { [key: string]: string; }; "timeout_seconds"?: number; "result_path"?: string; "artifact_paths"?: (string)[]; };
 export type CommandArtifact = { "id": OpaqueId; "filename": string; "media_type": string; "size_bytes": number; "sha256": string; "published_at": string; "expires_at": string; };
 export type Command = { "id": OpaqueId; "sandbox_id": OpaqueId; "state": "queued" | "running" | "stopping" | "collecting" | "completed" | "unknown"; "process_outcome": "pending" | "exited" | "cancelled" | "timed_out" | "start_failed" | "lost" | "unknown"; "exit_code": number | null; "signal": string | null; "stop_proven": boolean; "capture_status": "not_requested" | "pending" | "complete" | "partial" | "failed" | "unknown"; "result": StructuredCommandResult | null; "artifacts": (CommandArtifact)[]; "logs": { "first_sequence": number; "last_sequence": number; "persisted_bytes": number; "truncated": boolean; "error": NativeErrorEnvelope | null; }; "error": NativeErrorEnvelope | null; "resource_version": ResourceVersion; "created_at": string; "completed_at": string | null; "expires_at": string | null; };
@@ -206,6 +206,9 @@ export interface ListNativeCanvasSnapshotsOptions extends NativeRequestOptions {
 export interface RestoreNativeCanvasSnapshotOptions extends NativeRequestOptions {}
 
 import { parseNativeSSE } from "./native-sse.js";
+
+/** Modeled NativeResponseEvent type set; unknown future types are skipped, never fatal. */
+const NATIVE_RESPONSE_EVENT_TYPES: ReadonlySet<string> = new Set(["response.phase", "response.output", "response.interaction", "response.completed", "response.failed", "response.incomplete", "response.cancelled", "response.unknown"]);
 
 export interface BeeOSHTTPHeaders {
   request_id?: string; etag?: string; location?: string; should_retry?: boolean; retry_after?: string;
@@ -469,14 +472,16 @@ export class NativeBeeOSClient {
     if (!opened.response.headers.get("Content-Type")?.toLowerCase().startsWith("text/event-stream") || !opened.response.body) {
       opened.controller.abort(); throw new Error("Expected a text/event-stream response body");
     }
-    return new NativeEventStream<T>(opened.response, opened.controller, options.signal, options.lastEventId);
+    return new NativeEventStream<T>(opened.response, opened.controller, options.signal, options.lastEventId,
+      op.id === "streamNativeResponseEvents" ? NATIVE_RESPONSE_EVENT_TYPES : undefined);
   }
 }
 export class NativeEventStream<T> implements AsyncIterable<T> {
   readonly status: number; readonly headers: BeeOSHTTPHeaders; lastEventId?: string;
   private started = false;
   private readonly abort: () => void;
-  constructor(private readonly response: Response, private readonly controller: AbortController, private readonly signal?: AbortSignal, lastEventId?: string) {
+  constructor(private readonly response: Response, private readonly controller: AbortController, private readonly signal?: AbortSignal, lastEventId?: string,
+    private readonly eventTypes?: ReadonlySet<string>) {
     this.status = response.status; this.headers = nativeHeaders(response.headers); this.lastEventId = lastEventId;
     this.abort = () => this.controller.abort(this.signal?.reason);
     signal?.addEventListener("abort", this.abort, {once: true});
@@ -490,6 +495,9 @@ export class NativeEventStream<T> implements AsyncIterable<T> {
       for await (const event of parseNativeSSE(this.response.body!, {signal: this.controller.signal, maxEventBytes: 1024 * 1024})) {
         const value = JSON.parse(event.data) as T;
         if (event.id !== undefined) this.lastEventId = event.id;
+        // A newer producer may emit an event type this SDK does not model yet;
+        // skip it and keep the durable stream open at the last seen ID.
+        if (this.eventTypes && (typeof (value as {type?: unknown}).type !== "string" || !this.eventTypes.has((value as {type: string}).type))) continue;
         yield value;
       }
     } finally { this.close(); }

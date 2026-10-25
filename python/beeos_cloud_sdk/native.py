@@ -1,6 +1,9 @@
 # Generated from spec/native.openapi.json by native-python.mjs; do not edit.
 from __future__ import annotations
 
+# Modeled NativeResponseEvent type set; unknown future types are skipped, never fatal.
+_NATIVE_RESPONSE_EVENT_TYPES = frozenset({"response.phase", "response.output", "response.interaction", "response.completed", "response.failed", "response.incomplete", "response.cancelled", "response.unknown"})
+
 import asyncio
 import json
 import time
@@ -650,8 +653,8 @@ NativeResponse = TypedDict("NativeResponse", {
     "session_id": "Required[OpaqueId]",
     "sandbox_id": "Required[OpaqueId | None]",
     "agent_id": "Required[NativeAgentId]",
-    "status": "Required[Literal[\"queued\", \"in_progress\", \"waiting_input\", \"cancelling\", \"completed\", \"failed\", \"incomplete\", \"cancelled\", \"timed_out\", \"unknown\"]]",
-    "phase": "Required[Literal[\"accepted\", \"preparing_compute\", \"loading_session\", \"admitting\", \"executing\", \"waiting_input\", \"publishing_artifacts\", \"persisting_result\", \"finished\"]]",
+    "status": "Required[Literal[\"queued\", \"in_progress\", \"waiting_input\", \"cancelling\", \"completed\", \"failed\", \"incomplete\", \"cancelled\"]]",
+    "phase": "Required[Literal[\"accepted\", \"preparing_compute\", \"loading_session\", \"executing\", \"waiting_input\", \"finished\"]]",
     "terminal": "Required[bool]",
     "effective_configuration": "Required[EffectiveConfiguration | None]",
     "output": "Required[list[ResponseOutputItem]]",
@@ -682,7 +685,7 @@ NativeResponseEventValueVariant1 = TypedDict("NativeResponseEventValueVariant1",
     "type": "Required[Literal[\"response.phase\"]]",
     "response_id": "Required[OpaqueId]",
     "sequence": "Required[int]",
-    "phase": "Required[Literal[\"accepted\", \"preparing_compute\", \"loading_session\", \"admitting\", \"executing\", \"waiting_input\", \"publishing_artifacts\", \"persisting_result\", \"finished\"]]",
+    "phase": "Required[Literal[\"accepted\", \"preparing_compute\", \"loading_session\", \"executing\", \"waiting_input\", \"finished\"]]",
 })
 
 NativeResponseEventValueVariant2 = TypedDict("NativeResponseEventValueVariant2", {
@@ -1743,7 +1746,7 @@ class NativeBeeOSClient(_ClientBase):
         except httpx.RequestError as error:
             raise SDKTransportError(call.context) from error
 
-    def _execute(self, operation: _Operation, path_params: Mapping[str, str], body: object, options: Mapping[str, object] | None) -> BeeOSHTTPResponse[object] | EventStream[object]:
+    def _execute(self, operation: _Operation, path_params: Mapping[str, str], body: object, options: Mapping[str, object] | None, event_types: frozenset[str] | None = None) -> BeeOSHTTPResponse[object] | EventStream[object]:
         call = self._prepare(operation, path_params, body, options)
         if operation.output_media == "text/event-stream":
             try:
@@ -1754,7 +1757,7 @@ class NativeBeeOSClient(_ClientBase):
                         _response(raw, raw.read(), call)
                     finally:
                         raw.close()
-                return EventStream(raw, call.context)
+                return EventStream(raw, call.context, event_types)
             except httpx.TimeoutException as error:
                 raise SDKRequestTimeout(call.context) from error
             except httpx.RequestError as error:
@@ -1816,7 +1819,7 @@ class AsyncNativeBeeOSClient(_ClientBase):
         except httpx.RequestError as error:
             raise SDKTransportError(call.context) from error
 
-    async def _execute(self, operation: _Operation, path_params: Mapping[str, str], body: object, options: Mapping[str, object] | None) -> BeeOSHTTPResponse[object] | AsyncEventStream[object]:
+    async def _execute(self, operation: _Operation, path_params: Mapping[str, str], body: object, options: Mapping[str, object] | None, event_types: frozenset[str] | None = None) -> BeeOSHTTPResponse[object] | AsyncEventStream[object]:
         call = self._prepare(operation, path_params, body, options)
         if operation.output_media == "text/event-stream":
             try:
@@ -1831,7 +1834,7 @@ class AsyncNativeBeeOSClient(_ClientBase):
                     if raw.headers.get("content-type", "").split(";", 1)[0].strip().lower() != "text/event-stream":
                         await raw.aclose()
                         raise ValueError("Expected text/event-stream response")
-                    return AsyncEventStream(raw, call.context)
+                    return AsyncEventStream(raw, call.context, event_types)
             except (httpx.TimeoutException, TimeoutError) as error:
                 raise SDKRequestTimeout(call.context) from error
             except httpx.RequestError as error:
@@ -1885,7 +1888,8 @@ class _SSEParser:
         return False, None
 
 class EventStream(Generic[T], Iterator[T]):
-    def __init__(self, response: httpx.Response, context: OperationContext) -> None:
+    def __init__(self, response: httpx.Response, context: OperationContext,
+                 event_types: frozenset[str] | None = None) -> None:
         if response.headers.get("content-type", "").split(";", 1)[0].strip().lower() != "text/event-stream":
             response.close()
             raise ValueError("Expected text/event-stream response")
@@ -1893,6 +1897,7 @@ class EventStream(Generic[T], Iterator[T]):
         self._context = context
         self._lines = response.iter_lines()
         self._parser = _SSEParser()
+        self._event_types = event_types
         self.status = response.status_code
         self.headers = HTTPHeaders(response.headers)
 
@@ -1912,6 +1917,10 @@ class EventStream(Generic[T], Iterator[T]):
             for line in self._lines:
                 ready, value = self._parser.feed(line)
                 if ready:
+                    # A newer producer may emit an event type this SDK does not
+                    # model yet; skip it and keep the durable stream open.
+                    if self._event_types is not None and (not isinstance(value, dict) or value.get("type") not in self._event_types):
+                        continue
                     return cast(T, value)
             raise StopIteration
         except httpx.TimeoutException as error:
@@ -1934,11 +1943,13 @@ class EventStream(Generic[T], Iterator[T]):
         self.close()
 
 class AsyncEventStream(Generic[T], AsyncIterator[T]):
-    def __init__(self, response: httpx.Response, context: OperationContext) -> None:
+    def __init__(self, response: httpx.Response, context: OperationContext,
+                 event_types: frozenset[str] | None = None) -> None:
         self._response = response
         self._context = context
         self._lines = response.aiter_lines()
         self._parser = _SSEParser()
+        self._event_types = event_types
         self.status = response.status_code
         self.headers = HTTPHeaders(response.headers)
 
@@ -1960,6 +1971,10 @@ class AsyncEventStream(Generic[T], AsyncIterator[T]):
             async for line in self._lines:
                 ready, value = self._parser.feed(line)
                 if ready:
+                    # A newer producer may emit an event type this SDK does not
+                    # model yet; skip it and keep the durable stream open.
+                    if self._event_types is not None and (not isinstance(value, dict) or value.get("type") not in self._event_types):
+                        continue
                     return cast(T, value)
             raise StopAsyncIteration
         except httpx.TimeoutException as error:
@@ -2437,7 +2452,7 @@ class NativeResponsesResource:
         return cast("BeeOSHTTPResponse[NativeResponseResult]", self._client._execute(_OPERATIONS["cancelNativeResponse"], {"response_id": response_id}, None, options))
 
     def events(self, response_id: str, options: StreamNativeResponseEventsOptions | None = None) -> EventStream[NativeResponseEvent]:
-        return cast("EventStream[NativeResponseEvent]", self._client._execute(_OPERATIONS["streamNativeResponseEvents"], {"response_id": response_id}, None, options))
+        return cast("EventStream[NativeResponseEvent]", self._client._execute(_OPERATIONS["streamNativeResponseEvents"], {"response_id": response_id}, None, options, _NATIVE_RESPONSE_EVENT_TYPES))
 
     def list_input_items(self, response_id: str, options: ListNativeResponseInputItemsOptions | None = None) -> BeeOSHTTPResponse[ResponseInputPage]:
         return cast("BeeOSHTTPResponse[ResponseInputPage]", self._client._execute(_OPERATIONS["listNativeResponseInputItems"], {"response_id": response_id}, None, options))
@@ -2703,7 +2718,7 @@ class AsyncNativeResponsesResource:
         return cast("BeeOSHTTPResponse[NativeResponseResult]", await self._client._execute(_OPERATIONS["cancelNativeResponse"], {"response_id": response_id}, None, options))
 
     async def events(self, response_id: str, options: StreamNativeResponseEventsOptions | None = None) -> AsyncEventStream[NativeResponseEvent]:
-        return cast("AsyncEventStream[NativeResponseEvent]", await self._client._execute(_OPERATIONS["streamNativeResponseEvents"], {"response_id": response_id}, None, options))
+        return cast("AsyncEventStream[NativeResponseEvent]", await self._client._execute(_OPERATIONS["streamNativeResponseEvents"], {"response_id": response_id}, None, options, _NATIVE_RESPONSE_EVENT_TYPES))
 
     async def list_input_items(self, response_id: str, options: ListNativeResponseInputItemsOptions | None = None) -> BeeOSHTTPResponse[ResponseInputPage]:
         return cast("BeeOSHTTPResponse[ResponseInputPage]", await self._client._execute(_OPERATIONS["listNativeResponseInputItems"], {"response_id": response_id}, None, options))

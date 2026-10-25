@@ -116,7 +116,8 @@ export function generateNativePython(spec) {
         const streamType = `${async ? 'Async' : ''}EventStream[${op.output}]`;
         const output = op.outputMedia === 'text/event-stream' ? streamType : `BeeOSHTTPResponse[${op.outputMedia === 'application/octet-stream' ? 'bytes' : op.output}]`;
         const pathParams = op.parameters.filter(p => p.in === 'path').map(p => `${JSON.stringify(p.name)}: ${snake(p.name)}`).join(', ');
-        source += `\n    ${async ? 'async ' : ''}def ${op['x-sdk-python-method'] || snake(op['x-sdk-method'] || op.operationId)}(${args.join(', ')}) -> ${output}:\n        return cast(${JSON.stringify(output)}, ${async ? 'await ' : ''}self._client._execute(_OPERATIONS[${JSON.stringify(op.operationId)}], {${pathParams}}, ${op.input ? 'body' : 'None'}, options))\n`;
+        const eventFilter = op.operationId === 'streamNativeResponseEvents' ? ', _NATIVE_RESPONSE_EVENT_TYPES' : '';
+        source += `\n    ${async ? 'async ' : ''}def ${op['x-sdk-python-method'] || snake(op['x-sdk-method'] || op.operationId)}(${args.join(', ')}) -> ${output}:\n        return cast(${JSON.stringify(output)}, ${async ? 'await ' : ''}self._client._execute(_OPERATIONS[${JSON.stringify(op.operationId)}], {${pathParams}}, ${op.input ? 'body' : 'None'}, options${eventFilter}))\n`;
       }
       if (resource === 'responses') {
         source += `\n    ${async ? 'async ' : ''}def create_stream(self, body: NativeResponseCreate, options: CreateNativeResponseOptions | None = None) -> ${async ? 'Async' : ''}ResponseStream:\n        accepted = ${async ? 'await ' : ''}self.create(body, options)\n        response_id = accepted.body["data"]["id"]\n        try:\n            events = ${async ? 'await ' : ''}self.events(response_id, _event_options(options))\n        except SDKTransportError as error:\n            raise type(error)(cast(OperationContext, accepted.operation_context)) from error\n        except BeeOSAPIError as error:\n            error.acceptance = accepted.acceptance\n            error.operation_context = accepted.operation_context\n            raise\n        return ${async ? 'Async' : ''}ResponseStream(response_id, events, accepted)\n`;
@@ -124,6 +125,15 @@ export function generateNativePython(spec) {
       classes.push(source);
     }
   }
+  const eventTypes = (() => {
+    const types = [];
+    for (const variant of spec.components.schemas.NativeResponseEvent.oneOf ?? []) {
+      const type = variant.properties?.type;
+      if (typeof type?.const === 'string') types.push(type.const);
+      for (const value of type?.enum ?? []) types.push(value);
+    }
+    return [...new Set(types)];
+  })();
   const metadata = ops.map(op => `    ${JSON.stringify(op.operationId)}: _Operation(${JSON.stringify(op.operationId)}, ${JSON.stringify(op.method)}, ${JSON.stringify(op.path)}, ${JSON.stringify(op.inputMedia)}, ${JSON.stringify(op.outputMedia)}, ${op['x-sdk-wait-default'] ? 'True' : 'False'}, (${op.params.map(p => `(${JSON.stringify(snake(p.name))}, ${JSON.stringify(p.name)}, ${JSON.stringify(p.in)}, ${p.required ? 'True' : 'False'})`).join(', ')}${op.params.length === 1 ? ',' : ''})),`).join('\n');
   const roots = [...groups.keys()].filter(resource => !resource.includes('.'));
   const aliasDefinitions = [];
@@ -139,13 +149,16 @@ export function generateNativePython(spec) {
       remainingAliases.delete(name);
     }
   }
-  let runtime = RUNTIME.replace('@@MODELS@@', [...definitions.values(), ...aliasDefinitions].filter(Boolean).join('\n\n')).replace('@@METADATA@@', metadata).replace('@@RESOURCES@@', classes.join('\n\n'));
+  let runtime = RUNTIME.replace('/*NATIVE_RESPONSE_EVENT_TYPES*/', eventTypes.map(value => JSON.stringify(value)).join(', ')).replace('@@MODELS@@', [...definitions.values(), ...aliasDefinitions].filter(Boolean).join('\n\n')).replace('@@METADATA@@', metadata).replace('@@RESOURCES@@', classes.join('\n\n'));
   runtime = runtime.replace('@@SYNC_ROOTS@@', roots.map(resource => `        self.${resource} = ${resourceName(resource, false)}(self)`).join('\n')).replace('@@ASYNC_ROOTS@@', roots.map(resource => `        self.${resource} = ${resourceName(resource, true)}(self)`).join('\n'));
   return {'python/beeos_cloud_sdk/native.py': runtime};
 }
 
 const RUNTIME = String.raw`# Generated from spec/native.openapi.json by native-python.mjs; do not edit.
 from __future__ import annotations
+
+# Modeled NativeResponseEvent type set; unknown future types are skipped, never fatal.
+_NATIVE_RESPONSE_EVENT_TYPES = frozenset({/*NATIVE_RESPONSE_EVENT_TYPES*/})
 
 import asyncio
 import json
@@ -533,7 +546,7 @@ class NativeBeeOSClient(_ClientBase):
         except httpx.RequestError as error:
             raise SDKTransportError(call.context) from error
 
-    def _execute(self, operation: _Operation, path_params: Mapping[str, str], body: object, options: Mapping[str, object] | None) -> BeeOSHTTPResponse[object] | EventStream[object]:
+    def _execute(self, operation: _Operation, path_params: Mapping[str, str], body: object, options: Mapping[str, object] | None, event_types: frozenset[str] | None = None) -> BeeOSHTTPResponse[object] | EventStream[object]:
         call = self._prepare(operation, path_params, body, options)
         if operation.output_media == "text/event-stream":
             try:
@@ -544,7 +557,7 @@ class NativeBeeOSClient(_ClientBase):
                         _response(raw, raw.read(), call)
                     finally:
                         raw.close()
-                return EventStream(raw, call.context)
+                return EventStream(raw, call.context, event_types)
             except httpx.TimeoutException as error:
                 raise SDKRequestTimeout(call.context) from error
             except httpx.RequestError as error:
@@ -597,7 +610,7 @@ class AsyncNativeBeeOSClient(_ClientBase):
         except httpx.RequestError as error:
             raise SDKTransportError(call.context) from error
 
-    async def _execute(self, operation: _Operation, path_params: Mapping[str, str], body: object, options: Mapping[str, object] | None) -> BeeOSHTTPResponse[object] | AsyncEventStream[object]:
+    async def _execute(self, operation: _Operation, path_params: Mapping[str, str], body: object, options: Mapping[str, object] | None, event_types: frozenset[str] | None = None) -> BeeOSHTTPResponse[object] | AsyncEventStream[object]:
         call = self._prepare(operation, path_params, body, options)
         if operation.output_media == "text/event-stream":
             try:
@@ -612,7 +625,7 @@ class AsyncNativeBeeOSClient(_ClientBase):
                     if raw.headers.get("content-type", "").split(";", 1)[0].strip().lower() != "text/event-stream":
                         await raw.aclose()
                         raise ValueError("Expected text/event-stream response")
-                    return AsyncEventStream(raw, call.context)
+                    return AsyncEventStream(raw, call.context, event_types)
             except (httpx.TimeoutException, TimeoutError) as error:
                 raise SDKRequestTimeout(call.context) from error
             except httpx.RequestError as error:
@@ -666,7 +679,8 @@ class _SSEParser:
         return False, None
 
 class EventStream(Generic[T], Iterator[T]):
-    def __init__(self, response: httpx.Response, context: OperationContext) -> None:
+    def __init__(self, response: httpx.Response, context: OperationContext,
+                 event_types: frozenset[str] | None = None) -> None:
         if response.headers.get("content-type", "").split(";", 1)[0].strip().lower() != "text/event-stream":
             response.close()
             raise ValueError("Expected text/event-stream response")
@@ -674,6 +688,7 @@ class EventStream(Generic[T], Iterator[T]):
         self._context = context
         self._lines = response.iter_lines()
         self._parser = _SSEParser()
+        self._event_types = event_types
         self.status = response.status_code
         self.headers = HTTPHeaders(response.headers)
 
@@ -693,6 +708,10 @@ class EventStream(Generic[T], Iterator[T]):
             for line in self._lines:
                 ready, value = self._parser.feed(line)
                 if ready:
+                    # A newer producer may emit an event type this SDK does not
+                    # model yet; skip it and keep the durable stream open.
+                    if self._event_types is not None and (not isinstance(value, dict) or value.get("type") not in self._event_types):
+                        continue
                     return cast(T, value)
             raise StopIteration
         except httpx.TimeoutException as error:
@@ -715,11 +734,13 @@ class EventStream(Generic[T], Iterator[T]):
         self.close()
 
 class AsyncEventStream(Generic[T], AsyncIterator[T]):
-    def __init__(self, response: httpx.Response, context: OperationContext) -> None:
+    def __init__(self, response: httpx.Response, context: OperationContext,
+                 event_types: frozenset[str] | None = None) -> None:
         self._response = response
         self._context = context
         self._lines = response.aiter_lines()
         self._parser = _SSEParser()
+        self._event_types = event_types
         self.status = response.status_code
         self.headers = HTTPHeaders(response.headers)
 
@@ -741,6 +762,10 @@ class AsyncEventStream(Generic[T], AsyncIterator[T]):
             async for line in self._lines:
                 ready, value = self._parser.feed(line)
                 if ready:
+                    # A newer producer may emit an event type this SDK does not
+                    # model yet; skip it and keep the durable stream open.
+                    if self._event_types is not None and (not isinstance(value, dict) or value.get("type") not in self._event_types):
+                        continue
                     return cast(T, value)
             raise StopAsyncIteration
         except httpx.TimeoutException as error:
