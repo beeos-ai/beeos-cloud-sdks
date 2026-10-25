@@ -2877,6 +2877,15 @@
               "type": "string",
               "maxLength": 2048
             }
+          },
+          {
+            "name": "end_user_ref",
+            "in": "query",
+            "required": false,
+            "description": "Only Agents created with exactly this end_user_ref.",
+            "schema": {
+              "$ref": "#/components/schemas/EndUserRef"
+            }
           }
         ],
         "responses": {
@@ -3632,6 +3641,15 @@
                 "agent_deleted",
                 "deleting"
               ]
+            }
+          },
+          {
+            "name": "end_user_ref",
+            "in": "query",
+            "required": false,
+            "description": "Only Sessions created with exactly this end_user_ref.",
+            "schema": {
+              "$ref": "#/components/schemas/EndUserRef"
             }
           }
         ],
@@ -7583,6 +7601,7 @@
       },
       "MCPSelection": {
         "type": "object",
+        "description": "One MCP server of an Agent. kind=catalog (default; omitted on read) selects a Cloud catalog row by server_ref. kind=remote selects an endpoint the caller operates, such as the App MCP Hub: server_ref is the caller's opaque, stable reference (for example a Hub binding id) and name/url/transport/headers are delivered to the Harness verbatim. Secrets never enter this object: a remote endpoint's credential is the Agent credential slot credential_slot, bound by reference in credentials[] like an engine slot and sent as credential_header. The reference is resolved through the App credential resolver at every preparation and run; the resolved value must expire no later than the run deadline the resolver receives, so short-lived Hub tokens are refreshed by the next resolution and never by rewriting the Agent configuration. The Harness receives the definition (without the value) in prepared material, in the order of the committed configuration revision's MCP refs.",
         "properties": {
           "server_ref": {
             "$ref": "#/components/schemas/OpaqueId"
@@ -7597,7 +7616,52 @@
           },
           "credential_slot": {
             "type": "string",
-            "maxLength": 128
+            "maxLength": 128,
+            "description": "kind=remote: Agent credential slot (pattern ^[a-z][a-z0-9_]{0,63}$, distinct from the engine slots) whose resolved value is sent as credential_header. Listed in credential_status like an engine slot."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "catalog",
+              "remote"
+            ],
+            "default": "catalog"
+          },
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "kind=remote: Harness MCP server name; unique within the Agent."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048,
+            "description": "kind=remote: https endpoint without userinfo, query or fragment."
+          },
+          "transport": {
+            "type": "string",
+            "enum": [
+              "streamable-http",
+              "sse"
+            ],
+            "default": "streamable-http",
+            "description": "kind=remote only."
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "maxProperties": 16,
+            "description": "kind=remote: non-secret request headers. Authorization, Proxy-Authorization, Cookie, Set-Cookie, X-Api-Key, transport-owned headers and the credential_header are rejected."
+          },
+          "credential_header": {
+            "type": "string",
+            "maxLength": 64,
+            "default": "Authorization",
+            "description": "kind=remote with credential_slot: header that carries the resolved credential value verbatim (for example the whole \"Bearer <token>\")."
           }
         },
         "required": [
@@ -7892,6 +7956,9 @@
           "credentials": {
             "$ref": "#/components/schemas/CredentialBindings",
             "writeOnly": true
+          },
+          "end_user_ref": {
+            "$ref": "#/components/schemas/EndUserRef"
           }
         },
         "required": [
@@ -7899,6 +7966,13 @@
         ],
         "additionalProperties": false,
         "x-sdk-model-name": "NativeAgentCreate"
+      },
+      "EndUserRef": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256,
+        "description": "Opaque end-user reference supplied by the App (P4x). Cloud stores it verbatim at create, returns it and filters lists by exact match; it never interprets it, never authorizes with it and it cannot be changed later. No leading/trailing whitespace or control characters.",
+        "x-sdk-model-name": "EndUserRef"
       },
       "NativeAgentPatch": {
         "type": "object",
@@ -8149,6 +8223,16 @@
             "$ref": "#/components/schemas/OpaqueId",
             "description": "The model a Response without model_id runs under the desired configuration (UHP Harness.defaultModel) - configuration.model_id when set, otherwise the engine's platform default model. It is the entry marked default in GET /v2/agents/{agent_id}/models."
           },
+          "end_user_ref": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EndUserRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -8167,6 +8251,7 @@
           "publication",
           "authorization",
           "default_model_id",
+          "end_user_ref",
           "created_at",
           "updated_at"
         ],
@@ -8577,6 +8662,9 @@
               "maxLength": 1024
             },
             "maxProperties": 32
+          },
+          "end_user_ref": {
+            "$ref": "#/components/schemas/EndUserRef"
           }
         },
         "required": [
@@ -8745,6 +8833,16 @@
                 "type": "null"
               }
             ]
+          },
+          "end_user_ref": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EndUserRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -8761,7 +8859,8 @@
           "updated_at",
           "last_activity_at",
           "continuation_available",
-          "continuation_unavailable_reason"
+          "continuation_unavailable_reason",
+          "end_user_ref"
         ],
         "additionalProperties": false,
         "x-sdk-model-name": "NativeSession",

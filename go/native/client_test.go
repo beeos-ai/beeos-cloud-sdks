@@ -176,6 +176,8 @@ func nativeOptionField(name string) string {
 		return "MediaType"
 	case "agent_id":
 		return "AgentID"
+	case "end_user_ref":
+		return "EndUserRef"
 	}
 	return strings.ToUpper(name[:1]) + name[1:]
 }

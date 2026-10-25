@@ -252,10 +252,16 @@ type SkillSelection struct {
 }
 
 type MCPSelection struct {
-	ServerRef      OpaqueID `json:"server_ref"`
-	Enabled        bool     `json:"enabled"`
-	Required       bool     `json:"required"`
-	CredentialSlot *string  `json:"credential_slot,omitempty"`
+	ServerRef        OpaqueID           `json:"server_ref"`
+	Enabled          bool               `json:"enabled"`
+	Required         bool               `json:"required"`
+	CredentialSlot   *string            `json:"credential_slot,omitempty"`
+	Kind             *string            `json:"kind,omitempty"`
+	Name             *string            `json:"name,omitempty"`
+	URL              *string            `json:"url,omitempty"`
+	Transport        *string            `json:"transport,omitempty"`
+	Headers          *map[string]string `json:"headers,omitempty"`
+	CredentialHeader *string            `json:"credential_header,omitempty"`
 }
 
 type ComponentObservation struct {
@@ -298,7 +304,10 @@ type NativeAgentCreate struct {
 	RunTimeoutSeconds *int64              `json:"run_timeout_seconds,omitempty"`
 	Target            *BeeosTarget        `json:"target,omitempty"`
 	Credentials       *CredentialBindings `json:"credentials,omitempty"`
+	EndUserRef        *EndUserRef         `json:"end_user_ref,omitempty"`
 }
+
+type EndUserRef string
 
 type NativeAgentPatch struct {
 	Name              *string             `json:"name,omitempty"`
@@ -345,6 +354,7 @@ type NativeAgent struct {
 	Publication           Publication              `json:"publication"`
 	Authorization         AuthorizationEnforcement `json:"authorization"`
 	DefaultModelID        OpaqueID                 `json:"default_model_id"`
+	EndUserRef            *EndUserRef              `json:"end_user_ref"`
 	CreatedAt             string                   `json:"created_at"`
 	UpdatedAt             string                   `json:"updated_at"`
 }
@@ -505,9 +515,10 @@ type ResponseInputItem struct {
 type NativeMetadata map[string]string
 
 type NativeSessionCreate struct {
-	AgentID  NativeAgentID      `json:"agent_id"`
-	Name     *string            `json:"name,omitempty"`
-	Metadata *map[string]string `json:"metadata,omitempty"`
+	AgentID    NativeAgentID      `json:"agent_id"`
+	Name       *string            `json:"name,omitempty"`
+	Metadata   *map[string]string `json:"metadata,omitempty"`
+	EndUserRef *EndUserRef        `json:"end_user_ref,omitempty"`
 }
 
 type NativeSessionPatch struct {
@@ -537,6 +548,7 @@ type NativeSession struct {
 	LastActivityAt                string                          `json:"last_activity_at"`
 	ContinuationAvailable         bool                            `json:"continuation_available"`
 	ContinuationUnavailableReason *string                         `json:"continuation_unavailable_reason"`
+	EndUserRef                    *EndUserRef                     `json:"end_user_ref"`
 }
 
 type NativeResponseCreate struct {

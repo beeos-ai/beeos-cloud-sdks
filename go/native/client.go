@@ -696,8 +696,9 @@ type CreateNativeAgentOptions struct {
 }
 type ListNativeAgentsOptions struct {
 	RequestOptions
-	Limit  *int64
-	Cursor *string
+	Limit      *int64
+	Cursor     *string
+	EndUserRef *EndUserRef
 }
 type GetNativeAgentOptions struct {
 	RequestOptions
@@ -730,11 +731,12 @@ type CreateNativeSessionOptions struct {
 }
 type ListNativeSessionsOptions struct {
 	RequestOptions
-	Limit   *int64
-	Cursor  *string
-	AgentID *NativeAgentID
-	Order   *string
-	State   *string
+	Limit      *int64
+	Cursor     *string
+	AgentID    *NativeAgentID
+	Order      *string
+	State      *string
+	EndUserRef *EndUserRef
 }
 type GetNativeSessionOptions struct {
 	RequestOptions
@@ -857,7 +859,7 @@ var nativeOperations = map[string]nativeOperation{
 	"readSandboxFile":                 {ID: "readSandboxFile", Method: "GET", Path: "/v1/sandboxes/{sandbox_id}/files", ContentType: "", ResponseType: "bytes", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "path", In: "query", Required: true}, {Name: "If-Match", In: "header", Required: false}}},
 	"downloadCommandArtifact":         {ID: "downloadCommandArtifact", Method: "GET", Path: "/v1/sandboxes/{sandbox_id}/commands/{command_id}/artifacts/{artifact_id}", ContentType: "", ResponseType: "bytes", Wait: false, Keyed: false, Parameters: []nativeParameter{}},
 	"createNativeAgent":               {ID: "createNativeAgent", Method: "POST", Path: "/v2/agents", ContentType: "application/json", ResponseType: "json", Wait: true, Keyed: true, Parameters: []nativeParameter{}},
-	"listNativeAgents":                {ID: "listNativeAgents", Method: "GET", Path: "/v2/agents", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}}},
+	"listNativeAgents":                {ID: "listNativeAgents", Method: "GET", Path: "/v2/agents", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}, {Name: "end_user_ref", In: "query", Required: false}}},
 	"getNativeAgent":                  {ID: "getNativeAgent", Method: "GET", Path: "/v2/agents/{agent_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{}},
 	"updateNativeAgent":               {ID: "updateNativeAgent", Method: "PATCH", Path: "/v2/agents/{agent_id}", ContentType: "application/json", ResponseType: "json", Wait: true, Keyed: true, Parameters: []nativeParameter{{Name: "If-Match", In: "header", Required: true}}},
 	"deleteNativeAgent":               {ID: "deleteNativeAgent", Method: "DELETE", Path: "/v2/agents/{agent_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
@@ -866,7 +868,7 @@ var nativeOperations = map[string]nativeOperation{
 	"revokeNativeAgentAuthorizations": {ID: "revokeNativeAgentAuthorizations", Method: "POST", Path: "/v2/agents/{agent_id}/authorizations/revoke", ContentType: "application/json", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
 	"listNativeModels":                {ID: "listNativeModels", Method: "GET", Path: "/v2/models", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}}},
 	"createNativeSession":             {ID: "createNativeSession", Method: "POST", Path: "/v2/sessions", ContentType: "application/json", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
-	"listNativeSessions":              {ID: "listNativeSessions", Method: "GET", Path: "/v2/sessions", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}, {Name: "agent_id", In: "query", Required: false}, {Name: "order", In: "query", Required: false}, {Name: "state", In: "query", Required: false}}},
+	"listNativeSessions":              {ID: "listNativeSessions", Method: "GET", Path: "/v2/sessions", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}, {Name: "agent_id", In: "query", Required: false}, {Name: "order", In: "query", Required: false}, {Name: "state", In: "query", Required: false}, {Name: "end_user_ref", In: "query", Required: false}}},
 	"getNativeSession":                {ID: "getNativeSession", Method: "GET", Path: "/v2/sessions/{session_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{}},
 	"updateNativeSession":             {ID: "updateNativeSession", Method: "PATCH", Path: "/v2/sessions/{session_id}", ContentType: "application/json", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{{Name: "If-Match", In: "header", Required: true}}},
 	"deleteNativeSession":             {ID: "deleteNativeSession", Method: "DELETE", Path: "/v2/sessions/{session_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
@@ -1054,7 +1056,7 @@ func (service *AgentsService) Create(ctx context.Context, body NativeAgentCreate
 }
 
 func (service *AgentsService) List(ctx context.Context, options ListNativeAgentsOptions) (BeeOSHTTPResponse[NativeAgentPage], error) {
-	return callNative[NativeAgentPage](ctx, service.client, nativeOperations["listNativeAgents"], map[string]string{}, nil, map[string]any{"limit": options.Limit, "cursor": options.Cursor}, options.RequestOptions)
+	return callNative[NativeAgentPage](ctx, service.client, nativeOperations["listNativeAgents"], map[string]string{}, nil, map[string]any{"limit": options.Limit, "cursor": options.Cursor, "end_user_ref": options.EndUserRef}, options.RequestOptions)
 }
 
 func (service *AgentsService) Get(ctx context.Context, agentId string, options GetNativeAgentOptions) (BeeOSHTTPResponse[NativeAgentResult], error) {
@@ -1111,7 +1113,7 @@ func (service *SessionsService) Create(ctx context.Context, body NativeSessionCr
 }
 
 func (service *SessionsService) List(ctx context.Context, options ListNativeSessionsOptions) (BeeOSHTTPResponse[NativeSessionPage], error) {
-	return callNative[NativeSessionPage](ctx, service.client, nativeOperations["listNativeSessions"], map[string]string{}, nil, map[string]any{"limit": options.Limit, "cursor": options.Cursor, "agent_id": options.AgentID, "order": options.Order, "state": options.State}, options.RequestOptions)
+	return callNative[NativeSessionPage](ctx, service.client, nativeOperations["listNativeSessions"], map[string]string{}, nil, map[string]any{"limit": options.Limit, "cursor": options.Cursor, "agent_id": options.AgentID, "order": options.Order, "state": options.State, "end_user_ref": options.EndUserRef}, options.RequestOptions)
 }
 
 func (service *SessionsService) Get(ctx context.Context, sessionId string, options GetNativeSessionOptions) (BeeOSHTTPResponse[NativeSessionResult], error) {
