@@ -1,0 +1,142 @@
+{
+  "source": "beeos-cloud-backend openapi/beeos-cloud/webhooks/cloud-webhooks-v1.schema.json $defs/<type>/examples[0]",
+  "examples": {
+    "sandbox.created": {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "sandbox:sbx_7d2e:1:sandbox.created",
+        "type": "sandbox.created",
+        "occurredAt": "2026-10-25T08:30:15.123456Z",
+        "scope": {
+          "sandboxId": "sbx_7d2e"
+        },
+        "data": {
+          "id": "sbx_7d2e",
+          "status": "provisioning",
+          "pausedMode": null,
+          "lastError": null,
+          "agentId": null,
+          "managementSource": "explicit",
+          "labels": {},
+          "resourceVersion": "1"
+        }
+      }
+    },
+    "sandbox.updated": {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "sandbox:sbx_7d2e:3:sandbox.updated",
+        "type": "sandbox.updated",
+        "occurredAt": "2026-10-25T08:30:15.123456Z",
+        "scope": {
+          "sandboxId": "sbx_7d2e"
+        },
+        "data": {
+          "id": "sbx_7d2e",
+          "status": "error",
+          "pausedMode": null,
+          "lastError": {
+            "code": "capacity_exhausted",
+            "reason": "capacity_exhausted"
+          },
+          "agentId": null,
+          "managementSource": "explicit",
+          "labels": {
+            "team": "ops"
+          },
+          "resourceVersion": "3"
+        }
+      }
+    },
+    "sandbox.terminated": {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "sandbox:sbx_7d2e:9:sandbox.terminated",
+        "type": "sandbox.terminated",
+        "occurredAt": "2026-10-25T08:30:15.123456Z",
+        "scope": {
+          "sandboxId": "sbx_7d2e"
+        },
+        "data": {
+          "id": "sbx_7d2e",
+          "status": "terminated",
+          "pausedMode": null,
+          "lastError": null,
+          "agentId": null,
+          "managementSource": "explicit",
+          "labels": {
+            "team": "ops"
+          },
+          "resourceVersion": "9"
+        }
+      }
+    },
+    "agent.created": {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "3c5a1d2e-8f7b-4c6d-9e0a-1b2c3d4e5f60",
+        "type": "agent.created",
+        "occurredAt": "2026-10-25T08:30:15.123456Z",
+        "scope": {
+          "agentId": "6f0a0c55-3c1e-4a63-9a43-3f4b8f3f1d0e"
+        },
+        "data": {
+          "id": "6f0a0c55-3c1e-4a63-9a43-3f4b8f3f1d0e",
+          "resourceVersion": "1",
+          "desiredConfigRevision": "0d3c7f8e-2b4a-4b1e-9d0f-5a6b7c8d9e0f",
+          "publication": {
+            "acceptedConfigRevision": "0d3c7f8e-2b4a-4b1e-9d0f-5a6b7c8d9e0f",
+            "state": "accepted"
+          }
+        }
+      }
+    },
+    "agent.updated": {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "3c5a1d2e-8f7b-4c6d-9e0a-1b2c3d4e5f60",
+        "type": "agent.updated",
+        "occurredAt": "2026-10-25T08:30:15.123456Z",
+        "scope": {
+          "agentId": "6f0a0c55-3c1e-4a63-9a43-3f4b8f3f1d0e"
+        },
+        "data": {
+          "id": "6f0a0c55-3c1e-4a63-9a43-3f4b8f3f1d0e",
+          "resourceVersion": "2",
+          "desiredConfigRevision": "0d3c7f8e-2b4a-4b1e-9d0f-5a6b7c8d9e0f",
+          "publication": {
+            "acceptedConfigRevision": "0d3c7f8e-2b4a-4b1e-9d0f-5a6b7c8d9e0f",
+            "state": "ready"
+          }
+        }
+      }
+    },
+    "agent.deleted": {
+      "organization_id": "org_2f6c1a",
+      "app_id": "app_9b3d7e",
+      "event": {
+        "schemaVersion": 1,
+        "eventId": "3c5a1d2e-8f7b-4c6d-9e0a-1b2c3d4e5f60",
+        "type": "agent.deleted",
+        "occurredAt": "2026-10-25T08:30:15.123456Z",
+        "scope": {
+          "agentId": "6f0a0c55-3c1e-4a63-9a43-3f4b8f3f1d0e"
+        },
+        "data": {
+          "id": "6f0a0c55-3c1e-4a63-9a43-3f4b8f3f1d0e",
+          "resourceVersion": "3"
+        }
+      }
+    }
+  }
+}
