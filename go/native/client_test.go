@@ -156,7 +156,7 @@ func TestAllNativeOperationsReachCanonicalRoute(t *testing.T) {
 			count++
 		}
 	}
-	if count != 57 {
+	if count != 58 {
 		t.Fatalf("count %d", count)
 	}
 }

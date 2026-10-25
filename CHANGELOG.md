@@ -25,6 +25,11 @@
   are now opaque keyset cursors; the previous numeric offset form is not accepted
   there. Requires the matching Cloud backend deployment.
 
+- Native: `sessions.update` (`PATCH /v2/sessions/{session_id}`, If-Match +
+  Idempotency-Key) renames a Session. `NativeAgent.default_model_id` and
+  `ModelAvailability.default` (UHP `Harness.defaultModel` / `Model.default`)
+  state the default model. Requires the matching backend producer.
+
 ## 4.0.0 (2026-10-25) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v4`
 
 MAJOR: the entries under BREAKING below were already on `main` unreleased; the
