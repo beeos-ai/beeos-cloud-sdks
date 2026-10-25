@@ -550,6 +550,7 @@ NativeSession = TypedDict("NativeSession", {
 NativeResponseCreate = TypedDict("NativeResponseCreate", {
     "session_id": "Required[OpaqueId]",
     "input": "Required[list[ResponseInput]]",
+    "instructions": "NotRequired[str]",
     "model_id": "NotRequired[OpaqueId]",
     "previous_response_id": "NotRequired[OpaqueId]",
     "timeout_seconds": "NotRequired[int]",
@@ -679,6 +680,7 @@ NativeResponse = TypedDict("NativeResponse", {
     "resource_version": "Required[ResourceVersion]",
     "created_at": "Required[str]",
     "completed_at": "Required[str | None]",
+    "instructions": "Required[str | None]",
     "previous_response_id": "Required[OpaqueId | None]",
 })
 

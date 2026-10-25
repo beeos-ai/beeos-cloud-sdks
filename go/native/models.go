@@ -542,6 +542,7 @@ type NativeSession struct {
 type NativeResponseCreate struct {
 	SessionID          OpaqueID        `json:"session_id"`
 	Input              []ResponseInput `json:"input"`
+	Instructions       *string         `json:"instructions,omitempty"`
 	ModelID            *OpaqueID       `json:"model_id,omitempty"`
 	PreviousResponseID *OpaqueID       `json:"previous_response_id,omitempty"`
 	TimeoutSeconds     *int64          `json:"timeout_seconds,omitempty"`
@@ -825,6 +826,7 @@ type NativeResponse struct {
 	ResourceVersion    ResourceVersion `json:"resource_version"`
 	CreatedAt          string          `json:"created_at"`
 	CompletedAt        *string         `json:"completed_at"`
+	Instructions       *string         `json:"instructions"`
 	PreviousResponseID *OpaqueID       `json:"previous_response_id"`
 }
 
