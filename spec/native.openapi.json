@@ -4246,7 +4246,7 @@
       "get": {
         "operationId": "streamNativeResponseEvents",
         "summary": "streamNativeResponseEvents",
-        "description": "Same Response durable events only; disconnect/reconnect never reruns prompt. Only NativeResponseEvent variants are emitted (response.phase, response.output, response.interaction, and one terminal event); internal token deltas and part updates never cross this surface (U-1024-25 Q1). A cancelled Response always terminates with response.cancelled, never response.failed. Unknown future event types must be skipped by clients.",
+        "description": "Same Response events; disconnect/reconnect never reruns prompt. Only NativeResponseEvent variants are emitted (response.phase, response.output, response.interaction, response.output_text.delta, and one terminal event). response.output_text.delta frames are transient incremental text (U-1024-50) that is never persisted and owns no durable sequence; the terminal Response snapshot is authoritative. A cancelled Response always terminates with response.cancelled, never response.failed. Unknown future event types must be skipped by clients.",
         "tags": [
           "responses"
         ],
@@ -4263,9 +4263,10 @@
             "name": "Last-Event-ID",
             "in": "header",
             "required": false,
+            "description": "Resume cursor, the `id` of the last frame received (U-1024-50). `N` names the last durable event (its `sequence`); `N.T` additionally names the last output delta by its transient delta-channel position T. Output deltas never occupy a durable sequence. A resumed stream replays durable events after N, then the retained deltas after T; deltas are retained only briefly and a Response that is already terminal returns its durable snapshot only, whose terminal `response.output` text is authoritative.",
             "schema": {
               "type": "string",
-              "pattern": "^[0-9]+$"
+              "pattern": "^[0-9]+(\\.[0-9]+-[0-9]+)?$"
             }
           }
         ],
@@ -9816,6 +9817,47 @@
               "response_id",
               "sequence",
               "response"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "description": "Transient output text delta (U-1024-50), same name and semantics as UHP `response.output_text.delta`. It has no durable `sequence`; deltas of one `item_id` arrive in order and none follows the event that closes the Response. Concatenating the deltas of an item previews its text; the terminal Response `output` is authoritative.",
+            "properties": {
+              "type": {
+                "const": "response.output_text.delta"
+              },
+              "response_id": {
+                "$ref": "#/components/schemas/OpaqueId"
+              },
+              "item_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "output_index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1023
+              },
+              "content_index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1023
+              },
+              "delta": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 16384
+              }
+            },
+            "required": [
+              "type",
+              "response_id",
+              "item_id",
+              "output_index",
+              "content_index",
+              "delta"
             ],
             "additionalProperties": false
           }

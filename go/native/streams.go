@@ -13,7 +13,7 @@ import (
 
 // nativeEventTypes is the modeled NativeResponseEvent type set. A newer producer
 // may emit another type; consumers skip it and the stream stays open.
-var nativeEventTypes = map[string]bool{"response.phase": true, "response.output": true, "response.interaction": true, "response.completed": true, "response.failed": true, "response.incomplete": true, "response.cancelled": true, "response.unknown": true}
+var nativeEventTypes = map[string]bool{"response.phase": true, "response.output": true, "response.interaction": true, "response.completed": true, "response.failed": true, "response.incomplete": true, "response.cancelled": true, "response.unknown": true, "response.output_text.delta": true}
 
 type EventStream[T any] struct {
 	Status      int

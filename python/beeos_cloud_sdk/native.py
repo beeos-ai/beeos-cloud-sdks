@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 # Modeled NativeResponseEvent type set; unknown future types are skipped, never fatal.
-_NATIVE_RESPONSE_EVENT_TYPES = frozenset({"response.phase", "response.output", "response.interaction", "response.completed", "response.failed", "response.incomplete", "response.cancelled", "response.unknown"})
+_NATIVE_RESPONSE_EVENT_TYPES = frozenset({"response.phase", "response.output", "response.interaction", "response.completed", "response.failed", "response.incomplete", "response.cancelled", "response.unknown", "response.output_text.delta"})
 
 import asyncio
 import json
@@ -722,6 +722,15 @@ NativeResponseEventValueVariant4 = TypedDict("NativeResponseEventValueVariant4",
     "response": "Required[NativeResponse]",
 })
 
+NativeResponseEventValueVariant5 = TypedDict("NativeResponseEventValueVariant5", {
+    "type": "Required[Literal[\"response.output_text.delta\"]]",
+    "response_id": "Required[OpaqueId]",
+    "item_id": "Required[str]",
+    "output_index": "Required[int]",
+    "content_index": "Required[int]",
+    "delta": "Required[str]",
+})
+
 CommandCreate = TypedDict("CommandCreate", {
     "argv": "Required[list[str]]",
     "cwd": "NotRequired[str]",
@@ -1351,7 +1360,7 @@ ResponseOutputItem: TypeAlias = ResponseOutputItemValueVariant1 | ResponseOutput
 
 InteractionReply: TypeAlias = InteractionReplyValueVariant1 | InteractionReplyValueVariant2 | InteractionReplyValueVariant3
 
-NativeResponseEvent: TypeAlias = NativeResponseEventValueVariant1 | NativeResponseEventValueVariant2 | NativeResponseEventValueVariant3 | NativeResponseEventValueVariant4
+NativeResponseEvent: TypeAlias = NativeResponseEventValueVariant1 | NativeResponseEventValueVariant2 | NativeResponseEventValueVariant3 | NativeResponseEventValueVariant4 | NativeResponseEventValueVariant5
 
 CommandEvent: TypeAlias = CommandEventValueVariant1 | CommandEventValueVariant2
 

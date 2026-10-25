@@ -556,3 +556,4 @@ async function* readEvents(response: Response): AsyncGenerator<JSONValue> {
 
 export * as native from "./native.js";
 export { NativeBeeOSClient, NativeBeeOSAPIError, SDKWaitTimeout, SDKRequestTimeout, SDKCancelled, SDKPublicationSuperseded, SDKOperationFailed } from "./native.js";
+export { NativeResponseText } from "./native-text.js";

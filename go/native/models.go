@@ -856,11 +856,21 @@ type NativeResponseEventVariant4 struct {
 	Response   NativeResponse `json:"response"`
 }
 
+type NativeResponseEventVariant5 struct {
+	Type         string   `json:"type"`
+	ResponseID   OpaqueID `json:"response_id"`
+	ItemID       string   `json:"item_id"`
+	OutputIndex  int64    `json:"output_index"`
+	ContentIndex int64    `json:"content_index"`
+	Delta        string   `json:"delta"`
+}
+
 type NativeResponseEvent struct {
 	NativeResponseEventVariant1 *NativeResponseEventVariant1 `json:"-"`
 	NativeResponseEventVariant2 *NativeResponseEventVariant2 `json:"-"`
 	NativeResponseEventVariant3 *NativeResponseEventVariant3 `json:"-"`
 	NativeResponseEventVariant4 *NativeResponseEventVariant4 `json:"-"`
+	NativeResponseEventVariant5 *NativeResponseEventVariant5 `json:"-"`
 }
 
 func (value NativeResponseEvent) MarshalJSON() ([]byte, error) {
@@ -880,6 +890,10 @@ func (value NativeResponseEvent) MarshalJSON() ([]byte, error) {
 	}
 	if value.NativeResponseEventVariant4 != nil {
 		selected = value.NativeResponseEventVariant4
+		count++
+	}
+	if value.NativeResponseEventVariant5 != nil {
+		selected = value.NativeResponseEventVariant5
 		count++
 	}
 	if count != 1 {
@@ -914,6 +928,13 @@ func (value *NativeResponseEvent) UnmarshalJSON(data []byte) error {
 		var candidate NativeResponseEventVariant4
 		if err := json.Unmarshal(data, &candidate); err == nil {
 			value.NativeResponseEventVariant4 = &candidate
+			return nil
+		}
+	}
+	if matchesNativeVariant(data, "object", []string{"type", "response_id", "item_id", "output_index", "content_index", "delta"}, []string{"type", "response_id", "item_id", "output_index", "content_index", "delta"}, "{\"type\":\"response.output_text.delta\"}") {
+		var candidate NativeResponseEventVariant5
+		if err := json.Unmarshal(data, &candidate); err == nil {
+			value.NativeResponseEventVariant5 = &candidate
 			return nil
 		}
 	}

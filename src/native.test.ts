@@ -152,7 +152,7 @@ describe("native transport and observations", () => {
     });
     it("skips unknown response event types without closing the durable stream", async () => {
         const frames = [
-            'id: 1\ndata: {"type":"response.output_text.delta","response_id":"response_1","sequence":1,"delta":"x"}\n\n',
+            'id: 1\ndata: {"type":"response.output_text.preview","response_id":"response_1","sequence":1,"delta":"x"}\n\n',
             'id: 2\ndata: {"type":"response.beeos.part","response_id":"response_1","sequence":2}\n\n',
             'id: 3\ndata: {"type":"response.output","response_id":"response_1","sequence":3,"item":{"type":"output_text","text":"done"}}\n\n',
             'id: 4\ndata: {"type":"response.completed","response_id":"response_1","sequence":4,"response":{}}\n\n'];
