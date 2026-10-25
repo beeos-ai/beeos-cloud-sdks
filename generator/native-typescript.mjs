@@ -25,8 +25,18 @@ function tsType(schema) {
   if (schema.allOf) return schema.allOf.filter(branch => branch.$ref || branch.properties || branch.type).map(tsType).join(' & ') || 'unknown';
   return 'unknown';
 }
+function nativeEventTypes(spec) {
+  const types = [];
+  for (const variant of spec.components.schemas.NativeResponseEvent.oneOf ?? []) {
+    const type = variant.properties?.type;
+    if (typeof type?.const === 'string') types.push(type.const);
+    for (const value of type?.enum ?? []) types.push(value);
+  }
+  return [...new Set(types)];
+}
 export function generateNativeTypeScript(spec) {
   const ops = operations(spec);
+  const eventTypes = nativeEventTypes(spec);
   const table = Object.fromEntries(ops.map(op => {
     const success = resolve(spec, Object.entries(op.responses).find(([code]) => code.startsWith('2'))[1]);
     const [media = '', response = {}] = Object.entries(success.content ?? {})[0] ?? [];
@@ -38,7 +48,8 @@ export function generateNativeTypeScript(spec) {
   const classes = [];
   const roots = [...new Set(resourceNames.map(name => name.split('.')[0]))];
   let source = runtime.replace('/*RESOURCES*/', roots.map(name => 'readonly ' + name + ': Native' + pascal(name) + 'Module;').join('\n  '))
-    .replace('/*INITIALIZE*/', roots.map(name => 'this.' + name + ' = new Native' + pascal(name) + 'Module(this);').join('\n    '));
+    .replace('/*INITIALIZE*/', roots.map(name => 'this.' + name + ' = new Native' + pascal(name) + 'Module(this);').join('\n    '))
+    .replace('/*NATIVE_RESPONSE_EVENT_TYPES*/', eventTypes.map(value => JSON.stringify(value)).join(', '));
   for (const name of [...resourceNames, 'sandboxes.pty', 'sandboxes.desktop']) {
     const className = 'Native' + pascal(name) + 'Module';
     const children = [...new Set([...resourceNames, 'sandboxes.pty','sandboxes.desktop'].filter(child => child.startsWith(name + '.') && child.split('.').length === name.split('.').length + 1).map(child => child.slice(name.length + 1)))];
@@ -66,6 +77,9 @@ export function generateNativeTypeScript(spec) {
 }
 
 const runtime = String.raw`import { parseNativeSSE } from "./native-sse.js";
+
+/** Modeled NativeResponseEvent type set; unknown future types are skipped, never fatal. */
+const NATIVE_RESPONSE_EVENT_TYPES: ReadonlySet<string> = new Set([/*NATIVE_RESPONSE_EVENT_TYPES*/]);
 
 export interface BeeOSHTTPHeaders {
   request_id?: string; etag?: string; location?: string; should_retry?: boolean; retry_after?: string;
@@ -311,14 +325,16 @@ export class NativeBeeOSClient {
     if (!opened.response.headers.get("Content-Type")?.toLowerCase().startsWith("text/event-stream") || !opened.response.body) {
       opened.controller.abort(); throw new Error("Expected a text/event-stream response body");
     }
-    return new NativeEventStream<T>(opened.response, opened.controller, options.signal, options.lastEventId);
+    return new NativeEventStream<T>(opened.response, opened.controller, options.signal, options.lastEventId,
+      op.id === "streamNativeResponseEvents" ? NATIVE_RESPONSE_EVENT_TYPES : undefined);
   }
 }
 export class NativeEventStream<T> implements AsyncIterable<T> {
   readonly status: number; readonly headers: BeeOSHTTPHeaders; lastEventId?: string;
   private started = false;
   private readonly abort: () => void;
-  constructor(private readonly response: Response, private readonly controller: AbortController, private readonly signal?: AbortSignal, lastEventId?: string) {
+  constructor(private readonly response: Response, private readonly controller: AbortController, private readonly signal?: AbortSignal, lastEventId?: string,
+    private readonly eventTypes?: ReadonlySet<string>) {
     this.status = response.status; this.headers = nativeHeaders(response.headers); this.lastEventId = lastEventId;
     this.abort = () => this.controller.abort(this.signal?.reason);
     signal?.addEventListener("abort", this.abort, {once: true});
@@ -332,6 +348,9 @@ export class NativeEventStream<T> implements AsyncIterable<T> {
       for await (const event of parseNativeSSE(this.response.body!, {signal: this.controller.signal, maxEventBytes: 1024 * 1024})) {
         const value = JSON.parse(event.data) as T;
         if (event.id !== undefined) this.lastEventId = event.id;
+        // A newer producer may emit an event type this SDK does not model yet;
+        // skip it and keep the durable stream open at the last seen ID.
+        if (this.eventTypes && (typeof (value as {type?: unknown}).type !== "string" || !this.eventTypes.has((value as {type: string}).type))) continue;
         yield value;
       }
     } finally { this.close(); }

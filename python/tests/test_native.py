@@ -444,7 +444,7 @@ class NativeSyncTests(unittest.TestCase):
 
     def test_sync_sse_replays_same_response_cursor_and_discards_incomplete_event(self) -> None:
         def sse(handler: Any) -> None:
-            handler.wfile.write(b': heartbeat\r\nid: ev_2\r\nevent: response.updated\r\ndata: {"type":\r\ndata: "response.updated"}\r\n\r\nid: unfinished\ndata: {"unfinished": true}\n')
+            handler.wfile.write(b': heartbeat\r\nid: ev_2\r\nevent: response.phase\r\ndata: {"type":\r\ndata: "response.phase"}\r\n\r\nid: unfinished\ndata: {"unfinished": true}\n')
             handler.wfile.flush()
         def route(req: dict[str, Any]) -> tuple[Any, ...]:
             if req["method"] == "POST":
@@ -455,7 +455,7 @@ class NativeSyncTests(unittest.TestCase):
             created = client.responses.create_stream({"session_id": "s_1", "input": []}, {"idempotency_key": "turn_1"})
             self.assertEqual(created.response_id, "resp_1")
             with created.events as events:
-                self.assertEqual(next(events), {"type": "response.updated"})
+                self.assertEqual(next(events), {"type": "response.phase"})
                 self.assertEqual(events.last_event_id, "ev_2")
                 self.assertEqual(list(events), [])
                 self.assertEqual(events.last_event_id, "ev_2")
@@ -464,6 +464,23 @@ class NativeSyncTests(unittest.TestCase):
                 next(stream)
             self.assertEqual(api.requests[-1]["headers"]["Last-Event-ID"], "ev_2")
             self.assertEqual(len([r for r in api.requests if r["method"] == "POST"]), 1)
+
+    def test_sync_response_events_skip_unknown_types_without_closing(self) -> None:
+        def sse(handler: Any) -> None:
+            handler.wfile.write(b'id: 1\ndata: {"type":"response.output_text.delta","delta":"x"}\n\n'
+                                b'id: 2\ndata: {"type":"response.beeos.part","kind":"assistant"}\n\n'
+                                b'id: 3\ndata: {"type":"response.output","item":{"type":"output_text","text":"done"}}\n\n'
+                                b'id: 4\ndata: {"type":"response.completed"}\n\n')
+            handler.wfile.flush()
+        def route(req: dict[str, Any]) -> tuple[Any, ...]:
+            self.assertEqual(req["path"], "/v2/responses/resp_1/events")
+            return 200, {"Content-Type": "text/event-stream"}, sse
+        with LocalAPI(route) as api, NativeBeeOSClient(api.url, "key") as client:
+            with client.responses.events("resp_1") as events:
+                self.assertEqual([event["type"] for event in events], ["response.output", "response.completed"])
+                self.assertEqual(events.last_event_id, "4")
+            self.assertTrue(events.closed)
+            self.assertEqual(len(api.requests), 1)
 
     def test_create_stream_failure_keeps_original_acceptance(self) -> None:
         def route(req: dict[str, Any]) -> tuple[Any, ...]:
@@ -669,7 +686,7 @@ class NativeAsyncTests(unittest.IsolatedAsyncioTestCase):
     async def test_async_sse_cancellation_closes_stream_and_no_remote_mutation(self) -> None:
         disconnected = threading.Event()
         def stream(handler: Any) -> None:
-            handler.wfile.write(b'id: 1\ndata: {"type":"response.updated"}\n\n')
+            handler.wfile.write(b'id: 1\ndata: {"type":"response.phase"}\n\n')
             handler.wfile.flush()
             handler.connection.settimeout(2)
             try:
@@ -680,7 +697,7 @@ class NativeAsyncTests(unittest.IsolatedAsyncioTestCase):
         with LocalAPI(lambda _req: (200, {"Content-Type": "text/event-stream"}, stream)) as api:
             async with AsyncNativeBeeOSClient(api.url, "key") as client:
                 events = await client.responses.events("resp_1")
-                self.assertEqual(await anext(events), {"type": "response.updated"})
+                self.assertEqual(await anext(events), {"type": "response.phase"})
                 pending = asyncio.create_task(anext(events))
                 await asyncio.sleep(0.03)
                 pending.cancel()
@@ -708,6 +725,18 @@ class NativeAsyncTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(result.response.acceptance.status, 202)
                 self.assertTrue(events.closed)
                 self.assertEqual(len(api.requests), 2)
+
+
+    async def test_async_response_events_skip_unknown_types_without_closing(self) -> None:
+        def route(_req: dict[str, Any]) -> tuple[Any, ...]:
+            return 200, {"Content-Type": "text/event-stream"}, b'id: 1\ndata: {"type":"response.output_text.delta"}\n\nid: 2\ndata: {"type":"response.phase"}\n\n'
+        with LocalAPI(route) as api:
+            async with AsyncNativeBeeOSClient(api.url, "key") as client:
+                events = await client.responses.events("resp_1")
+                self.assertEqual([event async for event in events], [{"type": "response.phase"}])
+                self.assertEqual(events.last_event_id, "2")
+                self.assertTrue(events.closed)
+                self.assertEqual(len(api.requests), 1)
 
 
 @contextmanager

@@ -11,6 +11,10 @@ import (
 	"sync"
 )
 
+// nativeEventTypes is the modeled NativeResponseEvent type set. A newer producer
+// may emit another type; consumers skip it and the stream stays open.
+var nativeEventTypes = map[string]bool{"response.phase": true, "response.output": true, "response.interaction": true, "response.completed": true, "response.failed": true, "response.incomplete": true, "response.cancelled": true, "response.unknown": true}
+
 type EventStream[T any] struct {
 	Status      int
 	Headers     HTTPHeaders
@@ -101,11 +105,23 @@ func (stream *EventStream[T]) Receive(ctx context.Context) (T, error) {
 			}
 			raw := strings.Join(data, "\n")
 			var value T
-			if err := json.Unmarshal([]byte(raw), &value); err != nil {
+			var header struct {
+				Type string `json:"type"`
+			}
+			if err := json.Unmarshal([]byte(raw), &header); err != nil {
 				_ = stream.Close()
 				return zero, fmt.Errorf("invalid SSE JSON: %w", err)
 			}
 			stream.LastEventID = pendingID
+			data = nil
+			size = 0
+			if _, ok := any(zero).(NativeResponseEvent); ok && !nativeEventTypes[header.Type] {
+				continue
+			}
+			if err := json.Unmarshal([]byte(raw), &value); err != nil {
+				_ = stream.Close()
+				return zero, fmt.Errorf("invalid SSE JSON: %w", err)
+			}
 			return value, nil
 		}
 		size += len(line) + 1

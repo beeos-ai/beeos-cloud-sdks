@@ -2828,9 +2828,12 @@
         },
         "x-sdk-resource": "agents",
         "x-sdk-method": "create",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2912,9 +2915,12 @@
         },
         "x-sdk-resource": "agents",
         "x-sdk-method": "list",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "list",
         "x-sdk-go-method": "List"
@@ -2976,9 +2982,12 @@
         },
         "x-sdk-resource": "agents",
         "x-sdk-method": "get",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get",
         "x-sdk-go-method": "Get"
@@ -3057,9 +3066,12 @@
         },
         "x-sdk-resource": "agents",
         "x-sdk-method": "update",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3139,9 +3151,12 @@
         },
         "x-sdk-resource": "agents",
         "x-sdk-method": "delete",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "delete",
         "x-sdk-go-method": "Delete"
@@ -3215,9 +3230,12 @@
         },
         "x-sdk-resource": "models",
         "x-sdk-method": "list",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "list",
         "x-sdk-go-method": "List"
@@ -3299,9 +3317,12 @@
         },
         "x-sdk-resource": "agents",
         "x-sdk-method": "listModels",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "list_models",
         "x-sdk-go-method": "ListModels"
@@ -3371,9 +3392,12 @@
         },
         "x-sdk-resource": "agents",
         "x-sdk-method": "getSkillFiles",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get_skill_files",
         "x-sdk-go-method": "GetSkillFiles"
@@ -3445,9 +3469,12 @@
         },
         "x-sdk-resource": "agents",
         "x-sdk-method": "revokeAuthorizations",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-5"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3521,9 +3548,12 @@
         },
         "x-sdk-resource": "sessions",
         "x-sdk-method": "create",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3613,9 +3643,12 @@
         },
         "x-sdk-resource": "sessions",
         "x-sdk-method": "list",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "list",
         "x-sdk-go-method": "List"
@@ -3677,9 +3710,12 @@
         },
         "x-sdk-resource": "sessions",
         "x-sdk-method": "get",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get",
         "x-sdk-go-method": "Get"
@@ -3749,9 +3785,12 @@
         },
         "x-sdk-resource": "sessions",
         "x-sdk-method": "delete",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "delete",
         "x-sdk-go-method": "Delete"
@@ -3815,9 +3854,12 @@
         },
         "x-sdk-resource": "responses",
         "x-sdk-method": "create",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3889,9 +3931,12 @@
         },
         "x-sdk-resource": "responses",
         "x-sdk-method": "get",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get",
         "x-sdk-go-method": "Get"
@@ -3961,9 +4006,12 @@
         },
         "x-sdk-resource": "responses",
         "x-sdk-method": "delete",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "delete",
         "x-sdk-go-method": "Delete"
@@ -4059,9 +4107,12 @@
         },
         "x-sdk-resource": "responses",
         "x-sdk-method": "cancel",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "cancel",
         "x-sdk-go-method": "Cancel"
@@ -4071,7 +4122,7 @@
       "get": {
         "operationId": "streamNativeResponseEvents",
         "summary": "streamNativeResponseEvents",
-        "description": "Same Response durable events only; disconnect/reconnect never reruns prompt. Typed interactions and terminal observations; no false success from end_turn.",
+        "description": "Same Response durable events only; disconnect/reconnect never reruns prompt. Only NativeResponseEvent variants are emitted (response.phase, response.output, response.interaction, and one terminal event); internal token deltas and part updates never cross this surface (U-1024-25 Q1). A cancelled Response always terminates with response.cancelled, never response.failed. Unknown future event types must be skipped by clients.",
         "tags": [
           "responses"
         ],
@@ -4132,9 +4183,12 @@
         },
         "x-sdk-resource": "responses",
         "x-sdk-method": "events",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-event-schema": "NativeResponseEvent",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "events",
@@ -4217,9 +4271,12 @@
         },
         "x-sdk-resource": "responses",
         "x-sdk-method": "listInputItems",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "list_input_items",
         "x-sdk-go-method": "ListInputItems"
@@ -4229,7 +4286,7 @@
       "post": {
         "operationId": "replyNativeInteraction",
         "summary": "replyNativeInteraction",
-        "description": "Typed approval/question/resume to exact pending attempt and interaction revision. Resume echoes pause_sequence; trusted pending mapping supplies original target_message_id. One decision, never a new prompt. Expired410/conflict409; cancelled/deleted cannot resume.",
+        "description": "Typed approval/question/resume to exact pending attempt and interaction revision. Resume echoes pause_sequence; trusted pending mapping supplies original target_message_id. One decision, never a new prompt. A reply after expires_at returns 410 resource_expired without a decision; a stale attempt_ref, revision or kind returns 409 state_conflict; cancelled/deleted cannot resume.",
         "tags": [
           "responses"
         ],
@@ -4319,13 +4376,34 @@
                 }
               }
             }
+          },
+          "410": {
+            "description": "The interaction expired; no decision was recorded (code=resource_expired).",
+            "headers": {
+              "X-Request-ID": {
+                "schema": {
+                  "type": "string",
+                  "maxLength": 128
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         },
         "x-sdk-resource": "responses",
         "x-sdk-method": "replyInteraction",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4436,9 +4514,12 @@
         },
         "x-sdk-resource": "files",
         "x-sdk-method": "create",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-7"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -4511,9 +4592,12 @@
         },
         "x-sdk-resource": "files",
         "x-sdk-method": "get",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-7"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get",
         "x-sdk-go-method": "Get"
@@ -4583,9 +4667,12 @@
         },
         "x-sdk-resource": "files",
         "x-sdk-method": "delete",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-7"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "delete",
         "x-sdk-go-method": "Delete"
@@ -4661,9 +4748,12 @@
         },
         "x-sdk-resource": "files",
         "x-sdk-method": "download",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-7"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "download",
         "x-sdk-go-method": "Download"
@@ -4745,9 +4835,12 @@
         },
         "x-sdk-resource": "sessions",
         "x-sdk-method": "listFiles",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-7"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "list_files",
         "x-sdk-go-method": "ListFiles"
@@ -4800,9 +4893,12 @@
         },
         "x-sdk-resource": "capabilities",
         "x-sdk-method": "get",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-8"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get",
         "x-sdk-go-method": "Get"
@@ -4884,9 +4980,12 @@
         },
         "x-sdk-resource": "sessions",
         "x-sdk-method": "listResponses",
-        "x-status": "proposal_not_implemented",
+        "x-status": "implemented_u_1024_44",
         "x-required-capabilities": [],
-        "x-decision-status": "proposed-detail-under-approved-native-direction",
+        "x-decision-status": "U-1024-44-accepted",
+        "x-acceptance": [
+          "API-6"
+        ],
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "list_responses",
         "x-sdk-go-method": "ListResponses"
@@ -4978,8 +5077,12 @@
         },
         "x-sdk-resource": "agents.memory",
         "x-sdk-method": "remember",
-        "x-status": "proposal_not_implemented",
-        "x-decision-status": "STATE-P1-scope-accepted-route-detail-proposed",
+        "x-status": "implemented_u_1024_44",
+        "x-decision-status": "STATE-P1-accepted",
+        "x-acceptance": [
+          "API-9",
+          "STATE-1"
+        ],
         "x-authority": "State MemoryProvider; Message source refs only; no new generic operation ledger",
         "requestBody": {
           "required": true,
@@ -5050,8 +5153,12 @@
         },
         "x-sdk-resource": "agents.memory",
         "x-sdk-method": "recall",
-        "x-status": "proposal_not_implemented",
-        "x-decision-status": "STATE-P1-scope-accepted-route-detail-proposed",
+        "x-status": "implemented_u_1024_44",
+        "x-decision-status": "STATE-P1-accepted",
+        "x-acceptance": [
+          "API-9",
+          "STATE-1"
+        ],
         "x-authority": "State MemoryProvider; Message source refs only; no new generic operation ledger",
         "requestBody": {
           "required": true,
@@ -5162,8 +5269,12 @@
         },
         "x-sdk-resource": "agents.memory",
         "x-sdk-method": "correct",
-        "x-status": "proposal_not_implemented",
-        "x-decision-status": "STATE-P1-scope-accepted-route-detail-proposed",
+        "x-status": "implemented_u_1024_44",
+        "x-decision-status": "STATE-P1-accepted",
+        "x-acceptance": [
+          "API-9",
+          "STATE-1"
+        ],
         "x-authority": "State MemoryProvider; Message source refs only; no new generic operation ledger",
         "requestBody": {
           "required": true,
@@ -5274,8 +5385,12 @@
         },
         "x-sdk-resource": "agents.memory",
         "x-sdk-method": "forget",
-        "x-status": "proposal_not_implemented",
-        "x-decision-status": "STATE-P1-scope-accepted-route-detail-proposed",
+        "x-status": "implemented_u_1024_44",
+        "x-decision-status": "STATE-P1-accepted",
+        "x-acceptance": [
+          "API-9",
+          "STATE-1"
+        ],
         "x-authority": "State MemoryProvider; Message source refs only; no new generic operation ledger",
         "requestBody": {
           "required": true,
@@ -5354,8 +5469,12 @@
         },
         "x-sdk-resource": "agents.memory",
         "x-sdk-method": "getReceipt",
-        "x-status": "proposal_not_implemented",
-        "x-decision-status": "STATE-P1-scope-accepted-route-detail-proposed",
+        "x-status": "implemented_u_1024_44",
+        "x-decision-status": "STATE-P1-accepted",
+        "x-acceptance": [
+          "API-9",
+          "STATE-1"
+        ],
         "x-authority": "State MemoryProvider; Message source refs only; no new generic operation ledger",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get_receipt",
@@ -5412,6 +5531,9 @@
         "x-status": "implemented_u_1024_7",
         "x-required-capabilities": [],
         "x-decision-status": "U-1024-7-accepted",
+        "x-acceptance": [
+          "API-3"
+        ],
         "x-authority": "Canvas service persisted canvas/link/share/snapshot (Org/App/Agent scope); Gateway derives Agent from State Session or Canvas; no new store; never creates or wakes compute",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get",
@@ -5485,6 +5607,9 @@
         "x-status": "implemented_u_1024_7",
         "x-required-capabilities": [],
         "x-decision-status": "U-1024-7-accepted",
+        "x-acceptance": [
+          "API-3"
+        ],
         "x-authority": "Canvas service persisted canvas/link/share/snapshot (Org/App/Agent scope); Gateway derives Agent from State Session or Canvas; no new store; never creates or wakes compute",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "create_ticket",
@@ -5541,6 +5666,9 @@
         "x-status": "implemented_u_1024_7",
         "x-required-capabilities": [],
         "x-decision-status": "U-1024-7-accepted",
+        "x-acceptance": [
+          "API-3"
+        ],
         "x-authority": "Canvas service persisted canvas/link/share/snapshot (Org/App/Agent scope); Gateway derives Agent from State Session or Canvas; no new store; never creates or wakes compute",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "get_share",
@@ -5608,6 +5736,9 @@
         "x-status": "implemented_u_1024_7",
         "x-required-capabilities": [],
         "x-decision-status": "U-1024-7-accepted",
+        "x-acceptance": [
+          "API-3"
+        ],
         "x-authority": "Canvas service persisted canvas/link/share/snapshot (Org/App/Agent scope); Gateway derives Agent from State Session or Canvas; no new store; never creates or wakes compute",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "share",
@@ -5655,6 +5786,9 @@
         "x-status": "implemented_u_1024_7",
         "x-required-capabilities": [],
         "x-decision-status": "U-1024-7-accepted",
+        "x-acceptance": [
+          "API-3"
+        ],
         "x-authority": "Canvas service persisted canvas/link/share/snapshot (Org/App/Agent scope); Gateway derives Agent from State Session or Canvas; no new store; never creates or wakes compute",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "unshare",
@@ -5711,6 +5845,9 @@
         "x-status": "implemented_u_1024_7",
         "x-required-capabilities": [],
         "x-decision-status": "U-1024-7-accepted",
+        "x-acceptance": [
+          "API-3"
+        ],
         "x-authority": "Canvas service persisted canvas/link/share/snapshot (Org/App/Agent scope); Gateway derives Agent from State Session or Canvas; no new store; never creates or wakes compute",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "list_snapshots",
@@ -5782,6 +5919,9 @@
         "x-status": "implemented_u_1024_7",
         "x-required-capabilities": [],
         "x-decision-status": "U-1024-7-accepted",
+        "x-acceptance": [
+          "API-3"
+        ],
         "x-authority": "Canvas service persisted canvas/link/share/snapshot (Org/App/Agent scope); Gateway derives Agent from State Session or Canvas; no new store; never creates or wakes compute",
         "x-sdk-wait-default": false,
         "x-sdk-python-method": "restore_snapshot",
@@ -8845,6 +8985,7 @@
           },
           "state": {
             "type": "string",
+            "description": "Read-time projection; a pending interaction whose expires_at has passed is reported as expired, and a reply to it returns 410 resource_expired instead of 409.",
             "enum": [
               "pending",
               "resolved",
@@ -8854,7 +8995,8 @@
           },
           "expires_at": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "description": "Absolute expiry of this interaction. Honcho keeps the producer's pending row; readers and replies apply this instant."
           },
           "tool_call_id": {
             "oneOf": [
@@ -9127,6 +9269,7 @@
           },
           "status": {
             "type": "string",
+            "description": "waiting_input is produced while pending_interactions is non-empty; cancelling is the in-flight stop projection and cancelled its terminal fact. A timeout is a failure rather than a distinct status — failed with error.code=deadline_exceeded (there is no timed_out or unknown status).",
             "enum": [
               "queued",
               "in_progress",
@@ -9135,22 +9278,18 @@
               "completed",
               "failed",
               "incomplete",
-              "cancelled",
-              "timed_out",
-              "unknown"
+              "cancelled"
             ]
           },
           "phase": {
             "type": "string",
+            "description": "accepted then preparing_compute; loading_session while central history loads; executing during the turn; waiting_input while a typed interaction is pending; finished only for a terminal Response.",
             "enum": [
               "accepted",
               "preparing_compute",
               "loading_session",
-              "admitting",
               "executing",
               "waiting_input",
-              "publishing_artifacts",
-              "persisting_result",
               "finished"
             ]
           },
@@ -9346,15 +9485,13 @@
               },
               "phase": {
                 "type": "string",
+                "description": "Same phase projection as NativeResponse.phase; only these values are produced.",
                 "enum": [
                   "accepted",
                   "preparing_compute",
                   "loading_session",
-                  "admitting",
                   "executing",
                   "waiting_input",
-                  "publishing_artifacts",
-                  "persisting_result",
                   "finished"
                 ]
               }

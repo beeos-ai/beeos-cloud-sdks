@@ -115,11 +115,22 @@ export function generateNativeGo(spec) {
   }
   const output = {'go/native/models.go':'// Code generated from spec/native.openapi.json. DO NOT EDIT.\npackage native\nimport("encoding/json";"fmt")\n'+definitions.join('\n\n')+'\n',
     'go/native/client.go':'// Code generated from spec/native.openapi.json and maintained native runtime. DO NOT EDIT.\npackage native\n'+client+'\n'+options.join('\n')+'\nvar nativeOperations = map[string]nativeOperation{\n'+table.join(',\n')+',\n}\n'+services.join('\n\n')+'\n',
-    'go/native/streams.go':'// Code generated from generator/native-go.mjs. DO NOT EDIT.\npackage native\n'+streamRuntime,
+    'go/native/streams.go':'// Code generated from generator/native-go.mjs. DO NOT EDIT.\npackage native\n'+streamRuntime.replace('/*NATIVE_EVENT_TYPES*/', nativeEventTypes(spec).map(value=>JSON.stringify(value)+':true').join(',')),
     'go/native/connections.go':'// Code generated from generator/native-go.mjs. DO NOT EDIT.\npackage native\n'+connectionRuntime};
   return Object.fromEntries(Object.entries(output).map(([path, source])=>[path,execFileSync('gofmt',{encoding:'utf8',input:source})]));
 }
 const goStringList=values=>values===null?'nil':'[]string{'+values.map(v=>JSON.stringify(v)).join(',')+'}';
+// Modeled NativeResponseEvent type set from the contract. A newer producer may
+// emit a type this SDK does not know yet; that event is skipped, never fatal.
+function nativeEventTypes(spec) {
+  const types = [];
+  for (const variant of spec.components.schemas.NativeResponseEvent.oneOf ?? []) {
+    const type = variant.properties?.type;
+    if (typeof type?.const === 'string') types.push(type.const);
+    for (const value of type?.enum ?? []) types.push(value);
+  }
+  return [...new Set(types)];
+}
 
 const runtime = String.raw`import (
  "bytes"
@@ -335,6 +346,9 @@ const streamRuntime = String.raw`import (
  "strings"
  "sync"
 )
+// nativeEventTypes is the modeled NativeResponseEvent type set. A newer producer
+// may emit another type; consumers skip it and the stream stays open.
+var nativeEventTypes=map[string]bool{/*NATIVE_EVENT_TYPES*/}
 type EventStream[T any] struct {
  Status int
  Headers HTTPHeaders
@@ -379,8 +393,11 @@ func(stream *EventStream[T]) Receive(ctx context.Context) (T,error) {
   if line=="" {
    if len(data)==0{stream.LastEventID=pendingID;size=0;continue}
    raw:=strings.Join(data,"\n");var value T
+   var header struct{Type string \`json:"type"\`}
+   if err:=json.Unmarshal([]byte(raw),&header);err!=nil{_ = stream.Close();return zero,fmt.Errorf("invalid SSE JSON: %w",err)}
+   stream.LastEventID=pendingID;data=nil;size=0
+   if _,ok:=any(zero).(NativeResponseEvent);ok&&!nativeEventTypes[header.Type]{continue}
    if err:=json.Unmarshal([]byte(raw),&value);err!=nil{_ = stream.Close();return zero,fmt.Errorf("invalid SSE JSON: %w",err)}
-   stream.LastEventID=pendingID
    return value,nil
   }
   size+=len(line)+1;if size>1024*1024{_ = stream.Close();return zero,fmt.Errorf("SSE event exceeds 1 MiB")}

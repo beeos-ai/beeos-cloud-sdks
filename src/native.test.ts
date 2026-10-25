@@ -25,7 +25,10 @@ describe("native transport and observations", () => {
                 const response = Object.entries(op.responses).find(([code]) => code.startsWith("2"))!;
                 const status = Number(response[0]);
                 const media = Object.keys((response[1] as any).content ?? {})[0];
-                const c = client(async (input, init) => { observed = true; expect(new URL(String(input)).pathname).toBe(path.replace(/\{[^}]+\}/g, "id%2Fone")); expect(init?.method).toBe(method.toUpperCase()); expect(new Headers(init?.headers).get("Authorization")).toBe("Bearer bsk_test"); return media === "text/event-stream" ? new Response('id: 3\ndata: {"type":"status"}\n\n', { headers: { "Content-Type": media } }) : status === 204 ? new Response(null, { status }) : media === "application/octet-stream" ? new Response(new Uint8Array([0, 255])) : json({ data: { id: "id_one" } }, status); });
+                const streamFrame = op.operationId === "streamNativeResponseEvents"
+                    ? 'id: 3\ndata: {"type":"response.phase","response_id":"id_one","sequence":3,"phase":"executing"}\n\n'
+                    : 'id: 3\ndata: {"type":"status"}\n\n';
+                const c = client(async (input, init) => { observed = true; expect(new URL(String(input)).pathname).toBe(path.replace(/\{[^}]+\}/g, "id%2Fone")); expect(init?.method).toBe(method.toUpperCase()); expect(new Headers(init?.headers).get("Authorization")).toBe("Bearer bsk_test"); return media === "text/event-stream" ? new Response(streamFrame, { headers: { "Content-Type": media } }) : status === 204 ? new Response(null, { status }) : media === "application/octet-stream" ? new Response(new Uint8Array([0, 255])) : json({ data: { id: "id_one" } }, status); });
                 const module = op["x-sdk-resource"].split(".").reduce((parent: any, key: string) => parent[key], c);
                 const params = (op.parameters ?? []).map((p: any) => p.$ref ? p.$ref.split("/").slice(1).reduce((v: any, k: string) => v[k], spec) : p);
                 const options = { wait: false, idempotencyKey: "restore-key", ifMatch: '"7"', path: "/workspace/a", contentLength: 2, contentSha256: "a".repeat(64), filename: "a.bin", mediaType: "application/octet-stream" };
@@ -36,7 +39,7 @@ describe("native transport and observations", () => {
                 const result = await module[op["x-sdk-method"]](...args);
                 if (media === "text/event-stream") {
                     for await (const event of result)
-                        expect(event.type).toBe("status");
+                        expect(event.type).toBe(op.operationId === "streamNativeResponseEvents" ? "response.phase" : "status");
                     expect(result.lastEventId).toBe("3");
                 }
                 else
@@ -146,6 +149,19 @@ describe("native transport and observations", () => {
         expect(stream.events.lastEventId).toBe("9");
         expect(calls.map(c => c.method)).toEqual(["POST", "GET"]);
         expect(calls[1].cursor).toBe("8");
+    });
+    it("skips unknown response event types without closing the durable stream", async () => {
+        const frames = [
+            'id: 1\ndata: {"type":"response.output_text.delta","response_id":"response_1","sequence":1,"delta":"x"}\n\n',
+            'id: 2\ndata: {"type":"response.beeos.part","response_id":"response_1","sequence":2}\n\n',
+            'id: 3\ndata: {"type":"response.output","response_id":"response_1","sequence":3,"item":{"type":"output_text","text":"done"}}\n\n',
+            'id: 4\ndata: {"type":"response.completed","response_id":"response_1","sequence":4,"response":{}}\n\n'];
+        const c = client(async () => new Response(frames.join(""), { headers: { "Content-Type": "text/event-stream" } }));
+        const stream = await c.responses.events("response_1");
+        const seen: string[] = [];
+        for await (const event of stream) seen.push(event.type);
+        expect(seen).toEqual(["response.output", "response.completed"]);
+        expect(stream.lastEventId).toBe("4");
     });
     it("writes and reads binary bytes through an actual local HTTP server", async () => {
         const bytes = new Uint8Array([0, 255, 4]);

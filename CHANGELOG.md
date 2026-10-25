@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Changed
+
+- Native Response streams (TypeScript, Python sync/async and Go) skip an event
+  type the SDK does not model yet instead of failing, and keep the durable
+  `Last-Event-ID` cursor at that event so a reconnect never replays or loses it.
+- Native Response `status`/`phase` enums now match the projection: `waiting_input`
+  appears while a typed interaction is pending, a timeout is `failed` with
+  `error.code=deadline_exceeded` (there is no `timed_out`/`unknown` status), and
+  the never-emitted phases were removed.
+
 ## 4.0.0 (2026-10-25) — `@beeos-ai/cloud-sdk`, Python `beeos-cloud-sdk`, Go `go/v4`
 
 MAJOR: the entries under BREAKING below were already on `main` unreleased; the
