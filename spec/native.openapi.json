@@ -3571,7 +3571,7 @@
       "get": {
         "operationId": "listNativeSessions",
         "summary": "listNativeSessions",
-        "description": "Independent Session ACL; agent tombstone may be used as filter, live Agent not required.",
+        "description": "Independent Session ACL; agent tombstone may be used as filter, live Agent not required. Ordered by last_activity_at with an opaque cursor; state filters the public projection.",
         "tags": [
           "sessions"
         ],
@@ -3602,6 +3602,34 @@
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/NativeAgentId"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "description": "asc (oldest activity first) or desc (most recently active first).",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": false,
+            "description": "Filter by the projected Session state; omitted returns every active Session.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "agent_deleted",
+                "deleting"
+              ]
             }
           }
         ],
@@ -4908,7 +4936,7 @@
       "get": {
         "operationId": "listNativeSessionResponses",
         "summary": "List persistent Session response history",
-        "description": "Independent Session/Response ACL; stable chronological pagination. Survives Agent deletion; tombstoned content is omitted without removing internal continuity fences.",
+        "description": "Independent Session/Response ACL; stable chronological keyset pagination. Each item projects its committed input items and metadata, so one history page needs no per-Response input read. order=desc with the returned opaque cursor walks newest first. Survives Agent deletion; tombstoned content is omitted without removing internal continuity fences.",
         "tags": [
           "sessions"
         ],
@@ -4939,6 +4967,20 @@
             "schema": {
               "type": "string",
               "maxLength": 2048
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "description": "asc (oldest first) or desc (newest first). A cursor only continues the order that produced it.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
             }
           }
         ],
@@ -8377,6 +8419,16 @@
         "additionalProperties": false,
         "x-sdk-model-name": "ResponseInputItem"
       },
+      "NativeMetadata": {
+        "type": "object",
+        "description": "Opaque caller display/execution labels; same 32 x 1024 rule as Session metadata. Never interpreted by Cloud.",
+        "additionalProperties": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "maxProperties": 32,
+        "x-sdk-model-name": "NativeMetadata"
+      },
       "NativeSessionCreate": {
         "type": "object",
         "properties": {
@@ -8516,6 +8568,16 @@
             "type": "string",
             "format": "date-time"
           },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last change to Session identity, ACL or metadata."
+          },
+          "last_activity_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last committed turn admission or Session change. Native Session lists order by this value."
+          },
           "continuation_available": {
             "type": "boolean",
             "description": "False after Agent deletion or source-invalid native continuity; does not deny independently authorized history."
@@ -8548,6 +8610,8 @@
           "head_response_id",
           "resource_version",
           "created_at",
+          "updated_at",
+          "last_activity_at",
           "continuation_available",
           "continuation_unavailable_reason"
         ],
@@ -8602,6 +8666,10 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 3600
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/NativeMetadata",
+            "description": "Committed with the Response; echoed by Response and its input-items page. Not interpreted by Cloud."
           }
         },
         "required": [
@@ -9313,6 +9381,18 @@
             },
             "maxItems": 256
           },
+          "input": {
+            "type": "array",
+            "description": "Committed input items in admission order with their canonical State source identity. Lets one history read assemble a turn without a second call; never re-projects later input.",
+            "items": {
+              "$ref": "#/components/schemas/ResponseInputItem"
+            },
+            "maxItems": 128
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/NativeMetadata",
+            "description": "Metadata committed with this Response at admission (empty when none was supplied)."
+          },
           "pending_interactions": {
             "type": "array",
             "items": {
@@ -9454,6 +9534,8 @@
           "terminal",
           "effective_configuration",
           "output",
+          "input",
+          "metadata",
           "pending_interactions",
           "error",
           "usage",
@@ -10338,6 +10420,10 @@
             },
             "maxItems": 200
           },
+          "metadata": {
+            "$ref": "#/components/schemas/NativeMetadata",
+            "description": "Metadata committed with the owning Response, echoed for callers that read only input items."
+          },
           "next_cursor": {
             "oneOf": [
               {
@@ -10355,6 +10441,7 @@
         },
         "required": [
           "data",
+          "metadata",
           "next_cursor",
           "has_more"
         ],

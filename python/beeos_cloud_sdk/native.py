@@ -533,6 +533,8 @@ NativeSession = TypedDict("NativeSession", {
     "head_response_id": "Required[OpaqueId | None]",
     "resource_version": "Required[ResourceVersion]",
     "created_at": "Required[str]",
+    "updated_at": "Required[str]",
+    "last_activity_at": "Required[str]",
     "continuation_available": "Required[bool]",
     "continuation_unavailable_reason": "Required[Literal[\"agent_deleted\", \"session_deleting\", \"history_source_deleted\", \"native_continuity_unproven\"] | None]",
 })
@@ -543,6 +545,7 @@ NativeResponseCreate = TypedDict("NativeResponseCreate", {
     "model_id": "NotRequired[OpaqueId]",
     "previous_response_id": "NotRequired[OpaqueId]",
     "timeout_seconds": "NotRequired[int]",
+    "metadata": "NotRequired[NativeMetadata]",
 })
 
 EffectiveConfiguration = TypedDict("EffectiveConfiguration", {
@@ -658,6 +661,8 @@ NativeResponse = TypedDict("NativeResponse", {
     "terminal": "Required[bool]",
     "effective_configuration": "Required[EffectiveConfiguration | None]",
     "output": "Required[list[ResponseOutputItem]]",
+    "input": "Required[list[ResponseInputItem]]",
+    "metadata": "Required[NativeMetadata]",
     "pending_interactions": "Required[list[Interaction]]",
     "error": "Required[Error | None]",
     "usage": "Required[NativeResponseUsageVariant1 | None]",
@@ -858,6 +863,7 @@ FileMetadataPage = TypedDict("FileMetadataPage", {
 
 ResponseInputPage = TypedDict("ResponseInputPage", {
     "data": "Required[list[ResponseInputItem]]",
+    "metadata": "Required[NativeMetadata]",
     "next_cursor": "Required[str | None]",
     "has_more": "Required[bool]",
 })
@@ -1228,6 +1234,8 @@ class ListNativeSessionsOptions(NativeRequestOptions, total=False):
     limit: NotRequired[int]
     cursor: NotRequired[str]
     agent_id: NotRequired[NativeAgentId]
+    order: NotRequired[Literal["asc", "desc"]]
+    state: NotRequired[Literal["active", "agent_deleted", "deleting"]]
 
 class GetNativeSessionOptions(NativeRequestOptions, total=False):
     pass
@@ -1282,6 +1290,7 @@ class GetNativeCapabilitiesOptions(NativeRequestOptions, total=False):
 class ListNativeSessionResponsesOptions(NativeRequestOptions, total=False):
     limit: NotRequired[int]
     cursor: NotRequired[str]
+    order: NotRequired[Literal["asc", "desc"]]
 
 class RememberNativeMemoryOptions(NativeRequestOptions, total=False):
     pass
@@ -1324,6 +1333,8 @@ CanvasId: TypeAlias = str
 AuthorizationRevoke: TypeAlias = AuthorizationRevokeValueVariant1 | AuthorizationRevokeValueVariant2
 
 ResponseInput: TypeAlias = TextInput | FileInput
+
+NativeMetadata: TypeAlias = dict[str, str]
 
 ResponseOutputItem: TypeAlias = ResponseOutputItemValueVariant1 | ResponseOutputItemValueVariant2 | ResponseOutputItemValueVariant3
 
@@ -1474,7 +1485,7 @@ _OPERATIONS: dict[str, _Operation] = {
     "getNativeAgentSkillFiles": _Operation("getNativeAgentSkillFiles", "GET", "/v2/agents/{agent_id}/skills/{skill_id}/files", "", "application/json", False, ()),
     "revokeNativeAgentAuthorizations": _Operation("revokeNativeAgentAuthorizations", "POST", "/v2/agents/{agent_id}/authorizations/revoke", "application/json", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
     "createNativeSession": _Operation("createNativeSession", "POST", "/v2/sessions", "application/json", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
-    "listNativeSessions": _Operation("listNativeSessions", "GET", "/v2/sessions", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False), ("agent_id", "agent_id", "query", False))),
+    "listNativeSessions": _Operation("listNativeSessions", "GET", "/v2/sessions", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False), ("agent_id", "agent_id", "query", False), ("order", "order", "query", False), ("state", "state", "query", False))),
     "getNativeSession": _Operation("getNativeSession", "GET", "/v2/sessions/{session_id}", "", "application/json", False, ()),
     "deleteNativeSession": _Operation("deleteNativeSession", "DELETE", "/v2/sessions/{session_id}", "", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
     "createNativeResponse": _Operation("createNativeResponse", "POST", "/v2/responses", "application/json", "application/json", False, (("idempotency_key", "Idempotency-Key", "header", True),)),
@@ -1490,7 +1501,7 @@ _OPERATIONS: dict[str, _Operation] = {
     "downloadNativeFile": _Operation("downloadNativeFile", "GET", "/v2/files/{file_id}/content", "", "application/octet-stream", False, ()),
     "listNativeSessionFiles": _Operation("listNativeSessionFiles", "GET", "/v2/sessions/{session_id}/files", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False))),
     "getNativeCapabilities": _Operation("getNativeCapabilities", "GET", "/v2/capabilities", "", "application/json", False, ()),
-    "listNativeSessionResponses": _Operation("listNativeSessionResponses", "GET", "/v2/sessions/{session_id}/responses", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False))),
+    "listNativeSessionResponses": _Operation("listNativeSessionResponses", "GET", "/v2/sessions/{session_id}/responses", "", "application/json", False, (("limit", "limit", "query", False), ("cursor", "cursor", "query", False), ("order", "order", "query", False))),
     "rememberNativeMemory": _Operation("rememberNativeMemory", "POST", "/v2/agents/{agent_id}/memory/remember", "application/json", "application/json", True, (("idempotency_key", "Idempotency-Key", "header", True),)),
     "recallNativeMemory": _Operation("recallNativeMemory", "POST", "/v2/agents/{agent_id}/memory/recall", "application/json", "application/json", False, ()),
     "correctNativeMemory": _Operation("correctNativeMemory", "POST", "/v2/agents/{agent_id}/memory/records/{record_id}/correct", "application/json", "application/json", True, (("idempotency_key", "Idempotency-Key", "header", True),)),

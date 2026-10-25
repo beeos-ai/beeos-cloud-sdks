@@ -733,6 +733,8 @@ type ListNativeSessionsOptions struct {
 	Limit   *int64
 	Cursor  *string
 	AgentID *NativeAgentID
+	Order   *string
+	State   *string
 }
 type GetNativeSessionOptions struct {
 	RequestOptions
@@ -749,6 +751,7 @@ type ListNativeSessionResponsesOptions struct {
 	RequestOptions
 	Limit  *int64
 	Cursor *string
+	Order  *string
 }
 type CreateNativeResponseOptions struct {
 	RequestOptions
@@ -859,11 +862,11 @@ var nativeOperations = map[string]nativeOperation{
 	"revokeNativeAgentAuthorizations": {ID: "revokeNativeAgentAuthorizations", Method: "POST", Path: "/v2/agents/{agent_id}/authorizations/revoke", ContentType: "application/json", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
 	"listNativeModels":                {ID: "listNativeModels", Method: "GET", Path: "/v2/models", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}}},
 	"createNativeSession":             {ID: "createNativeSession", Method: "POST", Path: "/v2/sessions", ContentType: "application/json", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
-	"listNativeSessions":              {ID: "listNativeSessions", Method: "GET", Path: "/v2/sessions", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}, {Name: "agent_id", In: "query", Required: false}}},
+	"listNativeSessions":              {ID: "listNativeSessions", Method: "GET", Path: "/v2/sessions", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}, {Name: "agent_id", In: "query", Required: false}, {Name: "order", In: "query", Required: false}, {Name: "state", In: "query", Required: false}}},
 	"getNativeSession":                {ID: "getNativeSession", Method: "GET", Path: "/v2/sessions/{session_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{}},
 	"deleteNativeSession":             {ID: "deleteNativeSession", Method: "DELETE", Path: "/v2/sessions/{session_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
 	"listNativeSessionFiles":          {ID: "listNativeSessionFiles", Method: "GET", Path: "/v2/sessions/{session_id}/files", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}}},
-	"listNativeSessionResponses":      {ID: "listNativeSessionResponses", Method: "GET", Path: "/v2/sessions/{session_id}/responses", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}}},
+	"listNativeSessionResponses":      {ID: "listNativeSessionResponses", Method: "GET", Path: "/v2/sessions/{session_id}/responses", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{{Name: "limit", In: "query", Required: false}, {Name: "cursor", In: "query", Required: false}, {Name: "order", In: "query", Required: false}}},
 	"createNativeResponse":            {ID: "createNativeResponse", Method: "POST", Path: "/v2/responses", ContentType: "application/json", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
 	"getNativeResponse":               {ID: "getNativeResponse", Method: "GET", Path: "/v2/responses/{response_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: false, Parameters: []nativeParameter{}},
 	"deleteNativeResponse":            {ID: "deleteNativeResponse", Method: "DELETE", Path: "/v2/responses/{response_id}", ContentType: "", ResponseType: "json", Wait: false, Keyed: true, Parameters: []nativeParameter{}},
@@ -1103,7 +1106,7 @@ func (service *SessionsService) Create(ctx context.Context, body NativeSessionCr
 }
 
 func (service *SessionsService) List(ctx context.Context, options ListNativeSessionsOptions) (BeeOSHTTPResponse[NativeSessionPage], error) {
-	return callNative[NativeSessionPage](ctx, service.client, nativeOperations["listNativeSessions"], map[string]string{}, nil, map[string]any{"limit": options.Limit, "cursor": options.Cursor, "agent_id": options.AgentID}, options.RequestOptions)
+	return callNative[NativeSessionPage](ctx, service.client, nativeOperations["listNativeSessions"], map[string]string{}, nil, map[string]any{"limit": options.Limit, "cursor": options.Cursor, "agent_id": options.AgentID, "order": options.Order, "state": options.State}, options.RequestOptions)
 }
 
 func (service *SessionsService) Get(ctx context.Context, sessionId string, options GetNativeSessionOptions) (BeeOSHTTPResponse[NativeSessionResult], error) {
@@ -1119,7 +1122,7 @@ func (service *SessionsService) ListFiles(ctx context.Context, sessionId string,
 }
 
 func (service *SessionsService) ListResponses(ctx context.Context, sessionId string, options ListNativeSessionResponsesOptions) (BeeOSHTTPResponse[NativeResponsePage], error) {
-	return callNative[NativeResponsePage](ctx, service.client, nativeOperations["listNativeSessionResponses"], map[string]string{"session_id": sessionId}, nil, map[string]any{"limit": options.Limit, "cursor": options.Cursor}, options.RequestOptions)
+	return callNative[NativeResponsePage](ctx, service.client, nativeOperations["listNativeSessionResponses"], map[string]string{"session_id": sessionId}, nil, map[string]any{"limit": options.Limit, "cursor": options.Cursor, "order": options.Order}, options.RequestOptions)
 }
 
 type ResponsesService struct {
